@@ -14,6 +14,6 @@ namespace ServicesApp.Core.Models
 		public required String Country { get; set; }
 		public required bool Gender{ get; set; }
 		public DateOnly BirthDate{ get; set; }
-		public ICollection<Service>? services { get; set; }
+		public ICollection<Service> services { get; set; }
 	}
 }

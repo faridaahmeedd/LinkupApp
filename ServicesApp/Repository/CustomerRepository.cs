@@ -37,5 +37,33 @@ namespace ServicesApp.Repository
 		{
 			return _context.Services.Where(p => p.Customer.Id == id).ToList();
 		}
+
+		public bool CreateCustomer(Customer customer)
+		{
+			// Change Tracker (add,update,modify)
+			_context.Add(customer);
+			return Save();
+
+		}
+
+		public bool UpdateCustomer(Customer customer)
+		{
+			_context.Update(customer);
+			return Save();
+		}
+
+		public bool DeleteCustomer(int id)
+		{
+			var cutsomer = _context.Customers.Where(p => p.Id == id).FirstOrDefault();
+			_context.Remove(cutsomer!);
+			return Save();
+		}
+
+		public bool Save()
+		{
+			//sql code is generated here
+			var saved = _context.SaveChanges();
+			return saved > 0 ? true : false;
+		}
 	}
 }

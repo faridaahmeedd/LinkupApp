@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
+using ServicesApp.Models;
 using ServicesApp.Repository;
 
 namespace ServicesApp.Controllers
@@ -67,6 +68,57 @@ namespace ServicesApp.Controllers
 				return BadRequest(ModelState);
 			}
 			return Ok(mapServices);
+		}
+
+		[HttpPut("update")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		public IActionResult UpdateCustomer([FromBody] Customer customerUpdate)
+		{
+			if (customerUpdate == null)
+			{
+				return BadRequest(ModelState);
+			}
+			if (!_customerRepository.CustomerExist(customerUpdate.Id))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			if (!_customerRepository.UpdateCustomer(customerUpdate))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully updated");
+		}
+
+		[HttpDelete("{CustomerId}")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		public IActionResult DeleteCustomer(int CustomerId)
+		{
+			if (!_customerRepository.CustomerExist(CustomerId))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			if (!_customerRepository.DeleteCustomer(CustomerId))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully deleted");
+			// GET SERVICE BY CUSTOMER MAKE SURE THERE IS NO SERVICES BEFORE DELETING CUSTOMER
 		}
 
 	}

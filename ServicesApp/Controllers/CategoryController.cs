@@ -88,5 +88,56 @@ namespace ServicesApp.Controllers
 			}
 			return Ok("Successfully created");
 		}
+
+		[HttpPut("update")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		public IActionResult UpdateCategory([FromBody] Category categoryUpdate)
+		{
+			if(categoryUpdate == null)
+			{
+				return BadRequest(ModelState);
+			}
+			if (!_categoryRepository.CategoryExist(categoryUpdate.Id))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			if (!_categoryRepository.UpdateCategory(categoryUpdate))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully updated");
+		}
+
+		[HttpDelete("{CategoryId}")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		public IActionResult DeleteCategory(int CategoryId)
+		{
+			if (!_categoryRepository.CategoryExist(CategoryId))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			if (!_categoryRepository.DeleteCategory(CategoryId))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully deleted");
+			// GET SERVICE BY CATEGORY MAKE SURE THERE IS NO SERVICES BEFORE DELETING CATEGORY
+		}
 	}
 }

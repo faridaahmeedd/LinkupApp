@@ -10,6 +10,8 @@ namespace ServicesApp.Interfaces
 		Service GetService(string name);
 		bool ServiceExist(int id);
 		bool CreateService(Service service);
+		bool UpdateService(Service service);
+		bool DeleteService(int id);
 		bool Save();
 	}
 }

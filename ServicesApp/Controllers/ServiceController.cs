@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using ServicesApp.Core.Models;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Repository;
 
 namespace ServicesApp.Controllers
 {
@@ -77,14 +77,7 @@ namespace ServicesApp.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-			var Service = _serviceRepository.GetServices()
-				.Where(c => c.Name.Trim().ToUpper() == ServiceCreate.Name.ToUpper())
-				.FirstOrDefault();
-			if (Service != null)
-			{
-				ModelState.AddModelError("", "Service already exists");
-				return StatusCode(422, ModelState);
-			}
+
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
@@ -111,6 +104,72 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ModelState);
 			}
 			return Ok("Successfully created");
+		}
+
+		[HttpPut("update")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		public IActionResult UpdateService([FromQuery] int CustomerId, [FromQuery] int CategoryId, [FromBody] ServiceDto serviceUpdate)
+		{
+			if (serviceUpdate == null)
+			{
+				return BadRequest(ModelState);
+			}
+			if (!_serviceRepository.ServiceExist(serviceUpdate.Id))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			var serviceMap = _mapper.Map<Service>(serviceUpdate);
+
+			if (!_categoryRepository.CategoryExist(CategoryId))
+			{
+				ModelState.AddModelError("", "Category doesn't exist");
+				return StatusCode(422, ModelState);
+			}
+			serviceMap.Category = _categoryRepository.GetCategory(CategoryId);
+
+			if (!_customerRepository.CustomerExist(CustomerId))
+			{
+				ModelState.AddModelError("", "Customer doesn't exist");
+				return StatusCode(422, ModelState);
+			}
+			serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
+
+
+			if (!_serviceRepository.UpdateService(serviceMap))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully updated");
+		}
+
+		[HttpDelete("{ServiceId}")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		public IActionResult DeleteService(int ServiceId)
+		{
+			if (!_serviceRepository.ServiceExist(ServiceId))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			if (!_serviceRepository.DeleteService(ServiceId))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully deleted");
 		}
 	}
 }

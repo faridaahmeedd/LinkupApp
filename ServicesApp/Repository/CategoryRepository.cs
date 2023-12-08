@@ -40,11 +40,24 @@ namespace ServicesApp.Repository
 
 		}
 
+		public bool UpdateCategory(Category category)
+		{
+			_context.Update(category);
+			return Save();
+		}
+
+		public bool DeleteCategory(int id)
+		{
+			var category = _context.Categories.Where(p => p.Id == id).FirstOrDefault();
+			_context.Remove(category!);
+			return Save();
+		}
+
 		public bool Save()
 		{
 			//sql code is generated here
 			var saved = _context.SaveChanges();
-			return saved>0 ? true : false;
+			return saved > 0 ? true : false;
 		}
 	}
 }

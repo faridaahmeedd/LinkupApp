@@ -10,5 +10,9 @@ namespace ServicesApp.Interfaces
 		Customer GetCustomer(string Fname);
 		bool CustomerExist(int id);
 		ICollection<Service> GetServicesByCustomer(int id);
+		bool CreateCustomer(Customer customer);
+		bool UpdateCustomer(Customer customer);
+		bool DeleteCustomer(int id);
+		bool Save();
 	}
 }

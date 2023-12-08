@@ -40,6 +40,20 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
+		public bool UpdateService(Service service)
+		{
+			// Change Tracker (add,update,modify)
+			_context.Update(service);
+			return Save();
+		}
+
+		public bool DeleteService(int id)
+		{
+			var service = _context.Services.Where(p => p.Id == id).FirstOrDefault();
+			_context.Remove(service!);
+			return Save();
+		}
+
 		public bool Save()
 		{
 			//sql code is generated here

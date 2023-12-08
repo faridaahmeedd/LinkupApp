@@ -8,7 +8,7 @@ namespace ServicesApp.Helper
 	{
         public MappingProfiles()
         {
-            CreateMap<Service, ServiceDto>();
+            CreateMap<Service, ServiceDto>().PreserveReferences();
 			CreateMap<ServiceDto, Service>();
 		}
     }

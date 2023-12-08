@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
+using ServicesApp.Dto;
 using ServicesApp.Interfaces;
+using ServicesApp.Repository;
 
 namespace ServicesApp.Controllers
 {
@@ -9,10 +12,12 @@ namespace ServicesApp.Controllers
 	public class CustomerController : Controller
 	{
 		private readonly ICustomerRepository _customerRepository;
+		private readonly IMapper _mapper;
 
-		public CustomerController(ICustomerRepository customerRepository)
+		public CustomerController(ICustomerRepository customerRepository, IMapper mapper)
         {
 			_customerRepository = customerRepository;
+			_mapper = mapper;
 		}
 
         [HttpGet]
@@ -43,7 +48,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet("services/{CustomerId}")]
-		[ProducesResponseType(200, Type = typeof(Customer))]
+		[ProducesResponseType(200, Type = typeof(ServiceDto))]
 		public IActionResult GetServicesByCustomer(int CustomerId)
 		{
 			if (!_customerRepository.CustomerExist(CustomerId))
@@ -55,11 +60,13 @@ namespace ServicesApp.Controllers
 			{
 				return NotFound();
 			}
+
+			var mapServices = _mapper.Map<List<ServiceDto>>(services);
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
-			return Ok(services);
+			return Ok(mapServices);
 		}
 
 	}

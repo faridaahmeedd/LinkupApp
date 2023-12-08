@@ -35,7 +35,7 @@ namespace ServicesApp.Repository
 
 		public ICollection<Service> GetServicesByCustomer(int id)
 		{
-			return _context.Customers.Where(p => p.Id == id).Include(c => c.services).FirstOrDefault()?.services?.ToList();
-		} 
+			return _context.Services.Where(p => p.Customer.Id == id).ToList();
+		}
 	}
 }

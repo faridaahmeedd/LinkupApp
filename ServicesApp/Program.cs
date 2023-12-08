@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
-using ServicesApp.Models;
 using ServicesApp.Repository;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // builder.Services.AddTransient<Seed>();
+builder.Services.AddControllers().AddJsonOptions(x =>
+				x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using ServicesApp.Repository;
 
 namespace ServicesApp.Controllers
 {
@@ -12,12 +13,14 @@ namespace ServicesApp.Controllers
 	{
 		private readonly IServiceRepository _serviceRepository;
 		private readonly ICategoryRepository _categoryRepository;
+		private readonly ICustomerRepository _customerRepository;
 		private readonly IMapper _mapper;
 
-		public ServiceController(IServiceRepository ServiceRepository, ICategoryRepository CategoryRepository, IMapper mapper)
+		public ServiceController(IServiceRepository ServiceRepository, ICategoryRepository CategoryRepository, ICustomerRepository customerRepository, IMapper mapper)
 		{
 			_serviceRepository = ServiceRepository;
 			_categoryRepository = CategoryRepository;
+			_customerRepository = customerRepository;
 			_mapper = mapper;
 		}
 
@@ -41,7 +44,7 @@ namespace ServicesApp.Controllers
 			{
 				return NotFound();
 			}
-			var Service = _mapper.Map<List<ServiceDto>>(_serviceRepository.GetService(ServiceId));
+			var Service = _mapper.Map<ServiceDto>(_serviceRepository.GetService(ServiceId));
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
@@ -53,7 +56,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(200, Type = typeof(Service))]
 		public IActionResult GetService(String ServiceName)
 		{
-			var Service = _mapper.Map<List<ServiceDto>>(_serviceRepository.GetService(ServiceName));
+			var Service = _mapper.Map<ServiceDto>(_serviceRepository.GetService(ServiceName));
 			if (Service == null)
 			{
 				return NotFound();
@@ -68,7 +71,7 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
-		public IActionResult CreateService([FromQuery] int CategoryId, [FromBody] ServiceDto ServiceCreate)
+		public IActionResult CreateService([FromQuery] int CustomerId, [FromQuery] int CategoryId, [FromBody] ServiceDto ServiceCreate)
 		{
 			if (ServiceCreate == null)
 			{
@@ -87,7 +90,21 @@ namespace ServicesApp.Controllers
 				return BadRequest(ModelState);
 			}
 			var serviceMap = _mapper.Map<Service>(ServiceCreate);
+
+			if (!_categoryRepository.CategoryExist(CategoryId))
+			{
+				ModelState.AddModelError("", "Category doesn't exist");
+				return StatusCode(422, ModelState);
+			}
 			serviceMap.Category = _categoryRepository.GetCategory(CategoryId);
+
+			if (!_customerRepository.CustomerExist(CustomerId))
+			{
+				ModelState.AddModelError("", "Customer doesn't exist");
+				return StatusCode(422, ModelState);
+			}
+			serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
+
 			if (!_serviceRepository.CreateService(serviceMap))
 			{
 				ModelState.AddModelError("", "Something went wrong.");

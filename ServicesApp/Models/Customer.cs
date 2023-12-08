@@ -4,7 +4,7 @@ namespace ServicesApp.Core.Models
 {
 	public class Customer
 	{
-        public required int Id { get; set; }
+        public int Id { get; set; }
 		public required String Email { get; set; }
 		public required String Password { get; set; }
 		public required String FName { get; set; }

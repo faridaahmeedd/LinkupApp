@@ -42,7 +42,7 @@ namespace ServicesApp.Controllers
 			return Ok(customer);
 		}
 
-		[HttpGet("{CustomerId}/services")]
+		[HttpGet("services/{CustomerId}")]
 		[ProducesResponseType(200, Type = typeof(Customer))]
 		public IActionResult GetServicesByCustomer(int CustomerId)
 		{

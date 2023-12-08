@@ -31,5 +31,20 @@ namespace ServicesApp.Repository
 		{
 			return _context.Categories.Any(p => p.Id == id);
 		}
+
+		public bool CreateCategory(Category category)
+		{
+			// Change Tracker (add,update,modify)
+			_context.Add(category);
+			return Save();
+
+		}
+
+		public bool Save()
+		{
+			//sql code is generated here
+			var saved = _context.SaveChanges();
+			return saved>0 ? true : false;
+		}
 	}
 }

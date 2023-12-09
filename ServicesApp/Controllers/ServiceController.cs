@@ -25,7 +25,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<Service>))]
+		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceRequest>))]
 		public IActionResult GetServices()
 		{
 			var Service = _mapper.Map<List<ServiceDto>>(_serviceRepository.GetServices());
@@ -37,7 +37,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet("{ServiceId}")]
-		[ProducesResponseType(200, Type = typeof(Service))]
+		[ProducesResponseType(200, Type = typeof(ServiceRequest))]
 		public IActionResult GetService(int ServiceId)
 		{
 			if (!_serviceRepository.ServiceExist(ServiceId))
@@ -53,7 +53,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet("{ServiceName}/name")]
-		[ProducesResponseType(200, Type = typeof(Service))]
+		[ProducesResponseType(200, Type = typeof(ServiceRequest))]
 		public IActionResult GetService(String ServiceName)
 		{
 			var Service = _mapper.Map<ServiceDto>(_serviceRepository.GetService(ServiceName));
@@ -82,7 +82,7 @@ namespace ServicesApp.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-			var serviceMap = _mapper.Map<Service>(ServiceCreate);
+			var serviceMap = _mapper.Map<ServiceRequest>(ServiceCreate);
 
 			if (!_categoryRepository.CategoryExist(CategoryId))
 			{
@@ -124,7 +124,7 @@ namespace ServicesApp.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-			var serviceMap = _mapper.Map<Service>(serviceUpdate);
+			var serviceMap = _mapper.Map<ServiceRequest>(serviceUpdate);
 
 			if (!_categoryRepository.CategoryExist(CategoryId))
 			{

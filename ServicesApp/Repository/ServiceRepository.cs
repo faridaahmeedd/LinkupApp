@@ -14,17 +14,17 @@ namespace ServicesApp.Repository
 			this._context = context;
 		}
 
-		public ICollection<Service> GetServices()
+		public ICollection<ServiceRequest> GetServices()
 		{
 			return _context.Services.OrderBy(p => p.Id).ToList();
 		}
 
-		public Service GetService(int id)
+		public ServiceRequest GetService(int id)
 		{
 			return _context.Services.Where(p => p.Id == id).FirstOrDefault();
 		}
 
-		public Service GetService(string name)
+		public ServiceRequest GetService(string name)
 		{
 			return _context.Services.Where(p => p.Name == name).FirstOrDefault();
 		}
@@ -33,14 +33,14 @@ namespace ServicesApp.Repository
 			return _context.Services.Any(p => p.Id == id);
 		}
 
-		public bool CreateService(Service service)
+		public bool CreateService(ServiceRequest service)
 		{
 			// Change Tracker (add,update,modify)
 			_context.Add(service);
 			return Save();
 		}
 
-		public bool UpdateService(Service service)
+		public bool UpdateService(ServiceRequest service)
 		{
 			// Change Tracker (add,update,modify)
 			_context.Update(service);

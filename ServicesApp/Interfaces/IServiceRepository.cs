@@ -5,12 +5,12 @@ namespace ServicesApp.Interfaces
 {
 	public interface IServiceRepository
 	{
-		ICollection<Service> GetServices();
-		Service GetService(int id);
-		Service GetService(string name);
+		ICollection<ServiceRequest> GetServices();
+		ServiceRequest GetService(int id);
+		ServiceRequest GetService(string name);
 		bool ServiceExist(int id);
-		bool CreateService(Service service);
-		bool UpdateService(Service service);
+		bool CreateService(ServiceRequest service);
+		bool UpdateService(ServiceRequest service);
 		bool DeleteService(int id);
 		bool Save();
 	}

@@ -11,7 +11,9 @@ namespace ServicesApp.Data
 
 		}
 		public DbSet<Category> Categories { get; set; }
-		public DbSet<Service> Services { get; set; }
+		public DbSet<ServiceRequest> Services { get; set; }
 		public DbSet<Customer> Customers { get; set; }
+		public DbSet<Admin> Admins { get; set; }
+		public DbSet<Provider> Providers { get; set; }
 	}
 }

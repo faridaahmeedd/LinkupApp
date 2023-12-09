@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
-using ServicesApp.Models;
-using ServicesApp.Repository;
 
 namespace ServicesApp.Controllers
 {
@@ -47,6 +45,23 @@ namespace ServicesApp.Controllers
 			}
 			return Ok(customer);
 		}
+
+		[HttpGet("Login")]
+		[ProducesResponseType(200, Type = typeof(Customer))]
+		public IActionResult Login([FromQuery] string email, [FromQuery] string password)
+		{
+			var customer = _customerRepository.GetCustomer(email, password);
+			if (customer == null)
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			return Ok(customer);
+		}
+
 
 		[HttpGet("services/{CustomerId}")]
 		[ProducesResponseType(200, Type = typeof(ServiceDto))]
@@ -118,7 +133,7 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ModelState);
 			}
 			return Ok("Successfully deleted");
-			// GET SERVICE BY CUSTOMER MAKE SURE THERE IS NO SERVICES BEFORE DELETING CUSTOMER
+			// TODO : GET SERVICES BY CUSTOMER MAKE SURE THERE IS NO SERVICES BEFORE DELETING CUSTOMER
 		}
 
 	}

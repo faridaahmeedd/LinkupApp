@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ServicesApp.Core.Models;
+﻿using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -23,9 +22,9 @@ namespace ServicesApp.Repository
 			return _context.Customers.Where(p => p.Id == id).FirstOrDefault();
 		}
 
-		public Customer GetCustomer(string Fname)
+		public Customer GetCustomer(string email, string password)
 		{
-			return _context.Customers.Where(p => p.FName == Fname).FirstOrDefault();
+			return _context.Customers.Where(p => p.Email == email && p.Password == password).FirstOrDefault();
 		}
 
 		public ICollection<Customer> GetCustomers()
@@ -33,7 +32,7 @@ namespace ServicesApp.Repository
 			return _context.Customers.OrderBy(p => p.Id).ToList();
 		}
 
-		public ICollection<Service> GetServicesByCustomer(int id)
+		public ICollection<ServiceRequest> GetServicesByCustomer(int id)
 		{
 			return _context.Services.Where(p => p.Customer.Id == id).ToList();
 		}

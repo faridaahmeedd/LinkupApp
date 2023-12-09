@@ -12,7 +12,7 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231209114057_initial")]
+    [Migration("20231209133326_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -198,19 +198,14 @@ namespace ServicesApp.Migrations
                     b.Property<int>("ProviderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RequestId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TimeSlotid")
+                    b.Property<int>("ServiceRequestId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProviderId");
 
-                    b.HasIndex("RequestId");
-
-                    b.HasIndex("TimeSlotid");
+                    b.HasIndex("ServiceRequestId");
 
                     b.ToTable("Offers");
                 });
@@ -285,21 +280,13 @@ namespace ServicesApp.Migrations
 
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Offers")
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ServicesApp.Models.TimeSlot", "TimeSlot")
-                        .WithMany()
-                        .HasForeignKey("TimeSlotid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Provider");
 
                     b.Navigation("Request");
-
-                    b.Navigation("TimeSlot");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
@@ -326,7 +313,7 @@ namespace ServicesApp.Migrations
                     b.HasOne("ServicesApp.Models.ServiceRequest", "ServiceRequest")
                         .WithMany("TimeSlots")
                         .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ServiceRequest");

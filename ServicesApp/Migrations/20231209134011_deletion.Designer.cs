@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231209122700_models")]
-    partial class models
+    [Migration("20231209134011_deletion")]
+    partial class deletion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -198,7 +198,7 @@ namespace ServicesApp.Migrations
                     b.Property<int>("ProviderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RequestId")
+                    b.Property<int>("ServiceRequestId")
                         .HasColumnType("int");
 
                     b.Property<int>("TimeSlotId")
@@ -208,7 +208,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("ProviderId");
 
-                    b.HasIndex("RequestId");
+                    b.HasIndex("ServiceRequestId");
 
                     b.ToTable("Offers");
                 });
@@ -283,7 +283,7 @@ namespace ServicesApp.Migrations
 
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Offers")
-                        .HasForeignKey("RequestId")
+                        .HasForeignKey("ServiceRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

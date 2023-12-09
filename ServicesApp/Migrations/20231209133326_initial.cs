@@ -117,6 +117,34 @@ namespace ServicesApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Offers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fees = table.Column<int>(type: "int", nullable: false),
+                    Accepted = table.Column<bool>(type: "bit", nullable: false),
+                    ServiceRequestId = table.Column<int>(type: "int", nullable: false),
+                    ProviderId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Offers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Offers_Providers_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "Providers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Offers_Requests_ServiceRequestId",
+                        column: x => x.ServiceRequestId,
+                        principalTable: "Requests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TimeSlots",
                 columns: table => new
                 {
@@ -135,42 +163,7 @@ namespace ServicesApp.Migrations
                         column: x => x.ServiceRequestId,
                         principalTable: "Requests",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Offers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Fees = table.Column<int>(type: "int", nullable: false),
-                    Accepted = table.Column<bool>(type: "bit", nullable: false),
-                    ProviderId = table.Column<int>(type: "int", nullable: false),
-                    RequestId = table.Column<int>(type: "int", nullable: false),
-                    TimeSlotid = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Offers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Offers_Providers_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "Providers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Offers_Requests_RequestId",
-                        column: x => x.RequestId,
-                        principalTable: "Requests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Offers_TimeSlots_TimeSlotid",
-                        column: x => x.TimeSlotid,
-                        principalTable: "TimeSlots",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -179,14 +172,9 @@ namespace ServicesApp.Migrations
                 column: "ProviderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Offers_RequestId",
+                name: "IX_Offers_ServiceRequestId",
                 table: "Offers",
-                column: "RequestId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Offers_TimeSlotid",
-                table: "Offers",
-                column: "TimeSlotid");
+                column: "ServiceRequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Requests_CategoryId",
@@ -214,10 +202,10 @@ namespace ServicesApp.Migrations
                 name: "Offers");
 
             migrationBuilder.DropTable(
-                name: "Providers");
+                name: "TimeSlots");
 
             migrationBuilder.DropTable(
-                name: "TimeSlots");
+                name: "Providers");
 
             migrationBuilder.DropTable(
                 name: "Requests");

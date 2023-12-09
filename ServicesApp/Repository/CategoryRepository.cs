@@ -4,7 +4,7 @@ using ServicesApp.Models;
 
 namespace ServicesApp.Repository
 {
-	public class CategoryRepository : ICategoryRepository
+    public class CategoryRepository : ICategoryRepository
 	{
 		private readonly DataContext _context;
 

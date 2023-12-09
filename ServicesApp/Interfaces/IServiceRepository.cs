@@ -7,7 +7,6 @@ namespace ServicesApp.Interfaces
 	{
 		ICollection<ServiceRequest> GetServices();
 		ServiceRequest GetService(int id);
-		ServiceRequest GetService(string name);
 		bool ServiceExist(int id);
 		bool CreateService(ServiceRequest service);
 		bool UpdateService(ServiceRequest service);

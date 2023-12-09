@@ -52,22 +52,6 @@ namespace ServicesApp.Controllers
 			return Ok(Service);
 		}
 
-		[HttpGet("{ServiceName}/name")]
-		[ProducesResponseType(200, Type = typeof(ServiceRequest))]
-		public IActionResult GetService(String ServiceName)
-		{
-			var Service = _mapper.Map<ServiceDto>(_serviceRepository.GetService(ServiceName));
-			if (Service == null)
-			{
-				return NotFound();
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-			return Ok(Service);
-		}
-
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]

@@ -5,7 +5,7 @@ using ServicesApp.Models;
 
 namespace ServicesApp.Repository
 {
-	public class CustomerRepository : ICustomerRepository
+    public class CustomerRepository : ICustomerRepository
 	{
 		public readonly DataContext _context;
         public CustomerRepository(DataContext context)
@@ -34,7 +34,7 @@ namespace ServicesApp.Repository
 
 		public ICollection<ServiceRequest> GetServicesByCustomer(int id)
 		{
-			return _context.Services.Where(p => p.Customer.Id == id).ToList();
+			return _context.Requests.Where(p => p.Customer.Id == id).ToList();
 		}
 
 		public bool CreateCustomer(Customer customer)

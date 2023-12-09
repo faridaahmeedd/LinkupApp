@@ -5,7 +5,7 @@ using ServicesApp.Models;
 
 namespace ServicesApp.Repository
 {
-	public class ServiceRepository : IServiceRepository
+    public class ServiceRepository : IServiceRepository
 	{
 		private readonly DataContext _context;
 
@@ -16,21 +16,17 @@ namespace ServicesApp.Repository
 
 		public ICollection<ServiceRequest> GetServices()
 		{
-			return _context.Services.OrderBy(p => p.Id).ToList();
+			return _context.Requests.OrderBy(p => p.Id).ToList();
 		}
 
 		public ServiceRequest GetService(int id)
 		{
-			return _context.Services.Where(p => p.Id == id).FirstOrDefault();
+			return _context.Requests.Where(p => p.Id == id).FirstOrDefault();
 		}
 
-		public ServiceRequest GetService(string name)
-		{
-			return _context.Services.Where(p => p.Name == name).FirstOrDefault();
-		}
 		public bool ServiceExist(int id)
 		{
-			return _context.Services.Any(p => p.Id == id);
+			return _context.Requests.Any(p => p.Id == id);
 		}
 
 		public bool CreateService(ServiceRequest service)
@@ -49,7 +45,7 @@ namespace ServicesApp.Repository
 
 		public bool DeleteService(int id)
 		{
-			var service = _context.Services.Where(p => p.Id == id).FirstOrDefault();
+			var service = _context.Requests.Where(p => p.Id == id).FirstOrDefault();
 			_context.Remove(service!);
 			return Save();
 		}

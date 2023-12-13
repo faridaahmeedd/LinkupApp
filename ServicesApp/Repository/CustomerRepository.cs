@@ -22,11 +22,6 @@ namespace ServicesApp.Repository
 			return _context.Customers.Where(p => p.Id == id).FirstOrDefault();
 		}
 
-		//public Customer GetCustomer(string email, string password)
-		//{
-		//	return _context.Customers.Where(p => p.Email == email && p.Password == password).FirstOrDefault();
-		//}
-
 		public ICollection<Customer> GetCustomers()
 		{
 			return _context.Customers.OrderBy(p => p.Id).ToList();

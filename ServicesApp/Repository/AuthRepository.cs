@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Models;
 using System.Data;
@@ -23,16 +24,27 @@ public class AuthRepository
 		_roleManager = roleManager;
 	}
 
-	public async Task<IdentityResult> RegisterUser(RegistrationDto registerDto, string role)
+	public async Task<AppUser?> CheckUser(string email)
 	{
-		// Check if user already exists
-		var appUser = await _userManager.FindByEmailAsync(registerDto.Email);
+		var appUser = await _userManager.FindByEmailAsync(email);
 		if (appUser != null)
 		{
-			return IdentityResult.Failed(new IdentityError { Description = "Account Already Exists" });
+			return appUser;
 		}
+		return null;
+	}
 
-		// Add the user to DB
+	public async Task<bool> CheckRole(string role)
+	{
+		if (await _roleManager.RoleExistsAsync(role))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public async Task<bool> CreateUser(RegistrationDto registerDto, string role)
+	{	
 		var user = new AppUser
 		{
 			Email = registerDto.Email,
@@ -40,20 +52,15 @@ public class AuthRepository
 			UserName = registerDto.Email,
 		};
 
-		// Check if the role exists
-		if (await _roleManager.RoleExistsAsync(role))
+		var result = await _userManager.CreateAsync(user, registerDto.Password);
+		if (result.Succeeded)
 		{
-			var result = await _userManager.CreateAsync(user, registerDto.Password);
-			if (result.Succeeded)
-			{
-				await _userManager.AddToRoleAsync(user, role);
-				return result;
-			}
-			return IdentityResult.Failed(new IdentityError { Description = "Error while creating user" });
+			await _userManager.AddToRoleAsync(user, role);
+			return true;
 		}
-
-		return IdentityResult.Failed(new IdentityError { Description = "Role Doesn't Exist" });
+		return false;
 	}
+
 
 	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
 	{

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
+using ServicesApp.Models;
+using ServicesApp.Repository;
 
 namespace ServicesApp.Controllers
 {
@@ -31,7 +33,7 @@ namespace ServicesApp.Controllers
 			return Ok(customers);
 		}
 
-		[HttpGet("{CustomerId}")]
+		[HttpGet("{CustomerId}", Name = "GetCustomerById")]
 		[ProducesResponseType(200, Type = typeof(Customer))]
 		public IActionResult GetCustomer(string CustomerId) {
 			if(!_customerRepository.CustomerExist(CustomerId))
@@ -46,21 +48,35 @@ namespace ServicesApp.Controllers
 			return Ok(customer);
 		}
 
-		//[HttpGet("Login")]
-		//[ProducesResponseType(200, Type = typeof(Customer))]
-		//public IActionResult Login([FromQuery] string email, [FromQuery] string password)
-		//{
-		//	var customer = _customerRepository.GetCustomer(email, password);
-		//	if (customer == null)
-		//	{
-		//		return NotFound();
-		//	}
-		//	if (!ModelState.IsValid)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	return Ok(customer);
-		//}
+		[HttpPost]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		public IActionResult CreateProfile([FromBody] CustomerDto CustomerCreate)
+		{
+			if (CustomerCreate == null)
+			{
+				return BadRequest(ModelState);
+			}
+			var customer = _customerRepository.GetCustomers().Where(c => c.Id == CustomerCreate.Id).FirstOrDefault();
+			if (customer != null)
+			{
+				ModelState.AddModelError("", "Customer already exists");
+				return StatusCode(422, ModelState);
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			var customerMap = _mapper.Map<Customer>(CustomerCreate);
+
+			if (!_customerRepository.CreateCustomer(customerMap))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			var url = Url.Link("GetCustomerById", new { CustomerId = CustomerCreate.Id });
+			return Created(url, CustomerCreate);
+		}
 
 
 		[HttpGet("services/{CustomerId}")]
@@ -85,56 +101,57 @@ namespace ServicesApp.Controllers
 			return Ok(mapServices);
 		}
 
-		[HttpPut("update")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult UpdateCustomer([FromBody] Customer customerUpdate)
-		{
-			if (customerUpdate == null)
-			{
-				return BadRequest(ModelState);
-			}
-			if (!_customerRepository.CustomerExist(customerUpdate.Id))
-			{
-				return NotFound();
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
+		//[HttpPut("update")]
+		//[ProducesResponseType(204)]
+		//[ProducesResponseType(400)]
+		//[ProducesResponseType(404)]
+		//public IActionResult UpdateCustomer([FromBody] Customer customerUpdate)
+		//{
+		//	if (customerUpdate == null)
+		//	{
+		//		return BadRequest(ModelState);
+		//	}
+		//	if (!_customerRepository.CustomerExist(customerUpdate.Id))
+		//	{
+		//		return NotFound();
+		//	}
+		//	if (!ModelState.IsValid)
+		//	{
+		//		return BadRequest(ModelState);
+		//	}
 
-			if (!_customerRepository.UpdateCustomer(customerUpdate))
-			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
-			}
-			return Ok("Successfully updated");
-		}
+		//	if (!_customerRepository.UpdateCustomer(customerUpdate))
+		//	{
+		//		ModelState.AddModelError("", "Something went wrong.");
+		//		return StatusCode(500, ModelState);
+		//	}
+		//	return Ok("Successfully updated");
+		//}
 
-		[HttpDelete("{CustomerId}")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult DeleteCustomer(string CustomerId)
-		{
-			if (!_customerRepository.CustomerExist(CustomerId))
-			{
-				return NotFound();
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
 
-			if (!_customerRepository.DeleteCustomer(CustomerId))
-			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
-			}
-			return Ok("Successfully deleted");
-			// TODO : GET SERVICES BY CUSTOMER MAKE SURE THERE IS NO SERVICES BEFORE DELETING CUSTOMER
-		}
+		//[HttpDelete("{CustomerId}")]
+		//[ProducesResponseType(204)]
+		//[ProducesResponseType(400)]
+		//[ProducesResponseType(404)]
+		//public IActionResult DeleteCustomer(string CustomerId)
+		//{
+		//	if (!_customerRepository.CustomerExist(CustomerId))
+		//	{
+		//		return NotFound();
+		//	}
+		//	if (!ModelState.IsValid)
+		//	{
+		//		return BadRequest(ModelState);
+		//	}
+
+		//	if (!_customerRepository.DeleteCustomer(CustomerId))
+		//	{
+		//		ModelState.AddModelError("", "Something went wrong.");
+		//		return StatusCode(500, ModelState);
+		//	}
+		//	return Ok("Successfully deleted");
+		//	// TODO : GET SERVICES BY CUSTOMER MAKE SURE THERE IS NO SERVICES BEFORE DELETING CUSTOMER
+		//}
 
 	}
 }

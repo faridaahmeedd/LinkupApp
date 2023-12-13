@@ -17,16 +17,22 @@ public class AuthController : ControllerBase
 	{
 		if (ModelState.IsValid)
 		{
-			var result = await _authRepository.RegisterUser(registerDto, role);
-
-			if (result.Succeeded)
+			var appUser = await _authRepository.CheckUser(registerDto.Email);
+			if (appUser != null)
 			{
-				return Ok("Registration Successful");
+				return BadRequest("User already exists");
 			}
-
-			return BadRequest(result.Errors);
+			if (await _authRepository.CheckRole(role))
+			{
+				if (await _authRepository.CreateUser(registerDto, role))
+				{
+					appUser = await _authRepository.CheckUser(registerDto.Email);
+					return Ok(appUser.Id);
+				}
+				return BadRequest("Error while creating user");
+			}
+			return BadRequest("Role doesn't exist");
 		}
-
 		return BadRequest();
 	}
 
@@ -46,7 +52,6 @@ public class AuthController : ControllerBase
 				});
 			}
 		}
-
 		return Unauthorized();
 	}
 }

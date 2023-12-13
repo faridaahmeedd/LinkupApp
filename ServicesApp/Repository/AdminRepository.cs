@@ -12,20 +12,20 @@ namespace ServicesApp.Repository
             _context = context;
         }
 
-        public bool AdminExist(int id)
+        public bool AdminExist(string id)
         {
             return _context.Admins.Any(p => p.Id == id);
         }
 
-        public Admin GetAdmin(int id)
+        public Admin GetAdmin(string id)
         {
             return _context.Admins.Where(p => p.Id == id).FirstOrDefault();
         }
 
-        public Admin GetAdmin(string email, string password)
-        {
-            return _context.Admins.Where(p => p.Email == email && p.Password == password).FirstOrDefault();
-        }
+        //public Admin GetAdmin(string email, string password)
+        //{
+        //    return _context.Admins.Where(p => p.Email == email && p. == password).FirstOrDefault();
+        //}
 
         public ICollection<Admin> GetAdmins()
         {

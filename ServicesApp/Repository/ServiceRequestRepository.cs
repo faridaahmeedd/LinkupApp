@@ -1,15 +1,15 @@
 ﻿using ServicesApp.Data;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
-using ServicesApp.Models;
+using ServicesApp.Models; 
 
 namespace ServicesApp.Repository
 {
-    public class ServiceRepository : IServiceRepository
+    public class ServiceRequestRepository : IServiceRequestRepository
 	{
 		private readonly DataContext _context;
 
-		public ServiceRepository(DataContext context)
+		public ServiceRequestRepository(DataContext context)
 		{
 			this._context = context;
 		}
@@ -31,14 +31,12 @@ namespace ServicesApp.Repository
 
 		public bool CreateService(ServiceRequest service)
 		{
-			// Change Tracker (add,update,modify)
 			_context.Add(service);
 			return Save();
 		}
 
 		public bool UpdateService(ServiceRequest service)
 		{
-			// Change Tracker (add,update,modify)
 			_context.Update(service);
 			return Save();
 		}

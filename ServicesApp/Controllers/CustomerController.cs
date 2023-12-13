@@ -8,7 +8,7 @@ namespace ServicesApp.Controllers
 {
 	[Route("/api/[controller]")]
 	[ApiController]
-	public class CustomerController : Controller
+	public class CustomerController : ControllerBase
 	{
 		private readonly ICustomerRepository _customerRepository;
 		private readonly IMapper _mapper;
@@ -33,7 +33,7 @@ namespace ServicesApp.Controllers
 
 		[HttpGet("{CustomerId}")]
 		[ProducesResponseType(200, Type = typeof(Customer))]
-		public IActionResult GetCustomer(int CustomerId) {
+		public IActionResult GetCustomer(string CustomerId) {
 			if(!_customerRepository.CustomerExist(CustomerId))
 			{
 				return NotFound();
@@ -46,26 +46,26 @@ namespace ServicesApp.Controllers
 			return Ok(customer);
 		}
 
-		[HttpGet("Login")]
-		[ProducesResponseType(200, Type = typeof(Customer))]
-		public IActionResult Login([FromQuery] string email, [FromQuery] string password)
-		{
-			var customer = _customerRepository.GetCustomer(email, password);
-			if (customer == null)
-			{
-				return NotFound();
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-			return Ok(customer);
-		}
+		//[HttpGet("Login")]
+		//[ProducesResponseType(200, Type = typeof(Customer))]
+		//public IActionResult Login([FromQuery] string email, [FromQuery] string password)
+		//{
+		//	var customer = _customerRepository.GetCustomer(email, password);
+		//	if (customer == null)
+		//	{
+		//		return NotFound();
+		//	}
+		//	if (!ModelState.IsValid)
+		//	{
+		//		return BadRequest(ModelState);
+		//	}
+		//	return Ok(customer);
+		//}
 
 
 		[HttpGet("services/{CustomerId}")]
-		[ProducesResponseType(200, Type = typeof(ServiceDto))]
-		public IActionResult GetServicesByCustomer(int CustomerId)
+		[ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
+		public IActionResult GetServicesByCustomer(string CustomerId)
 		{
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
@@ -77,7 +77,7 @@ namespace ServicesApp.Controllers
 				return NotFound();
 			}
 
-			var mapServices = _mapper.Map<List<ServiceDto>>(services);
+			var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
@@ -116,7 +116,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		public IActionResult DeleteCustomer(int CustomerId)
+		public IActionResult DeleteCustomer(string CustomerId)
 		{
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{

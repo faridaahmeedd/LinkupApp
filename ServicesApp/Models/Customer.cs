@@ -1,22 +1,21 @@
 ﻿using ServicesApp.Models;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ServicesApp.Core.Models
 {
-	public class Customer
+	[Table("Customer")]
+	public class Customer : AppUser
 	{
-        public int Id { get; set; }
-		public required String Email { get; set; }
-		public required String Password { get; set; }
 		public required String FName { get; set; }
 		public required String LName { get; set; }
-		public required String PhoneNumber { get; set; }
 		public required String City { get; set; }
 		public required String Country { get; set; }
 		public required String Address { get; set; }
-		public required bool Gender{ get; set; }
-		public DateOnly BirthDate{ get; set; }
+		public required bool Gender { get; set; }
+		public required DateOnly BirthDate { get; set; }
 		public String? Disability { get; set; }
         public String? EmergencyContact { get; set; }
-        public ICollection<ServiceRequest>? Services { get; set; }
+		public ICollection<ServiceRequest>? Services { get; set; }
 	}
 }

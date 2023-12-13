@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using ServicesApp.Core.Models;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -9,14 +8,14 @@ namespace ServicesApp.Controllers
 {
 	[Route("/api/[controller]")]
 	[ApiController]
-	public class ServiceController : Controller
+	public class ServiceRequestController : ControllerBase
 	{
-		private readonly IServiceRepository _serviceRepository;
+		private readonly IServiceRequestRepository _serviceRepository;
 		private readonly ICategoryRepository _categoryRepository;
 		private readonly ICustomerRepository _customerRepository;
 		private readonly IMapper _mapper;
 
-		public ServiceController(IServiceRepository ServiceRepository, ICategoryRepository CategoryRepository, ICustomerRepository customerRepository, IMapper mapper)
+		public ServiceRequestController(IServiceRequestRepository ServiceRepository, ICategoryRepository CategoryRepository, ICustomerRepository customerRepository, IMapper mapper)
 		{
 			_serviceRepository = ServiceRepository;
 			_categoryRepository = CategoryRepository;
@@ -28,7 +27,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceRequest>))]
 		public IActionResult GetServices()
 		{
-			var Service = _mapper.Map<List<ServiceDto>>(_serviceRepository.GetServices());
+			var Service = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServices());
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
@@ -44,7 +43,7 @@ namespace ServicesApp.Controllers
 			{
 				return NotFound();
 			}
-			var Service = _mapper.Map<ServiceDto>(_serviceRepository.GetService(ServiceId));
+			var Service = _mapper.Map<ServiceRequestDto>(_serviceRepository.GetService(ServiceId));
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
@@ -55,7 +54,7 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
-		public IActionResult CreateService([FromQuery] int CustomerId, [FromQuery] int CategoryId, [FromBody] ServiceDto ServiceCreate)
+		public IActionResult CreateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, [FromBody] ServiceRequestDto ServiceCreate)
 		{
 			if (ServiceCreate == null)
 			{
@@ -87,14 +86,14 @@ namespace ServicesApp.Controllers
 				ModelState.AddModelError("", "Something went wrong.");
 				return StatusCode(500, ModelState);
 			}
-			return Ok("Successfully created");
+			return Created($"/api/Service/{serviceMap.Id}", serviceMap);
 		}
 
 		[HttpPut("update")]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		public IActionResult UpdateService([FromQuery] int CustomerId, [FromQuery] int CategoryId, [FromBody] ServiceDto serviceUpdate)
+		public IActionResult UpdateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, [FromBody] ServiceRequestDto serviceUpdate)
 		{
 			if (serviceUpdate == null)
 			{

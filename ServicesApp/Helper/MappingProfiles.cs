@@ -8,8 +8,8 @@ namespace ServicesApp.Helper
 	{
         public MappingProfiles()
         {
-            CreateMap<ServiceRequest, ServiceDto>();
-			CreateMap<ServiceDto, ServiceRequest>();
+            CreateMap<ServiceRequest, ServiceRequestDto>();
+			CreateMap<ServiceRequestDto, ServiceRequest>();
 		}
     }
 }

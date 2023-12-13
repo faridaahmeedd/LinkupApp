@@ -1,9 +1,12 @@
-﻿namespace ServicesApp.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ServicesApp.Models
 {
 	public class Admin
 	{
-		public int Id { get; set; }
-		public required String Email { get; set; }
-		public required String Password { get; set; }
-	}
+        public string Id { get; set; }
+        public String Password { get; set; }
+        public string Email { get; set; }
+
+    }
 }

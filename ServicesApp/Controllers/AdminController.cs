@@ -6,7 +6,7 @@ namespace ServicesApp.Controllers
 {
 	[Route("/api/[controller]")]
 	[ApiController]
-	public class AdminController : Controller
+	public class AdminController : ControllerBase
 	{
 		private readonly IAdminRepository _adminRepository;
 
@@ -29,7 +29,7 @@ namespace ServicesApp.Controllers
 
 		[HttpGet("{AdminId}")]
 		[ProducesResponseType(200, Type = typeof(Admin))]
-		public IActionResult GetAdmin(int AdminId)
+		public IActionResult GetAdmin(string AdminId)
 		{
 			if (!_adminRepository.AdminExist(AdminId))
 			{
@@ -43,20 +43,20 @@ namespace ServicesApp.Controllers
 			return Ok(Admin);
 		}
 
-		[HttpGet("Login")]
-		[ProducesResponseType(200, Type = typeof(Admin))]
-		public IActionResult Login([FromQuery] string email, [FromQuery] string password)
-		{
-			var Admin = _adminRepository.GetAdmin(email, password);
-			if (Admin == null)
-			{
-				return NotFound();
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-			return Ok(Admin);
-		}
+		//[HttpGet("Login")]
+		//[ProducesResponseType(200, Type = typeof(Admin))]
+		//public IActionResult Login([FromQuery] string email, [FromQuery] string password)
+		//{
+		//	var Admin = _adminRepository.GetAdmin(email, password);
+		//	if (Admin == null)
+		//	{
+		//		return NotFound();
+		//	}
+		//	if (!ModelState.IsValid)
+		//	{
+		//		return BadRequest(ModelState);
+		//	}
+		//	return Ok(Admin);
+		//}
 	}
 }

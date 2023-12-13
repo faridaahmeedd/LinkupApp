@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Repository;
@@ -7,7 +8,7 @@ namespace ServicesApp.Controllers
 {
 	[Route("/api/[controller]")]
 	[ApiController]
-	public class CategoryController : Controller
+	public class CategoryController : ControllerBase
 	{
 		private readonly ICategoryRepository _categoryRepository;
 
@@ -28,7 +29,7 @@ namespace ServicesApp.Controllers
 			return Ok(category);
 		}
 
-		[HttpGet("{CategoryId}")]
+		[HttpGet("{CategoryId:int}", Name ="GetCategoryById")]
 		[ProducesResponseType(200, Type = typeof(Category))]
 		public IActionResult GetCategory(int CategoryId)
 		{
@@ -44,7 +45,7 @@ namespace ServicesApp.Controllers
 			return Ok(category);
 		}
 
-		[HttpGet("{CategoryName}/name")]
+		[HttpGet("{CategoryName:minlength(1)}")]
 		[ProducesResponseType(200, Type = typeof(Category))]
 		public IActionResult GetCategory(String CategoryName)
 		{
@@ -63,6 +64,7 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
+		// [Authorize]
 		public IActionResult CreateCategory([FromBody] Category categoryCreate)
 		{
 			if(categoryCreate == null)
@@ -86,13 +88,15 @@ namespace ServicesApp.Controllers
 				ModelState.AddModelError("", "Something went wrong.");
 				return StatusCode(500,ModelState);
 			}
-			return Ok("Successfully created");
+			var url = Url.Link("GetCategoryById", new {CategoryId = categoryCreate.Id });
+			return Created(url, categoryCreate);
 		}
 
 		[HttpPut("update")]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
+		// [Authorize]
 		public IActionResult UpdateCategory([FromBody] Category categoryUpdate)
 		{
 			if(categoryUpdate == null)
@@ -120,6 +124,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
+		// [Authorize]
 		public IActionResult DeleteCategory(int CategoryId)
 		{
 			if (!_categoryRepository.CategoryExist(CategoryId))

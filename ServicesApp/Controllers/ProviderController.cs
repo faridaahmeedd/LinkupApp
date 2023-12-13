@@ -4,7 +4,7 @@ namespace ServicesApp.Controllers
 {
 	[Route("/api/[controller]")]
 	[ApiController]
-	public class ProviderController : Controller
+	public class ProviderController : ControllerBase
 	{
 
 	}

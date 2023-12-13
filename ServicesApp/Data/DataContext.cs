@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ServicesApp.Core.Models;
 using ServicesApp.Models;
 
 namespace ServicesApp.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<AppUser>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -20,22 +22,26 @@ namespace ServicesApp.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			// Configure the relationship: One ServiceRequest has many TimeSlots
-			modelBuilder.Entity<ServiceRequest>()
-				.HasMany(sr => sr.TimeSlots)
-				.WithOne(ts => ts.ServiceRequest)
-				.HasForeignKey(ts => ts.ServiceRequestId)
-				.IsRequired()
-				.OnDelete(DeleteBehavior.Cascade);     // SEARCHH
-
-			// Configure the relationship: One ServiceRequest has many ServiceOffers
-			modelBuilder.Entity<ServiceRequest>()
-				.HasMany(sr => sr.Offers)
-				.WithOne(so => so.Request)
-				.HasForeignKey(so => so.ServiceRequestId)
-				.IsRequired()
-				.OnDelete(DeleteBehavior.Cascade);     // SEARCHH
+			base.OnModelCreating(modelBuilder);
+			SeedRoles(modelBuilder);
+			//modelBuilder.HasDefaultSchema("dbo");
+			//modelBuilder.Entity<IdentityUser>().ToTable("Users");
+			//modelBuilder.Entity<IdentityRole>().ToTable("Roles");
+			//modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
+			//modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+			//modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+			//modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+			//modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
 		}
 
+		// Adding User Roles to DB
+		private void SeedRoles(ModelBuilder builder)
+		{
+			builder.Entity<IdentityRole>().HasData(
+					new IdentityRole() { Name = "Customer", ConcurrencyStamp = "1", NormalizedName = "Customer" },
+					new IdentityRole() { Name = "Provider", ConcurrencyStamp = "2", NormalizedName = "Provider" },
+					new IdentityRole() { Name = "Admin", ConcurrencyStamp = "3", NormalizedName = "Admin" }
+				);
+		}
 	}
 }

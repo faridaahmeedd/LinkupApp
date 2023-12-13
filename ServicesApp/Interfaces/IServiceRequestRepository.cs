@@ -3,7 +3,7 @@ using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
 {
-	public interface IServiceRepository
+	public interface IServiceRequestRepository
 	{
 		ICollection<ServiceRequest> GetServices();
 		ServiceRequest GetService(int id);

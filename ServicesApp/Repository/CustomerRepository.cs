@@ -12,27 +12,27 @@ namespace ServicesApp.Repository
         {
             _context = context;
         }
-        public bool CustomerExist(int id)
+        public bool CustomerExist(string id)
 		{
 			return _context.Customers.Any(p => p.Id == id);
 		}
 
-		public Customer GetCustomer(int id)
+		public Customer GetCustomer(string id)
 		{
 			return _context.Customers.Where(p => p.Id == id).FirstOrDefault();
 		}
 
-		public Customer GetCustomer(string email, string password)
-		{
-			return _context.Customers.Where(p => p.Email == email && p.Password == password).FirstOrDefault();
-		}
+		//public Customer GetCustomer(string email, string password)
+		//{
+		//	return _context.Customers.Where(p => p.Email == email && p.Password == password).FirstOrDefault();
+		//}
 
 		public ICollection<Customer> GetCustomers()
 		{
 			return _context.Customers.OrderBy(p => p.Id).ToList();
 		}
 
-		public ICollection<ServiceRequest> GetServicesByCustomer(int id)
+		public ICollection<ServiceRequest> GetServicesByCustomer(string id)
 		{
 			return _context.Requests.Where(p => p.Customer.Id == id).ToList();
 		}
@@ -51,7 +51,7 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
-		public bool DeleteCustomer(int id)
+		public bool DeleteCustomer(string id)
 		{
 			var cutsomer = _context.Customers.Where(p => p.Id == id).FirstOrDefault();
 			_context.Remove(cutsomer!);

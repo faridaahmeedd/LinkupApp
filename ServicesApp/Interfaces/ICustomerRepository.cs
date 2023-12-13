@@ -6,13 +6,13 @@ namespace ServicesApp.Interfaces
 	public interface ICustomerRepository 
 	{
 		ICollection<Customer> GetCustomers();
-		Customer GetCustomer(int id);
-		Customer GetCustomer(string email, string password);
-		bool CustomerExist(int id);
-		ICollection<ServiceRequest> GetServicesByCustomer(int id);
+		Customer GetCustomer(string id);
+		// Customer GetCustomer(string email, string password);
+		bool CustomerExist(string id);
+		ICollection<ServiceRequest> GetServicesByCustomer(string id);
 		bool CreateCustomer(Customer customer);
 		bool UpdateCustomer(Customer customer);
-		bool DeleteCustomer(int id);
+		bool DeleteCustomer(string id);
 		bool Save();
 	}
 }

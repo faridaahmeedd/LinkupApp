@@ -1,4 +1,5 @@
 ﻿using ServicesApp.Core.Models;
+using System.Text.Json.Serialization;
 
 namespace ServicesApp.Models
 {

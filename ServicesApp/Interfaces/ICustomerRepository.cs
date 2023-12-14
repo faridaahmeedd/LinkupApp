@@ -8,7 +8,6 @@ namespace ServicesApp.Interfaces
 	{
 		ICollection<Customer> GetCustomers();
 		Customer GetCustomer(string id);
-		// Customer GetCustomer(string email, string password);
 		bool CustomerExist(string id);
 		ICollection<ServiceRequest> GetServicesByCustomer(string id);
 		bool CreateCustomer(Customer customer);

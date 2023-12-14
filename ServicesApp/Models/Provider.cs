@@ -13,7 +13,7 @@ namespace ServicesApp.Models
 		public String? Address { get; set; }
 		public bool Gender { get; set; }
 		public DateOnly BirthDate { get; set; }
-		public String JobTitle { get; set; }
+		public String? JobTitle { get; set; }
         public String? Description { get; set; }
 		public ICollection<ServiceOffer>? Offers { get; set; }
 		// SKILLS

@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using ServicesApp.Dto;
+using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 
 namespace ServicesApp.Controllers
 {
-	[Route("/api/[controller]")]
+    [Route("/api/[controller]")]
 	[ApiController]
 	public class ServiceRequestController : ControllerBase
 	{

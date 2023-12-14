@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
-using ServicesApp.Dto;
+using ServicesApp.Dto.Service;
+using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
 
 namespace ServicesApp.Controllers
 {
-	[Route("/api/[controller]")]
+    [Route("/api/[controller]")]
 	[ApiController]
 	public class CustomerController : ControllerBase
 	{
@@ -25,11 +26,12 @@ namespace ServicesApp.Controllers
 		public IActionResult GetCustomers()
 		{
 			var customers = _customerRepository.GetCustomers();
+			var mapCustomers = _mapper.Map<List<CustomerDto>>(customers);
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
-			return Ok(customers);
+			return Ok(mapCustomers);
 		}
 
 
@@ -41,35 +43,37 @@ namespace ServicesApp.Controllers
 				return NotFound();
 			}
 			var customer = _customerRepository.GetCustomer(CustomerId);
-			if(!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-			return Ok(customer);
-		}
+			var mapCustomer = _mapper.Map<CustomerDto>(customer);
 
-
-		[HttpGet("services/{CustomerId}")]
-		[ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
-		public IActionResult GetServicesByCustomer(string CustomerId)
-		{
-			if (!_customerRepository.CustomerExist(CustomerId))
-			{
-				return NotFound();
-			}
-			var services = _customerRepository.GetServicesByCustomer(CustomerId);
-			if(services == null)
-			{
-				return NotFound();
-			}
-
-			var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
-			return Ok(mapServices);
+			return Ok(mapCustomer);
 		}
+
+
+		//[HttpGet("services/{CustomerId}")]
+		//[ProducesResponseType(200, Type = typeof(List<ServiceRequestDto>))]
+		//public IActionResult GetServicesByCustomer(string CustomerId)
+		//{
+		//	if (!_customerRepository.CustomerExist(CustomerId))
+		//	{
+		//		return NotFound();
+		//	}
+		//	var services = _customerRepository.GetServicesByCustomer(CustomerId);
+		//	if(services == null)
+		//	{
+		//		return NotFound();
+		//	}
+
+		//	var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
+		//	if (!ModelState.IsValid)
+		//	{
+		//		return BadRequest(ModelState);
+		//	}
+		//	return Ok(mapServices);
+		//}
 
 
 		[HttpPost("Update")]

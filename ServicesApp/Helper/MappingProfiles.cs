@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using ServicesApp.Core.Models;
-using ServicesApp.Dto;
 using ServicesApp.Dto.Authentication;
+using ServicesApp.Dto.Service;
+using ServicesApp.Dto.Users;
 using ServicesApp.Models;
 
 namespace ServicesApp.Helper
 {
-	public class MappingProfiles : Profile
+    public class MappingProfiles : Profile
 	{
         public MappingProfiles()
         {
@@ -16,6 +17,10 @@ namespace ServicesApp.Helper
 			CreateMap<CustomerDto, Customer>();
 			CreateMap<RegistrationDto, Customer>();
 			CreateMap<CustomerDto, RegistrationDto>();
+			CreateMap<Provider, ProviderDto>();
+			CreateMap<ProviderDto, Provider>();
+			CreateMap<RegistrationDto, Provider>();
+			CreateMap<ProviderDto, RegistrationDto>();
 		}
     }
 }

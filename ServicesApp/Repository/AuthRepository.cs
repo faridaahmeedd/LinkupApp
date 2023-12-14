@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
+using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,15 +15,21 @@ public class AuthRepository
 	private readonly UserManager<AppUser> _userManager;
 	private readonly IConfiguration _config;
 	private readonly RoleManager<IdentityRole> _roleManager;
+	private readonly IMapper _mapper;
+	private readonly ICustomerRepository _customerRepository;
 
 	public AuthRepository(
 		UserManager<AppUser> userManager,
 		IConfiguration config,
-		RoleManager<IdentityRole> roleManager)
+		RoleManager<IdentityRole> roleManager,
+		IMapper mapper,
+		ICustomerRepository customerRepository)
 	{
 		_userManager = userManager;
 		_config = config;
 		_roleManager = roleManager;
+		_mapper = mapper;
+		_customerRepository = customerRepository;
 	}
 
 	public async Task<AppUser?> CheckUser(string email)
@@ -44,20 +52,32 @@ public class AuthRepository
 	}
 
 	public async Task<bool> CreateUser(RegistrationDto registerDto, string role)
-	{	
-		var user = new AppUser
+	{
+		if(role == "Customer")
 		{
-			Email = registerDto.Email,
-			SecurityStamp = Guid.NewGuid().ToString(),
-			UserName = registerDto.Email,
-		};
-
-		var result = await _userManager.CreateAsync(user, registerDto.Password);
-		if (result.Succeeded)
-		{
-			await _userManager.AddToRoleAsync(user, role);
-			return true;
+			var userMap = _mapper.Map<Customer>(registerDto);
+			userMap.Email = registerDto.Email;
+			userMap.SecurityStamp = Guid.NewGuid().ToString();
+			userMap.UserName = registerDto.Email;
+			if (_customerRepository.CreateCustomer(userMap))
+			{
+				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
+				await _userManager.AddToRoleAsync(userMap, role);
+				return true;
+			}
 		}
+		//if (role == "Provider")
+		//{
+		//	var userMap = _mapper.Map<Provider>(registerDto);
+		//	userMap.Email = registerDto.Email;
+		//	userMap.SecurityStamp = Guid.NewGuid().ToString();
+		//	userMap.UserName = registerDto.Email;
+		//	if (_providerRepository.CreateProvider(userMap))
+		//	{
+		//		await _userManager.AddToRoleAsync(userMap, role);
+		//		return true;
+		//	}
+		//}
 		return false;
 	}
 

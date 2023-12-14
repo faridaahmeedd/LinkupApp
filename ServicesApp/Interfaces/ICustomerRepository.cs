@@ -1,4 +1,5 @@
-﻿using ServicesApp.Core.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using ServicesApp.Core.Models;
 using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
@@ -11,8 +12,8 @@ namespace ServicesApp.Interfaces
 		bool CustomerExist(string id);
 		ICollection<ServiceRequest> GetServicesByCustomer(string id);
 		bool CreateCustomer(Customer customer);
-		bool UpdateCustomer(Customer customer);
-		bool DeleteCustomer(string id);
+		Task<IdentityResult> UpdateCustomer(Customer customerUpdate);
+		Task<IdentityResult> DeleteCustomer(string id);
 		bool Save();
 	}
 }

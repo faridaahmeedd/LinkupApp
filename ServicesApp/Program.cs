@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -33,6 +34,18 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>{
 	options.User.RequireUniqueEmail = true;
 	options.User.AllowedUserNameCharacters = null;
 }).AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
+
+builder.Services.AddIdentityCore<Customer>()
+	.AddRoles<IdentityRole>()
+	.AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<Customer, IdentityRole>>()
+	.AddEntityFrameworkStores<DataContext>()
+	.AddDefaultTokenProviders();
+
+builder.Services.AddIdentityCore<Provider>()
+	.AddRoles<IdentityRole>()
+	.AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<Provider, IdentityRole>>()
+	.AddEntityFrameworkStores<DataContext>()
+	.AddDefaultTokenProviders();
 
 
 // make [Authorize] check for token instead of cookie

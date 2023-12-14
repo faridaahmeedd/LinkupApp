@@ -1,17 +1,23 @@
-﻿using ServicesApp.Core.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using ServicesApp.Core.Models;
 using ServicesApp.Data;
+using ServicesApp.Dto;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using System.Reflection;
 
 namespace ServicesApp.Repository
 {
     public class CustomerRepository : ICustomerRepository
 	{
 		public readonly DataContext _context;
-        public CustomerRepository(DataContext context)
+		private readonly UserManager<Customer> _userManager;
+
+		public CustomerRepository(DataContext context, UserManager<Customer> userManager)
         {
             _context = context;
-        }
+			_userManager = userManager;
+		}
         public bool CustomerExist(string id)
 		{
 			return _context.Customers.Any(p => p.Id == id);
@@ -19,7 +25,7 @@ namespace ServicesApp.Repository
 
 		public Customer GetCustomer(string id)
 		{
-			return _context.Customers.Where(p => p.Id == id).FirstOrDefault();
+			return _context.Customers.FirstOrDefault(p => p.Id == id);
 		}
 
 		public ICollection<Customer> GetCustomers()
@@ -37,20 +43,29 @@ namespace ServicesApp.Repository
 			// Change Tracker (add,update,modify)
 			_context.Add(customer);
 			return Save();
-
 		}
 
-		public bool UpdateCustomer(Customer customer)
+		public async Task<IdentityResult> UpdateCustomer(Customer customerUpdate)
 		{
-			_context.Update(customer);
-			return Save();
+			var existingCustomer = await _userManager.FindByIdAsync(customerUpdate.Id);
+			existingCustomer.FName = customerUpdate.FName;
+			existingCustomer.LName = customerUpdate.LName;
+			existingCustomer.Address = customerUpdate.Address;
+			existingCustomer.City = customerUpdate.City;
+			existingCustomer.Country = customerUpdate.Country;
+			existingCustomer.BirthDate = customerUpdate.BirthDate;
+			existingCustomer.Gender = customerUpdate.Gender;
+			existingCustomer.Disability = customerUpdate.Disability;
+			existingCustomer.EmergencyContact = customerUpdate.EmergencyContact;
+			var result = await _userManager.UpdateAsync(existingCustomer);
+			return result;
 		}
 
-		public bool DeleteCustomer(string id)
+		public async Task<IdentityResult> DeleteCustomer(string id)
 		{
-			var cutsomer = _context.Customers.Where(p => p.Id == id).FirstOrDefault();
-			_context.Remove(cutsomer!);
-			return Save();
+			var customer = await _userManager.FindByIdAsync(id);
+			var result = await _userManager.DeleteAsync(customer);
+			return result;
 		}
 
 		public bool Save()

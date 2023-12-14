@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto;
+using ServicesApp.Dto.Authentication;
 using ServicesApp.Models;
 
 namespace ServicesApp.Helper
@@ -13,6 +14,8 @@ namespace ServicesApp.Helper
 			CreateMap<ServiceRequestDto, ServiceRequest>();
 			CreateMap<Customer, CustomerDto>();
 			CreateMap<CustomerDto, Customer>();
+			CreateMap<RegistrationDto, Customer>();
+			CreateMap<CustomerDto, RegistrationDto>();
 		}
     }
 }

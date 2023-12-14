@@ -2,7 +2,6 @@
 {
 	public class CustomerDto
 	{
-		public required string Id { get; set; }
 		public required String FName { get; set; }
 		public required String LName { get; set; }
 		public required String City { get; set; }

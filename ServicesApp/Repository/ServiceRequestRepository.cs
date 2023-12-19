@@ -1,6 +1,9 @@
-﻿using ServicesApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ServicesApp.Core.Models;
+using ServicesApp.Data;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
+using ServicesApp.Migrations;
 using ServicesApp.Models; 
 
 namespace ServicesApp.Repository
@@ -29,19 +32,41 @@ namespace ServicesApp.Repository
 			return _context.Requests.Any(p => p.Id == id);
 		}
 
-		public bool CreateService(ServiceRequest service)
+		public  bool CreateService(ServiceRequest service)
 		{
+		
 			_context.Add(service);
 			return Save();
 		}
 
-		public bool UpdateService(ServiceRequest service)
-		{
-			_context.Update(service);
-			return Save();
-		}
+     
 
-		public bool DeleteService(int id)
+        public bool UpdateService(ServiceRequest updatedService)
+        {
+            var existingService = _context.Requests.Find(updatedService.Id);
+            Console.WriteLine(existingService);
+            Console.WriteLine("before");
+            if (existingService != null)
+            {
+               
+                existingService.Fees = updatedService.Fees;
+                existingService.Description = updatedService.Description;
+                existingService.Image = updatedService.Image; //TODO
+
+           
+
+
+                _context.SaveChanges();
+                Console.WriteLine("After");
+
+                return true;
+            }
+            Console.WriteLine("error");
+
+            return false;
+        }
+
+        public bool DeleteService(int id)
 		{
 			var service = _context.Requests.Where(p => p.Id == id).FirstOrDefault();
 			_context.Remove(service!);
@@ -50,10 +75,10 @@ namespace ServicesApp.Repository
 
 		public bool Save()
 		{
-			//sql code is generated here
-			var saved = _context.SaveChanges();
-			return saved > 0 ? true : false;
-		}
+            //sql code is generated here
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
 
 	}
 }

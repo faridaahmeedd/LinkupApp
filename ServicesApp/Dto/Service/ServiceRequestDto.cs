@@ -9,13 +9,15 @@ namespace ServicesApp.Dto.Service
         public required string Description { get; set; }
         public int Fees { get; set; }
         public byte[]? Image { get; set; }
-        public string? CategoryName { get; set; }
-        public required string CustomerName { get; set; }
-        public required Dictionary<DateOnly, Tuple<TimeOnly, TimeOnly>> TimeSlots { get; set; }
+        //public string? CategoryName { get; set; }
+        //public required string CustomerName { get; set; }
+       // public required ICollection<TimeSlotDto> TimeSlots { get; set; }
 
-        public ServiceRequestDto()
-        {
-            TimeSlots = new Dictionary<DateOnly, Tuple<TimeOnly, TimeOnly>>();
-        }
+        //public required Dictionary<DateOnly, Tuple<TimeOnly, TimeOnly>> TimeSlots { get; set; }
+
+        //public ServiceRequestDto()
+        //{
+        //    TimeSlots = new Dictionary<DateOnly, Tuple<TimeOnly, TimeOnly>>();
+        //}
     }
 }

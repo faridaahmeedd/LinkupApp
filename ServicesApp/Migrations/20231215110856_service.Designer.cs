@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicesApp.Data;
 
@@ -11,9 +12,11 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231215110856_service")]
+    partial class service
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5c27e805-c587-445a-b35b-a04f7f1eb7ce",
+                            Id = "d85c45fc-ab18-48bc-9ab9-ba4215899e8d",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "f2449a0f-2110-446f-9703-2871851f67bb",
+                            Id = "70cd399a-1028-460c-ae13-72bbc5f62773",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "441dd1a2-79ee-4c6b-8cff-6e951fb529e0",
+                            Id = "a95a6bfd-40bb-4cab-898e-56e233f70615",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -339,9 +342,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<int>("Fees")
                         .HasColumnType("int");
-
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 

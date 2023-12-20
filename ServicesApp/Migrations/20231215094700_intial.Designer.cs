@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231214191128_auth")]
-    partial class auth
+    [Migration("20231215094700_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "029a7d70-48e2-4a77-a124-fa136597ccd2",
+                            Id = "55aafdc7-1bb5-42ef-b961-1f63ba299118",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "1ce7581c-e646-4327-90ca-4c22104b06c8",
+                            Id = "1f206e5f-5373-4c7a-861b-fce1ea1a85f4",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "ba22cd70-8273-48b1-99f4-f2f9717a0b67",
+                            Id = "da80f1c8-b3d5-471f-a256-6005273e87fb",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -342,9 +342,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<int>("Fees")
                         .HasColumnType("int");
-
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 

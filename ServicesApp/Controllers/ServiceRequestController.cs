@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-
+using ServicesApp.Repository;
+//TODO : timeslot get   - timeslot update (was 2 slots -- > 1 slot) ? - Image
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -15,12 +16,14 @@ namespace ServicesApp.Controllers
 		private readonly ICustomerRepository _customerRepository;
 		private readonly IMapper _mapper;
 
-		public ServiceRequestController(IServiceRequestRepository ServiceRepository, ICategoryRepository CategoryRepository, ICustomerRepository customerRepository, IMapper mapper)
+		public ServiceRequestController(IServiceRequestRepository ServiceRepository,
+			ICategoryRepository CategoryRepository, ICustomerRepository customerRepository,
+			IMapper mapper)
 		{
 			_serviceRepository = ServiceRepository;
 			_categoryRepository = CategoryRepository;
 			_customerRepository = customerRepository;
-			_mapper = mapper;
+            _mapper = mapper;
 		}
 
 		[HttpGet]
@@ -54,18 +57,19 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
-		public IActionResult CreateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, [FromBody] ServiceRequestDto ServiceCreate)
+		public IActionResult CreateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, 
+			[FromBody] ServiceRequestDto serviceRequestDto )
 		{
-			if (ServiceCreate == null)
+			if (serviceRequestDto == null)
 			{
 				return BadRequest(ModelState);
-			}
+			} 
 
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
-			var serviceMap = _mapper.Map<ServiceRequest>(ServiceCreate);
+			var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
 
 			if (!_categoryRepository.CategoryExist(CategoryId))
 			{
@@ -93,13 +97,15 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		public IActionResult UpdateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, [FromBody] ServiceRequestDto serviceUpdate)
+		public IActionResult UpdateService([FromQuery] string CustomerId, 
+			[FromQuery] int ServiceId, [FromQuery] int CategoryId,
+            [FromBody] ServiceRequestDto serviceRequestDto )
 		{
-			if (serviceUpdate == null)
+			if (serviceRequestDto == null)
 			{
 				return BadRequest(ModelState);
 			}
-			if (!_serviceRepository.ServiceExist(serviceUpdate.Id))
+			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
 				return NotFound();
 			}
@@ -107,9 +113,9 @@ namespace ServicesApp.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-			var serviceMap = _mapper.Map<ServiceRequest>(serviceUpdate);
+			var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
 
-			if (!_categoryRepository.CategoryExist(CategoryId))
+            if (!_categoryRepository.CategoryExist(CategoryId))
 			{
 				ModelState.AddModelError("", "Category doesn't exist");
 				return StatusCode(422, ModelState);
@@ -122,9 +128,9 @@ namespace ServicesApp.Controllers
 				return StatusCode(422, ModelState);
 			}
 			serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
+            serviceMap.Id = ServiceId;
 
-
-			if (!_serviceRepository.UpdateService(serviceMap))
+            if (!_serviceRepository.UpdateService(serviceMap) )
 			{
 				ModelState.AddModelError("", "Something went wrong.");
 				return StatusCode(500, ModelState);

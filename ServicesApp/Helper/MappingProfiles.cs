@@ -21,6 +21,9 @@ namespace ServicesApp.Helper
 			CreateMap<ProviderDto, Provider>();
 			CreateMap<RegistrationDto, Provider>();
 			CreateMap<ProviderDto, RegistrationDto>();
-		}
+            CreateMap<TimeSlot, TimeSlotDto>();
+            CreateMap<TimeSlotDto, TimeSlot>();
+
+        }
     }
 }

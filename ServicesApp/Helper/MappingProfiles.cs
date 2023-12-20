@@ -13,6 +13,8 @@ namespace ServicesApp.Helper
         {
             CreateMap<ServiceRequest, ServiceRequestDto>();
 			CreateMap<ServiceRequestDto, ServiceRequest>();
+			CreateMap<ServiceOffer, ServiceOfferDto>();
+			CreateMap<ServiceOfferDto, ServiceOffer>();
 			CreateMap<Customer, CustomerDto>();
 			CreateMap<CustomerDto, Customer>();
 			CreateMap<RegistrationDto, Customer>();

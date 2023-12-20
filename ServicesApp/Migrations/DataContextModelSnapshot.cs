@@ -51,21 +51,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5c27e805-c587-445a-b35b-a04f7f1eb7ce",
+                            Id = "6d04e218-c600-489c-b5e0-e216a744f018",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "f2449a0f-2110-446f-9703-2871851f67bb",
+                            Id = "c7c0e226-c7f3-44ba-9898-5f33b09196ac",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "441dd1a2-79ee-4c6b-8cff-6e951fb529e0",
+                            Id = "737e2eca-6ca5-4310-aae3-5982ffa83889",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -304,7 +304,7 @@ namespace ServicesApp.Migrations
                     b.Property<string>("ProviderId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ServiceRequestId")
+                    b.Property<int>("RequestId")
                         .HasColumnType("int");
 
                     b.Property<int>("TimeSlotId")
@@ -314,7 +314,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("ProviderId");
 
-                    b.HasIndex("ServiceRequestId");
+                    b.HasIndex("RequestId");
 
                     b.ToTable("Offers");
                 });
@@ -354,11 +354,11 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.TimeSlot", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
@@ -372,7 +372,7 @@ namespace ServicesApp.Migrations
                     b.Property<TimeOnly>("ToTime")
                         .HasColumnType("time");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.HasIndex("ServiceRequestId");
 
@@ -506,7 +506,7 @@ namespace ServicesApp.Migrations
 
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Offers")
-                        .HasForeignKey("ServiceRequestId")
+                        .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

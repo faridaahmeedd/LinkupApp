@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -246,6 +246,7 @@ namespace ServicesApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Fees = table.Column<int>(type: "int", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -320,9 +321,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1f206e5f-5373-4c7a-861b-fce1ea1a85f4", "2", "Provider", "Provider" },
-                    { "55aafdc7-1bb5-42ef-b961-1f63ba299118", "1", "Customer", "Customer" },
-                    { "da80f1c8-b3d5-471f-a256-6005273e87fb", "3", "Admin", "Admin" }
+                    { "0b01c681-6549-4b27-b72b-b05cac51e5af", "2", "Provider", "Provider" },
+                    { "1640ad47-cffa-45e9-8093-3a312702fd6e", "1", "Customer", "Customer" },
+                    { "bed3bd23-9e39-400b-8206-7b91f226d3a3", "3", "Admin", "Admin" }
                 });
 
             migrationBuilder.CreateIndex(

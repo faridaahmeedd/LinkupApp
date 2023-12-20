@@ -12,5 +12,6 @@ namespace ServicesApp.Interfaces
 		bool UpdateService(ServiceRequest service);
 		bool DeleteService(int id);
 		bool Save();
+		public bool TimeSlotsExistInService(int ServiceId, int timeSlotId);
 	}
 }

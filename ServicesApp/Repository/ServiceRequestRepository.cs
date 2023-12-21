@@ -81,15 +81,15 @@ namespace ServicesApp.Repository
 
         public bool CompleteService(int id)
         {
-            var existingOffer = _context.Offers.Find(id);
-            Console.WriteLine(existingOffer);
-            if (existingOffer != null)
+			var request = _context.Requests.Include(o => o.Offers).FirstOrDefault(o => o.Id == id);
+			//var request = _context.Requests.Find(id);
+            if (request != null)
             {
-                var service = _context.Requests.Find(existingOffer.Request.Id);
-                service.Status = "Completed";
-                service.Offers = service.Offers
-                .Where(item => item.Accepted == true)
-                .ToList();
+                request.Status = "Completed";
+				if(request.Offers != null)
+				{
+					request.Offers = request.Offers.Where(item => item.Accepted == true).ToList();
+				}
                 _context.SaveChanges();
                 return true;
             }

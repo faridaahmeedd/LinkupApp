@@ -30,9 +30,12 @@ namespace ServicesApp.Repository
 			return _context.TimeSlots.Where(p => p.ServiceRequest.Id == ServiceId).ToList();
 		}
 
-		public bool AddTimeSlot(TimeSlot timeSlot)
+		public bool AddTimeSlot(List<TimeSlot> timeSlots)
 		{
-			_context.Add(timeSlot);
+			foreach (var item in timeSlots)
+			{
+				_context.Add(item);
+			}
 			return Save();
 		}
 

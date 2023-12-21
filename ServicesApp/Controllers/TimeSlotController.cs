@@ -3,6 +3,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 using ServicesApp.Interfaces;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServicesApp.Controllers
 {
@@ -57,9 +58,9 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
-		public IActionResult AddTimeSlot([FromQuery] int ServiceId, [FromBody] TimeSlotDto timeSlot)
+		public IActionResult AddTimeSlot([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
-			if (timeSlot == null)
+			if (timeSlots == null)
 			{
 				return BadRequest(ModelState);
 			}
@@ -68,16 +69,19 @@ namespace ServicesApp.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-			var mapTimeSlot = _mapper.Map<TimeSlot>(timeSlot);
-
 			if (!_requestRepository.ServiceExist(ServiceId))
 			{
 				ModelState.AddModelError("", "Service doesn't exist");
 				return StatusCode(422, ModelState);
 			}
-			mapTimeSlot.ServiceRequest = _requestRepository.GetService(ServiceId);
-
-			if (!_timeSlotRepository.AddTimeSlot(mapTimeSlot))
+			List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
+			foreach (var item in timeSlots)
+			{
+				var mapItem = _mapper.Map<TimeSlot>(item);
+				mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
+				mapTimeSlots.Add(mapItem);
+			}
+			if (!_timeSlotRepository.AddTimeSlot(mapTimeSlots))
 			{
 				ModelState.AddModelError("", "Something went wrong.");
 				return StatusCode(500, ModelState);

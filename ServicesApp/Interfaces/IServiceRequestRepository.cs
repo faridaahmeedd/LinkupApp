@@ -13,5 +13,7 @@ namespace ServicesApp.Interfaces
 		bool DeleteService(int id);
 		bool Save();
 		public bool TimeSlotsExistInService(int ServiceId, int timeSlotId);
-	}
+		public bool CompleteService(int id);
+
+    }
 }

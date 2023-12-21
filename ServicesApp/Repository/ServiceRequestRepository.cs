@@ -78,6 +78,23 @@ namespace ServicesApp.Repository
 			var timeSlots = _context.TimeSlots.Where(p => p.ServiceRequest.Id == ServiceId);
 			return timeSlots.Any(p => p.Id == timeSlotId);
 		}
-		
-	}
+
+        public bool CompleteService(int id)
+        {
+            var existingOffer = _context.Offers.Find(id);
+            Console.WriteLine(existingOffer);
+            if (existingOffer != null)
+            {
+                var service = _context.Requests.Find(existingOffer.Request.Id);
+                service.Status = "Completed";
+                service.Offers = service.Offers
+                .Where(item => item.Accepted == true)
+                .ToList();
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+    }
 }

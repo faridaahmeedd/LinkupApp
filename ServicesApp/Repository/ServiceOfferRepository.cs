@@ -1,4 +1,5 @@
-﻿using ServicesApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 
@@ -35,19 +36,23 @@ namespace ServicesApp.Repository
 		}
 		public bool AcceptOffer(int id)
 		{
-			var existingOffer = _context.Offers.Find(id);
-			Console.WriteLine(existingOffer);
+			//var existingOffer = _context.Offers.Find(id);
+            var existingOffer = _context.Offers.Include(o => o.Request).FirstOrDefault(o => o.Id == id);
+            Console.WriteLine(existingOffer);
 			if (existingOffer != null)
 			{
 				existingOffer.Accepted = true;
-
-				_context.SaveChanges();
+				Console.WriteLine($"offer {existingOffer}");
+                Console.WriteLine($"request {existingOffer.Request}");
+                var service = _context.Requests.Find(existingOffer.Request.Id);
+				service.Status = "Pending";
+                _context.SaveChanges();
 				return true;
 			}
 			return false;
 		}
 
-		public bool UpdateOffer(ServiceOffer updatedOffer)
+        public bool UpdateOffer(ServiceOffer updatedOffer)
 		{
 			var existingOffer = _context.Offers.Find(updatedOffer.Id);
 			Console.WriteLine(existingOffer);

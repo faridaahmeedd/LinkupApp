@@ -51,21 +51,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6d04e218-c600-489c-b5e0-e216a744f018",
+                            Id = "0a99ae78-b434-4b50-ba12-bab8c3a3251d",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "c7c0e226-c7f3-44ba-9898-5f33b09196ac",
+                            Id = "bb005de8-d856-49e5-aaa1-fb69cc85ed98",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "737e2eca-6ca5-4310-aae3-5982ffa83889",
+                            Id = "33705aea-61d4-4481-9d02-ed02064bf3f8",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -342,6 +342,10 @@ namespace ServicesApp.Migrations
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

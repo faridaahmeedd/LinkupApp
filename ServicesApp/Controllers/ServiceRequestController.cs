@@ -54,24 +54,44 @@ namespace ServicesApp.Controllers
 			return Ok(Service);
 		}
 
-		//[HttpGet("timeslots/{ServiceId}")]
-		//[ProducesResponseType(200, Type = typeof(TimeSlot))]
-		//public IActionResult GetTimeSlotsOfRequest(int ServiceId)
-		//{
-		//	if (!_serviceRepository.ServiceExist(ServiceId))
-		//	{
-		//		return NotFound();
-		//	}
+        [HttpGet("Complete")]
+        [ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
+        public IActionResult CompleteService(int ServiceId)
+        {
+            if (!_serviceRepository.ServiceExist(ServiceId))
+            {
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+			if (!_serviceRepository.CompleteService(ServiceId))
+			{
+                ModelState.AddModelError("", "Something went wrong.");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("Succefully completed");
+        }
 
-		//	var timeSlots = _mapper.Map<List<TimeSlotDto>>(_serviceRepository.GetTimeSlotsOfRequest(ServiceId));
-		//	if (!ModelState.IsValid)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	return Ok(timeSlots);
-		//}
+        //[HttpGet("timeslots/{ServiceId}")]
+        //[ProducesResponseType(200, Type = typeof(TimeSlot))]
+        //public IActionResult GetTimeSlotsOfRequest(int ServiceId)
+        //{
+        //	if (!_serviceRepository.ServiceExist(ServiceId))
+        //	{
+        //		return NotFound();
+        //	}
 
-		[HttpPost]
+        //	var timeSlots = _mapper.Map<List<TimeSlotDto>>(_serviceRepository.GetTimeSlotsOfRequest(ServiceId));
+        //	if (!ModelState.IsValid)
+        //	{
+        //		return BadRequest(ModelState);
+        //	}
+        //	return Ok(timeSlots);
+        //}
+
+        [HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		public IActionResult CreateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, 

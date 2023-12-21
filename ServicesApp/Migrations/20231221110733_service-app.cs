@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class serviceapp : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -248,6 +248,7 @@ namespace ServicesApp.Migrations
                     Fees = table.Column<int>(type: "int", nullable: false),
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -274,9 +275,9 @@ namespace ServicesApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fees = table.Column<int>(type: "int", nullable: false),
                     Accepted = table.Column<bool>(type: "bit", nullable: false),
-                    ServiceRequestId = table.Column<int>(type: "int", nullable: false),
                     TimeSlotId = table.Column<int>(type: "int", nullable: false),
-                    ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RequestId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -287,8 +288,8 @@ namespace ServicesApp.Migrations
                         principalTable: "Provider",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Offers_Requests_ServiceRequestId",
-                        column: x => x.ServiceRequestId,
+                        name: "FK_Offers_Requests_RequestId",
+                        column: x => x.RequestId,
                         principalTable: "Requests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -298,7 +299,7 @@ namespace ServicesApp.Migrations
                 name: "TimeSlots",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     FromTime = table.Column<TimeOnly>(type: "time", nullable: false),
@@ -307,7 +308,7 @@ namespace ServicesApp.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TimeSlots", x => x.id);
+                    table.PrimaryKey("PK_TimeSlots", x => x.Id);
                     table.ForeignKey(
                         name: "FK_TimeSlots_Requests_ServiceRequestId",
                         column: x => x.ServiceRequestId,
@@ -321,9 +322,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0b01c681-6549-4b27-b72b-b05cac51e5af", "2", "Provider", "Provider" },
-                    { "1640ad47-cffa-45e9-8093-3a312702fd6e", "1", "Customer", "Customer" },
-                    { "bed3bd23-9e39-400b-8206-7b91f226d3a3", "3", "Admin", "Admin" }
+                    { "0a99ae78-b434-4b50-ba12-bab8c3a3251d", "1", "Customer", "Customer" },
+                    { "33705aea-61d4-4481-9d02-ed02064bf3f8", "3", "Admin", "Admin" },
+                    { "bb005de8-d856-49e5-aaa1-fb69cc85ed98", "2", "Provider", "Provider" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -371,9 +372,9 @@ namespace ServicesApp.Migrations
                 column: "ProviderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Offers_ServiceRequestId",
+                name: "IX_Offers_RequestId",
                 table: "Offers",
-                column: "ServiceRequestId");
+                column: "RequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Requests_CategoryId",

@@ -33,6 +33,19 @@ namespace ServicesApp.Repository
 			_context.Add(offer);
 			return Save();
 		}
+		public bool AcceptOffer(int id)
+		{
+			var existingOffer = _context.Offers.Find(id);
+			Console.WriteLine(existingOffer);
+			if (existingOffer != null)
+			{
+				existingOffer.Accepted = true;
+
+				_context.SaveChanges();
+				return true;
+			}
+			return false;
+		}
 
 		public bool UpdateOffer(ServiceOffer updatedOffer)
 		{
@@ -41,7 +54,6 @@ namespace ServicesApp.Repository
 			if (existingOffer != null)
 			{
 				existingOffer.Fees = updatedOffer.Fees;
-				existingOffer.Accepted = updatedOffer.Accepted;
 				existingOffer.TimeSlotId = updatedOffer.TimeSlotId;
 
 				_context.SaveChanges();

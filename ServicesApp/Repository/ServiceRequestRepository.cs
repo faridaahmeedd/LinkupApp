@@ -78,5 +78,6 @@ namespace ServicesApp.Repository
 			var timeSlots = _context.TimeSlots.Where(p => p.ServiceRequest.Id == ServiceId);
 			return timeSlots.Any(p => p.Id == timeSlotId);
 		}
+		
 	}
 }

@@ -11,6 +11,7 @@ namespace ServicesApp.Interfaces
 		public bool CreateOffer(ServiceOffer offer);
 		public bool UpdateOffer(ServiceOffer updatedOffer);
 		public bool DeleteOffer(int id);
+		public bool AcceptOffer(int id);
 		public bool Save();
 	}
 }

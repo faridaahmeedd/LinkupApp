@@ -100,35 +100,58 @@ namespace ServicesApp.Controllers
 			return Created($"/api/Service/{offerMap.Id}", offerMap);
 		}
 
-		//[HttpPut()]
-		//[ProducesResponseType(204)]
-		//[ProducesResponseType(400)]
-		//[ProducesResponseType(404)]
-		//public IActionResult UpdateOffer([FromQuery] int OfferId, [FromBody] ServiceOfferDto serviceOfferDto)
-		//{
-		//	if (serviceOfferDto == null)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	if (!_offerRepository.OfferExist(OfferId))
-		//	{
-		//		return NotFound();
-		//	}
-		//	if (!ModelState.IsValid)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	var serviceMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
-  //          serviceMap.Id = OfferId;
+		[HttpPut()]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		public IActionResult UpdateOffer([FromQuery] int OfferId, [FromBody] ServiceOfferDto serviceOfferDto)
+		{
+			if (serviceOfferDto == null)
+			{
+				return BadRequest(ModelState);
+			}
+			if (!_offerRepository.OfferExist(OfferId))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			var serviceMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
+			serviceMap.Id = OfferId;
 
-  //          if (!_offerRepository.UpdateOffer(serviceMap) )
-		//	{
-		//		ModelState.AddModelError("", "Something went wrong.");
-		//		return StatusCode(500, ModelState);
-		//	}
-		//	return Ok("Successfully updated");
-		//}
+			if (!_offerRepository.UpdateOffer(serviceMap))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully updated");
+		}
 
+		[HttpPut("Accept")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		public IActionResult AcceptOffer([FromQuery] int OfferId)
+		{
+		
+			if (!_offerRepository.OfferExist(OfferId))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			if (!_offerRepository.AcceptOffer(OfferId))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Offer Accepted");
+		}
+		 // change status pending
 		//[HttpDelete()]
 		//[ProducesResponseType(204)]
 		//[ProducesResponseType(400)]

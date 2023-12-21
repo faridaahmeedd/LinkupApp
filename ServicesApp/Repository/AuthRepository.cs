@@ -103,7 +103,7 @@ public class AuthRepository
 
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
 			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-			var expiration = DateTime.Now.AddHours(3);
+			var expiration = DateTime.Now.AddMonths(5);
 
 			var jwtToken = new JwtSecurityToken(
 				issuer: _config["JWT:ValidIssuer"],

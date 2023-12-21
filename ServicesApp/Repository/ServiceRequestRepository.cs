@@ -3,7 +3,6 @@ using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
-using ServicesApp.Migrations;
 using ServicesApp.Models; 
 
 namespace ServicesApp.Repository
@@ -39,8 +38,6 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
-     
-
         public bool UpdateService(ServiceRequest updatedService)
         {
             var existingService = _context.Requests.Find(updatedService.Id);
@@ -48,13 +45,9 @@ namespace ServicesApp.Repository
             Console.WriteLine("before");
             if (existingService != null)
             {
-               
                 existingService.Fees = updatedService.Fees;
                 existingService.Description = updatedService.Description;
                 existingService.Image = updatedService.Image; //TODO
-
-           
-
 
                 _context.SaveChanges();
                 Console.WriteLine("After");
@@ -80,5 +73,28 @@ namespace ServicesApp.Repository
             return saved > 0 ? true : false;
         }
 
-	}
+		public bool TimeSlotsExistInService(int ServiceId, int timeSlotId)
+		{
+			var timeSlots = _context.TimeSlots.Where(p => p.ServiceRequest.Id == ServiceId);
+			return timeSlots.Any(p => p.Id == timeSlotId);
+		}
+
+        public bool CompleteService(int id)
+        {
+            var existingOffer = _context.Offers.Find(id);
+            Console.WriteLine(existingOffer);
+            if (existingOffer != null)
+            {
+                var service = _context.Requests.Find(existingOffer.Request.Id);
+                service.Status = "Completed";
+                service.Offers = service.Offers
+                .Where(item => item.Accepted == true)
+                .ToList();
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+    }
 }

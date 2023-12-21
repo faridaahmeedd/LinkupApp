@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231215094700_intial")]
-    partial class intial
+    [Migration("20231221110733_service-app")]
+    partial class serviceapp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "55aafdc7-1bb5-42ef-b961-1f63ba299118",
+                            Id = "0a99ae78-b434-4b50-ba12-bab8c3a3251d",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "1f206e5f-5373-4c7a-861b-fce1ea1a85f4",
+                            Id = "bb005de8-d856-49e5-aaa1-fb69cc85ed98",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "da80f1c8-b3d5-471f-a256-6005273e87fb",
+                            Id = "33705aea-61d4-4481-9d02-ed02064bf3f8",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -307,7 +307,7 @@ namespace ServicesApp.Migrations
                     b.Property<string>("ProviderId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ServiceRequestId")
+                    b.Property<int>("RequestId")
                         .HasColumnType("int");
 
                     b.Property<int>("TimeSlotId")
@@ -317,7 +317,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("ProviderId");
 
-                    b.HasIndex("ServiceRequestId");
+                    b.HasIndex("RequestId");
 
                     b.ToTable("Offers");
                 });
@@ -343,6 +343,13 @@ namespace ServicesApp.Migrations
                     b.Property<int>("Fees")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
@@ -354,11 +361,11 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.TimeSlot", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
@@ -372,7 +379,7 @@ namespace ServicesApp.Migrations
                     b.Property<TimeOnly>("ToTime")
                         .HasColumnType("time");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.HasIndex("ServiceRequestId");
 
@@ -506,7 +513,7 @@ namespace ServicesApp.Migrations
 
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Offers")
-                        .HasForeignKey("ServiceRequestId")
+                        .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

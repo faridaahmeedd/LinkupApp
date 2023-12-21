@@ -27,7 +27,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceRequest>))]
+		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceRequestDto>))]
 		public IActionResult GetServices()
 		{
 			var Service = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServices());
@@ -39,7 +39,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet("{ServiceId}")]
-		[ProducesResponseType(200, Type = typeof(ServiceRequest))]
+		[ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
 		public IActionResult GetService(int ServiceId)
 		{
 			if (!_serviceRepository.ServiceExist(ServiceId))
@@ -54,16 +54,53 @@ namespace ServicesApp.Controllers
 			return Ok(Service);
 		}
 
-		[HttpPost]
+        [HttpGet("Complete")]
+        [ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
+        public IActionResult CompleteService(int ServiceId)
+        {
+            if (!_serviceRepository.ServiceExist(ServiceId))
+            {
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+			if (!_serviceRepository.CompleteService(ServiceId))
+			{
+                ModelState.AddModelError("", "Something went wrong.");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("Succefully completed");
+        }
+
+        //[HttpGet("timeslots/{ServiceId}")]
+        //[ProducesResponseType(200, Type = typeof(TimeSlot))]
+        //public IActionResult GetTimeSlotsOfRequest(int ServiceId)
+        //{
+        //	if (!_serviceRepository.ServiceExist(ServiceId))
+        //	{
+        //		return NotFound();
+        //	}
+
+        //	var timeSlots = _mapper.Map<List<TimeSlotDto>>(_serviceRepository.GetTimeSlotsOfRequest(ServiceId));
+        //	if (!ModelState.IsValid)
+        //	{
+        //		return BadRequest(ModelState);
+        //	}
+        //	return Ok(timeSlots);
+        //}
+
+        [HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		public IActionResult CreateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, 
-			[FromBody] ServiceRequestDto serviceRequestDto )
+			[FromBody] ServiceRequestDto serviceRequestDto)
 		{
 			if (serviceRequestDto == null)
 			{
 				return BadRequest(ModelState);
-			} 
+			}
 
 			if (!ModelState.IsValid)
 			{
@@ -97,9 +134,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		public IActionResult UpdateService([FromQuery] string CustomerId, 
-			[FromQuery] int ServiceId, [FromQuery] int CategoryId,
-            [FromBody] ServiceRequestDto serviceRequestDto )
+		public IActionResult UpdateService([FromQuery] int ServiceId, [FromBody] ServiceRequestDto serviceRequestDto )
 		{
 			if (serviceRequestDto == null)
 			{
@@ -114,20 +149,6 @@ namespace ServicesApp.Controllers
 				return BadRequest(ModelState);
 			}
 			var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
-
-            if (!_categoryRepository.CategoryExist(CategoryId))
-			{
-				ModelState.AddModelError("", "Category doesn't exist");
-				return StatusCode(422, ModelState);
-			}
-			serviceMap.Category = _categoryRepository.GetCategory(CategoryId);
-
-			if (!_customerRepository.CustomerExist(CustomerId))
-			{
-				ModelState.AddModelError("", "Customer doesn't exist");
-				return StatusCode(422, ModelState);
-			}
-			serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
             serviceMap.Id = ServiceId;
 
             if (!_serviceRepository.UpdateService(serviceMap) )

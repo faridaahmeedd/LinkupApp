@@ -7,7 +7,6 @@ namespace ServicesApp.Models
         public string Id { get; set; }
         public String Password { get; set; }
         public string Email { get; set; }
-        public string FName { get; set; }
-        public string LName { get; set; }
+   
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class admin : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,9 @@ namespace ServicesApp.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -322,9 +324,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "06385b62-d855-4781-ad16-298ad1627a4f", "3", "Admin", "Admin" },
-                    { "1bfadf93-00b7-4ab6-a8fc-3cdb4d332ff5", "1", "Customer", "Customer" },
-                    { "360c94f6-8059-48e4-8a5e-840a2a62e227", "2", "Provider", "Provider" }
+                    { "14bb625b-4963-4d56-bfd4-e3d1f9ebfa34", "2", "Provider", "Provider" },
+                    { "314f3559-44fe-436a-9d4f-7ffa0653734c", "1", "Customer", "Customer" },
+                    { "f3970f6c-3c84-4d4b-babf-01cbf4486471", "3", "Admin", "Admin" }
                 });
 
             migrationBuilder.CreateIndex(

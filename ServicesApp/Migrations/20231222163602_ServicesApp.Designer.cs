@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicesApp.Data;
 
@@ -11,9 +12,11 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231222163602_ServicesApp")]
+    partial class ServicesApp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,33 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-<<<<<<< HEAD:ServicesApp/Migrations/DataContextModelSnapshot.cs
                             Id = "9a036b88-c347-4ffb-841f-a1f6279dc6e5",
-=======
-                            Id = "314f3559-44fe-436a-9d4f-7ffa0653734c",
->>>>>>> 202b1ab411ef1c7768f862d4e28eaee6224ad19f:ServicesApp/Interfaces/Migrations/DataContextModelSnapshot.cs
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-<<<<<<< HEAD:ServicesApp/Migrations/DataContextModelSnapshot.cs
                             Id = "6954697e-edae-4ed4-8166-ada00cbde579",
-=======
-                            Id = "14bb625b-4963-4d56-bfd4-e3d1f9ebfa34",
->>>>>>> 202b1ab411ef1c7768f862d4e28eaee6224ad19f:ServicesApp/Interfaces/Migrations/DataContextModelSnapshot.cs
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-<<<<<<< HEAD:ServicesApp/Migrations/DataContextModelSnapshot.cs
                             Id = "ef6fe85b-e9a2-404e-8a86-bb196935684b",
-=======
-                            Id = "f3970f6c-3c84-4d4b-babf-01cbf4486471",
->>>>>>> 202b1ab411ef1c7768f862d4e28eaee6224ad19f:ServicesApp/Interfaces/Migrations/DataContextModelSnapshot.cs
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -196,14 +187,6 @@ namespace ServicesApp.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

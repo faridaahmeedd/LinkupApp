@@ -27,7 +27,22 @@ namespace ServicesApp.Controllers
 			return Ok(Admins);
 		}
 
-		[HttpGet("{AdminId}")]
+		//when use async
+        /*[HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Admin>))]
+        public async Task<IActionResult> GetAdmins()
+        {
+            var admins = await _adminRepository.GetAdminsAsync();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(admins);
+        }
+		*/
+
+
+        [HttpGet("{AdminId}")]
 		[ProducesResponseType(200, Type = typeof(Admin))]
 		public IActionResult GetAdmin(string AdminId)
 		{

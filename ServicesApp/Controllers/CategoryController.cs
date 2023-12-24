@@ -29,7 +29,7 @@ namespace ServicesApp.Controllers
 			return Ok(category);
 		}
 
-		[HttpGet("{CategoryId:int}", Name ="GetCategoryById")]
+		[HttpGet("ById/{CategoryId:int}", Name ="GetCategoryById")]
 		[ProducesResponseType(200, Type = typeof(Category))]
 		public IActionResult GetCategory(int CategoryId)
 		{

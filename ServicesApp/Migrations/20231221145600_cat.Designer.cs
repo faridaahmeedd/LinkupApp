@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicesApp.Data;
 
@@ -11,9 +12,11 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231221145600_cat")]
+    partial class cat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "9a036b88-c347-4ffb-841f-a1f6279dc6e5",
+                            Id = "cb2b771d-0795-4d3c-bc36-07eb0e52f9b6",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "6954697e-edae-4ed4-8166-ada00cbde579",
+                            Id = "11727d6d-3bc0-49b1-b284-d9216f281ecd",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "ef6fe85b-e9a2-404e-8a86-bb196935684b",
+                            Id = "2fe1b16d-40cb-4856-96b6-91575620aaca",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -183,14 +186,6 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Admins");
@@ -265,24 +260,24 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.Category", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdProp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdProp"));
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionProp")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MinFees")
+                    b.Property<int>("MinFeesProp")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NameProp")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdProp");
 
                     b.ToTable("Categories");
                 });
@@ -327,7 +322,7 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int>("CategoryIdProp")
                         .HasColumnType("int");
 
                     b.Property<string>("CustomerId")
@@ -349,7 +344,7 @@ namespace ServicesApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryIdProp");
 
                     b.HasIndex("CustomerId");
 
@@ -523,7 +518,7 @@ namespace ServicesApp.Migrations
                 {
                     b.HasOne("ServicesApp.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("CategoryIdProp")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

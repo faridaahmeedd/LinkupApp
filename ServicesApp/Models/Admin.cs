@@ -2,8 +2,9 @@
 
 namespace ServicesApp.Models
 {
-	public class Admin
+	public class Admin 
 	{
+<<<<<<< HEAD
         private string _Id;
         private String _Password;
         private string _Email;
@@ -34,5 +35,11 @@ namespace ServicesApp.Models
         }
 
         
+=======
+        public string Id { get; set; }
+        public String Password { get; set; }
+        public string Email { get; set; }
+   
+>>>>>>> 202b1ab411ef1c7768f862d4e28eaee6224ad19f
     }
 }

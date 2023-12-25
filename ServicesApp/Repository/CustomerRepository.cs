@@ -55,6 +55,7 @@ namespace ServicesApp.Repository
 			existingCustomer.Gender = customerUpdate.Gender;
 			existingCustomer.Disability = customerUpdate.Disability;
 			existingCustomer.EmergencyContact = customerUpdate.EmergencyContact;
+			existingCustomer.MobileNumber = customerUpdate.MobileNumber;
 			var result = await _userManager.UpdateAsync(existingCustomer);
 			return result;
 		}

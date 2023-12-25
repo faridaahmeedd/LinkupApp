@@ -7,9 +7,12 @@ using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
-
+using Microsoft.AspNetCore.Mvc;
+using System;
 public class AuthRepository
 {
 	private readonly UserManager<AppUser> _userManager;
@@ -18,14 +21,16 @@ public class AuthRepository
 	private readonly IMapper _mapper;
 	private readonly ICustomerRepository _customerRepository;
 	private readonly IProviderRepository _providerRepository;
+   
 
-	public AuthRepository(
+
+    public AuthRepository(
 		UserManager<AppUser> userManager,
 		IConfiguration config,
 		RoleManager<IdentityRole> roleManager,
 		IMapper mapper,
 		ICustomerRepository customerRepository,
-		IProviderRepository providerRepository)
+		IProviderRepository providerRepository )
 	{
 		_userManager = userManager;
 		_config = config;
@@ -120,4 +125,90 @@ public class AuthRepository
 
 		return (null, DateTime.MinValue);
 	}
+
+
+
+
+  
+    public async  Task<string> ForgetPassword( string mail )
+	{
+        string senderEmail = "shrookayman617@gmail.com";
+        string senderPassword = "duzi ugle sqrh wtgx"; 
+        string recipientEmail = mail;
+
+        var user = await _userManager.FindByEmailAsync(mail);
+		if (user == null){
+			
+			return string.Empty;
+		}
+
+        string resetCode = GenerateRandomCode(); 
+
+        // Save the confirmation code in your database or a secure storage
+        //user.ConfirmationCode = confirmationCode; 
+       // await _userManager.UpdateAsync(user);
+
+
+        MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+        {
+            Subject = "Linkup Reset Password Email",
+            Body = $"Reset Code : {resetCode}",
+            IsBodyHtml = true , 
+        }; 
+
+        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(senderEmail, senderPassword),
+            EnableSsl = true
+        };
+
+        try
+        {
+            smtpClient.Send(mailMessage);
+            Console.WriteLine("Email sent successfully!");
+            return resetCode;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        return string.Empty;
+	}
+
+    private string GenerateRandomCode(int length = 6)
+    {
+        const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        Random random = new Random();
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+
+    public async Task<bool> ResetPassword(string mail, string newPassword)
+    {
+        var user = await _userManager.FindByEmailAsync(mail);
+
+        if (user == null )
+        {
+            return false; 
+        }
+
+        // Reset the user's password
+       // var jjj = await _userManager.ChangePasswordAsync()
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+
+        if (result.Succeeded)
+        {
+           
+            await _userManager.UpdateAsync(user);
+            return true; 
+        }
+		return false;
+    }
+
+
+
 }

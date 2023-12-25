@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Authentication;
 
 [Route("api/[controller]")]
@@ -54,4 +55,40 @@ public class AuthController : ControllerBase
 		}
 		return Unauthorized();
 	}
+
+	[HttpPost("forgetPassword")]
+	public  async Task<IActionResult> ForgetPassword(string mail)
+	{
+        var resetCode = await _authRepository.ForgetPassword(mail);
+
+        if (resetCode != string.Empty)
+		{
+			return Ok(resetCode);
+		}
+		return BadRequest("Can not send mail");
+
+	}
+    [HttpPut("resetPassword")]
+    public async Task<IActionResult> ResetPassword([FromBody] RegistrationDto registrationDto)
+    {
+
+
+        if (registrationDto.Password == registrationDto.ConfirmPassword)
+        {
+			Console.Write(registrationDto.Password);
+            
+			var resetPassword = await _authRepository.ResetPassword(registrationDto.Email, registrationDto.Password);
+
+			if (resetPassword)
+			{
+                return Ok("Password Changed Successfully.");
+
+            }
+        }
+        return BadRequest("Can not Change Password.");
+
+    }
+
+
+
 }

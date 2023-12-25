@@ -12,7 +12,7 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231225135035_intial")]
+    [Migration("20231225173149_intial")]
     partial class intial
     {
         /// <inheritdoc />
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c6fced6f-1e97-486e-9c95-14ef3d342009",
+                            Id = "144cfe0a-d056-4844-99b3-0cd5de43ec7e",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "4c8ef619-99dc-4356-8319-5d4ea84f3466",
+                            Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "19c5b85f-f5ce-4fc5-9b0f-2a7b23fce149",
+                            Id = "831f1147-aa54-4038-ac59-aafc37bbb7f2",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -235,12 +235,6 @@ namespace ServicesApp.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -340,9 +334,6 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Fees")
-                        .HasColumnType("int");
-
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
 
@@ -417,6 +408,9 @@ namespace ServicesApp.Migrations
                     b.Property<string>("LName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MobileNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.ToTable("Customer");
                 });
 
@@ -449,6 +443,9 @@ namespace ServicesApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MobileNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("Provider");

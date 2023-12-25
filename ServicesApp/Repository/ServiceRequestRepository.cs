@@ -45,7 +45,6 @@ namespace ServicesApp.Repository
             Console.WriteLine("before");
             if (existingService != null)
             {
-                existingService.Fees = updatedService.Fees;
                 existingService.Description = updatedService.Description;
                 existingService.Image = updatedService.Image; //TODO
 
@@ -109,6 +108,19 @@ namespace ServicesApp.Repository
             }
             return null;
         }
+        public ServiceOffer AcceptedOffer(int serviceId)
+        {
+            var serviceRequest = _context.Requests.Include(sr => sr.Offers).FirstOrDefault(sr => sr.Id == serviceId);
+
+            if (serviceRequest != null)
+            {
+                var acceptedOffer = serviceRequest.Offers.FirstOrDefault(o => o.Accepted);
+                return acceptedOffer;
+            }
+
+            return null;
+        }
+
 
     }
 }

@@ -54,7 +54,9 @@ namespace ServicesApp.Repository
 			existingProvider.Gender = ProviderUpdate.Gender;
 			existingProvider.JobTitle = ProviderUpdate.JobTitle;
 			existingProvider.Description = ProviderUpdate.Description;
-			var result = await _userManager.UpdateAsync(existingProvider);
+			existingProvider.MobileNumber = ProviderUpdate.MobileNumber;
+
+            var result = await _userManager.UpdateAsync(existingProvider);
 			return result;
 		}
 

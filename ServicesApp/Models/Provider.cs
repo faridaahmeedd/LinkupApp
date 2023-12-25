@@ -11,7 +11,8 @@ namespace ServicesApp.Models
 		public String? City { get; set; }
 		public String? Country { get; set; }
 		public String? Address { get; set; }
-		public bool Gender { get; set; }
+        public String? MobileNumber { get; set; }
+        public bool Gender { get; set; }
 		public DateOnly BirthDate { get; set; }
 		public String? JobTitle { get; set; }
         public String? Description { get; set; }

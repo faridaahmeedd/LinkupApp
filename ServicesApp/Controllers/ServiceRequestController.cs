@@ -208,6 +208,24 @@ namespace ServicesApp.Controllers
 
             return NotFound();
         }
+        [HttpGet("accepted-offer")]
+        [ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
+        [ProducesResponseType(404)]
+        public IActionResult GetAcceptedOffer(int serviceId)
+        {
+            var acceptedOffer = _serviceRepository.AcceptedOffer(serviceId);
+
+            if (acceptedOffer != null)
+            {
+                var offersMap = _mapper.Map<ServiceOfferDto>(acceptedOffer);
+
+                return Ok(offersMap);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
 
     }
 }

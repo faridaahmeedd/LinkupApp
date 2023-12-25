@@ -53,8 +53,6 @@ namespace ServicesApp.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
@@ -196,6 +194,7 @@ namespace ServicesApp.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Disability = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -222,6 +221,7 @@ namespace ServicesApp.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -245,7 +245,6 @@ namespace ServicesApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Fees = table.Column<int>(type: "int", nullable: false),
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -322,9 +321,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "19c5b85f-f5ce-4fc5-9b0f-2a7b23fce149", "3", "Admin", "Admin" },
-                    { "4c8ef619-99dc-4356-8319-5d4ea84f3466", "2", "Provider", "Provider" },
-                    { "c6fced6f-1e97-486e-9c95-14ef3d342009", "1", "Customer", "Customer" }
+                    { "144cfe0a-d056-4844-99b3-0cd5de43ec7e", "1", "Customer", "Customer" },
+                    { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "2", "Provider", "Provider" },
+                    { "831f1147-aa54-4038-ac59-aafc37bbb7f2", "3", "Admin", "Admin" }
                 });
 
             migrationBuilder.CreateIndex(

@@ -22,7 +22,12 @@ namespace ServicesApp.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			base.OnModelCreating(modelBuilder);
+
+            base.OnModelCreating(modelBuilder);
+			modelBuilder.Entity<AppUser>().Ignore(c => c.PhoneNumber)
+											   .Ignore(c => c.PhoneNumberConfirmed);
+                                               
+            base.OnModelCreating(modelBuilder);
 			SeedRoles(modelBuilder);
 			//modelBuilder.HasDefaultSchema("dbo");
 			//modelBuilder.Entity<IdentityUser>().ToTable("Users");

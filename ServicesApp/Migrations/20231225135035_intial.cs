@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class cat : Migration
+    public partial class intial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,9 @@ namespace ServicesApp.Migrations
                 name: "Admins",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -67,15 +69,15 @@ namespace ServicesApp.Migrations
                 name: "Categories",
                 columns: table => new
                 {
-                    IdProp = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NameProp = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DescriptionProp = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MinFeesProp = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MinFees = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.IdProp);
+                    table.PrimaryKey("PK_Categories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -245,7 +247,7 @@ namespace ServicesApp.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Fees = table.Column<int>(type: "int", nullable: false),
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    CategoryIdProp = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -253,10 +255,10 @@ namespace ServicesApp.Migrations
                 {
                     table.PrimaryKey("PK_Requests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Requests_Categories_CategoryIdProp",
-                        column: x => x.CategoryIdProp,
+                        name: "FK_Requests_Categories_CategoryId",
+                        column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "IdProp",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Requests_Customer_CustomerId",
@@ -320,9 +322,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "11727d6d-3bc0-49b1-b284-d9216f281ecd", "2", "Provider", "Provider" },
-                    { "2fe1b16d-40cb-4856-96b6-91575620aaca", "3", "Admin", "Admin" },
-                    { "cb2b771d-0795-4d3c-bc36-07eb0e52f9b6", "1", "Customer", "Customer" }
+                    { "19c5b85f-f5ce-4fc5-9b0f-2a7b23fce149", "3", "Admin", "Admin" },
+                    { "4c8ef619-99dc-4356-8319-5d4ea84f3466", "2", "Provider", "Provider" },
+                    { "c6fced6f-1e97-486e-9c95-14ef3d342009", "1", "Customer", "Customer" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -375,9 +377,9 @@ namespace ServicesApp.Migrations
                 column: "RequestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Requests_CategoryIdProp",
+                name: "IX_Requests_CategoryId",
                 table: "Requests",
-                column: "CategoryIdProp");
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Requests_CustomerId",

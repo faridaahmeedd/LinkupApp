@@ -76,11 +76,11 @@ namespace ServicesApp.Controllers
 		//}
 
 
-		[HttpPost("Update")]
+		[HttpPost("Create")]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		public async Task<IActionResult> UpdateProfile(CustomerDto customerUpdate, string CustomerId)
+		public async Task<IActionResult> CreateProfile(CustomerDto customerUpdate, string CustomerId)
 		{
 			if (customerUpdate == null)
 			{

@@ -95,6 +95,20 @@ namespace ServicesApp.Repository
             }
             return false;
         }
+		public ICollection<ServiceOffer> GetOffersOfService(int id )
+		{
+            var request = _context.Requests.Include(o => o.Offers).FirstOrDefault(o => o.Id == id);
+           
+            if (request != null)
+            {
+                var Offers = request.Offers;
+                if (request.Offers != null)
+                {
+                    return Offers;
+                }
+            }
+            return null;
+        }
 
     }
 }

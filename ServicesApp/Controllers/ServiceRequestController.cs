@@ -181,5 +181,33 @@ namespace ServicesApp.Controllers
 			}
 			return Ok("Successfully deleted");
 		}
-	}
+
+        [HttpGet("GetOffersOfService/{id}")]
+        [ProducesResponseType(200, Type = typeof(ICollection<ServiceOfferDto>))]
+        [ProducesResponseType(404)]
+        public IActionResult GetOffersOfService(int id)
+        {
+           
+            if (!_serviceRepository.ServiceExist(id))
+            {
+                return NotFound();
+            }
+            var offers = _serviceRepository.GetOffersOfService(id);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (offers != null)
+            {
+
+                var offersMap = _mapper.Map<List<ServiceOfferDto>>(offers);
+
+                return Ok(offersMap);
+            }
+
+            return NotFound();
+        }
+
+    }
 }

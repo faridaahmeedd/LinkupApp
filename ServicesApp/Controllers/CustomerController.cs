@@ -126,6 +126,10 @@ namespace ServicesApp.Controllers
 				ModelState.AddModelError("", "Something went wrong.");
 				return StatusCode(500, result.Errors);
 			}
+			if(result == null)
+			{
+                return BadRequest(ModelState);
+            }
 			return Ok("Successfully deleted");
 			// TODO : GET SERVICES BY CUSTOMER MAKE SURE THERE IS NO SERVICES BEFORE DELETING CUSTOMER
 		}

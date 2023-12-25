@@ -66,7 +66,7 @@ namespace ServicesApp.Repository
 			}
 			return false;
 		}
-
+		//request -- offer req---offer delete (accepted & in same day)
 		public bool DeleteOffer(int id)
 		{
 			var offer = _context.Offers.Where(p => p.Id == id).FirstOrDefault();

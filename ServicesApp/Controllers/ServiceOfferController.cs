@@ -5,6 +5,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Repository;
+using System;
 
 namespace ServicesApp.Controllers
 {
@@ -15,16 +16,19 @@ namespace ServicesApp.Controllers
 		private readonly IServiceOfferRepository _offerRepository;
 		private readonly IServiceRequestRepository _requestRepository;
 		private readonly IProviderRepository _providerRepository;
+		private readonly ITimeSlotsRepository _timeSlotsRepository;
 		private readonly IMapper _mapper;
 
 		public ServiceOfferController(IServiceRequestRepository RequestRepository, 
 			IServiceOfferRepository OfferRepository,
 			IProviderRepository ProviderRepository,
+			ITimeSlotsRepository TimeSlotsRepository,
 			IMapper mapper)
 		{
 			_offerRepository = OfferRepository;
 			_requestRepository = RequestRepository;
 			_providerRepository = ProviderRepository;
+			_timeSlotsRepository = TimeSlotsRepository;
 			_mapper = mapper;
 		}
 
@@ -86,9 +90,32 @@ namespace ServicesApp.Controllers
 				ModelState.AddModelError("", "Time slot is not available for this request");
 				return StatusCode(422, ModelState);
 			}
-
 			var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
+			Console.WriteLine(serviceOfferDto.TimeSlotId);
 
+			
+			if(_timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId) == null)
+			{
+                ModelState.AddModelError("", "Time slot not found");
+                return StatusCode(422, ModelState);
+            }
+		
+            // Retrieve the TimeSlot information
+            var timeSlot = _timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId);
+
+            // Assuming TakeTime is a valid TimeOnly duration            
+			var toTime = timeSlot.FromTime.AddMinutes(serviceOfferDto.TakeTime);
+            timeSlot.ToTime = toTime;
+
+            Console.WriteLine(toTime);
+
+            if (!_timeSlotsRepository.UpdateToTime(timeSlot))
+            {
+                ModelState.AddModelError("", "Failed to update TimeSlot");
+                return StatusCode(500, ModelState);
+            }
+
+            
 			offerMap.Provider = _providerRepository.GetProvider(serviceOfferDto.ProviderId);
 			offerMap.Request = _requestRepository.GetService(serviceOfferDto.RequestId);
 

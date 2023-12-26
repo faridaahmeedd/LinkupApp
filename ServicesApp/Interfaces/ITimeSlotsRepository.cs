@@ -9,7 +9,7 @@ namespace ServicesApp.Interfaces
 		TimeSlot GetTimeSlot(int id);
 		ICollection<TimeSlot> GetTimeSlotsOfService(int ServiceId);
 		bool AddTimeSlot(List<TimeSlot> timeSlots);
-		//bool UpdateTimeSlot(TimeSlot timeSlot);
+		bool UpdateToTime(TimeSlot timeSlot);
 		bool DeleteTimeSlot(int id);
 		bool Save();
 	}

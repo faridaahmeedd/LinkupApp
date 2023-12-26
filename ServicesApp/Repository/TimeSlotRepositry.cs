@@ -39,24 +39,22 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
-		public bool DeleteTimeSlot(int id)
+
+        public bool DeleteTimeSlot(int id)
 		{
 			_context.Remove(id);
 			return Save();
 		}
 
-		//public bool UpdateTimeSlot(TimeSlot timeSlot)
-        //{
-        //  var existingTimeSlot = _context.TimeSlots.Find(timeSlot.Id);
-		//	if (existingTimeSlot != null)
-		//	{
-		//		// Update properties of existingService with values from updatedService
-		//		existingTimeSlot.FromTime = timeSlot.FromTime;
-		//		existingTimeSlot.ToTime = timeSlot.ToTime;
-		//		existingTimeSlot.Date = timeSlot.Date;
-		//	}
-		//  return Save();
-		//}
+		public bool UpdateToTime(TimeSlot timeSlot)
+        {
+          var existingTimeSlot = GetTimeSlot(timeSlot.Id);
+			if (existingTimeSlot != null)
+		    {
+			  existingTimeSlot.ToTime = timeSlot.ToTime;
+		    }
+		  return Save();
+		}
 
 		public bool Save()
 		{

@@ -1,4 +1,6 @@
-﻿using ServicesApp.Data;
+﻿using Microsoft.AspNetCore.Identity;
+using ServicesApp.Core.Models;
+using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 
@@ -6,30 +8,64 @@ namespace ServicesApp.Repository
 {
     public class AdminRepository : IAdminRepository
     {
-        public readonly DataContext _context;
-        public AdminRepository(DataContext context)
+        private readonly DataContext _context;
+		private readonly UserManager<AppUser> _userManager;
+
+		public AdminRepository(DataContext context, UserManager<AppUser> userManager)
         {
             _context = context;
-        }
+			_userManager = userManager;
+		}
 
-        public bool AdminExist(string id)
+        public async Task<bool> AdminExist(string id)
         {
-            return _context.Admins.Any(p => p.Id == id);
+			var admin = await _userManager.FindByIdAsync(id);
+			if(admin == null)
+			{
+				return false;
+			}
+			var result = await _userManager.IsInRoleAsync(admin, "Admin");
+			return result;
         }
 
-        public Admin GetAdmin(string id)
+		public bool CreateAdmin(Admin admin)
+		{
+			_context.Add(admin);
+			return Save();
+		}
+
+		public async Task<AppUser> GetAdmin(string id)
         {
-            return _context.Admins.Where(p => p.Id == id).FirstOrDefault();
+			var admin = await _userManager.FindByIdAsync(id);
+			if(admin != null)
+			{
+				if(await _userManager.IsInRoleAsync(admin, "Admin"))
+					return admin;
+			}
+			return null;
         }
 
-        //public Admin GetAdmin(string email, string password)
-        //{
-        //    return _context.Admins.Where(p => p.Email == email && p. == password).FirstOrDefault();
-        //}
-
-        public ICollection<Admin> GetAdmins()
+        public async Task<ICollection<AppUser>> GetAdmins()
         {
-            return _context.Admins.OrderBy(p => p.Id).ToList();
+			var admins = await _userManager.GetUsersInRoleAsync("Admin");
+			return admins;
         }
-    }
+
+		public async Task<bool> DeleteAdmin(string id)
+		{
+			var admin = await GetAdmin(id);
+			if(admin != null)
+			{
+				await _userManager.DeleteAsync(admin);
+				return true;
+			}
+			return false;
+		}
+
+		public bool Save()
+		{
+			var saved = _context.SaveChanges();
+			return saved > 0 ? true : false;
+		}
+	}
 }

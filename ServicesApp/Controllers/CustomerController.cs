@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
-using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
 
@@ -52,31 +51,7 @@ namespace ServicesApp.Controllers
 			return Ok(mapCustomer);
 		}
 
-
-		//[HttpGet("services/{CustomerId}")]
-		//[ProducesResponseType(200, Type = typeof(List<ServiceRequestDto>))]
-		//public IActionResult GetServicesByCustomer(string CustomerId)
-		//{
-		//	if (!_customerRepository.CustomerExist(CustomerId))
-		//	{
-		//		return NotFound();
-		//	}
-		//	var services = _customerRepository.GetServicesByCustomer(CustomerId);
-		//	if(services == null)
-		//	{
-		//		return NotFound();
-		//	}
-
-		//	var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
-		//	if (!ModelState.IsValid)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	return Ok(mapServices);
-		//}
-
-
-		[HttpPost("Create")]
+		[HttpPost("Profile")]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
@@ -131,36 +106,28 @@ namespace ServicesApp.Controllers
                 return BadRequest(ModelState);
             }
 			return Ok("Successfully deleted");
-			// TODO : GET SERVICES BY CUSTOMER MAKE SURE THERE IS NO SERVICES BEFORE DELETING CUSTOMER
 		}
 
-		//[HttpPost]
-		//[ProducesResponseType(204)]
-		//[ProducesResponseType(400)]
-		//public IActionResult CreateProfile(CustomerDto CustomerCreate)
+		//[HttpGet("services/{CustomerId}")]
+		//[ProducesResponseType(200, Type = typeof(List<ServiceRequestDto>))]
+		//public IActionResult GetServicesByCustomer(string CustomerId)
 		//{
-		//	if (CustomerCreate == null)
+		//	if (!_customerRepository.CustomerExist(CustomerId))
 		//	{
-		//		return BadRequest(ModelState);
+		//		return NotFound();
 		//	}
-		//	var customer = _customerRepository.GetCustomers().Where(c => c.Id == CustomerCreate.Id).FirstOrDefault();
-		//	if (customer == null)
+		//	var services = _customerRepository.GetServicesByCustomer(CustomerId);
+		//	if(services == null)
 		//	{
-		//		ModelState.AddModelError("", "Customer doesn't exist");
-		//		return StatusCode(422, ModelState);
+		//		return NotFound();
 		//	}
+
+		//	var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
 		//	if (!ModelState.IsValid)
 		//	{
 		//		return BadRequest(ModelState);
 		//	}
-		//	var customerMap = _mapper.Map<Customer>(CustomerCreate);
-
-		//	if (!_customerRepository.UpdateCustomer(customerMap))
-		//	{
-		//		ModelState.AddModelError("", "Something went wrong.");
-		//		return StatusCode(500, ModelState);
-		//	}
-		//	return Ok("Profile Updated successfully");
+		//	return Ok(mapServices);
 		//}
 	}
 }

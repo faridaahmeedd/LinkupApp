@@ -24,8 +24,8 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IServiceRequestRepository, ServiceRequestRepository>();
 builder.Services.AddScoped<IServiceOfferRepository, ServiceOfferRepository>();
 builder.Services.AddScoped<ITimeSlotsRepository , TimeSlotRepositry>();
-
 builder.Services.AddScoped<AuthRepository>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,10 +33,14 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(
 	builder.Configuration.GetConnectionString("DefaultConnection")
 ));
 
-builder.Services.AddIdentity<AppUser, IdentityRole>(options =>{
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
 	options.User.RequireUniqueEmail = true;
 	options.User.AllowedUserNameCharacters = null;
-}).AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
+})
+.AddEntityFrameworkStores<DataContext>()
+.AddDefaultTokenProviders();
+
 
 builder.Services.AddIdentityCore<Customer>()
 	.AddRoles<IdentityRole>()

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Interfaces;
-using ServicesApp.Models;
 
 namespace ServicesApp.Controllers
 {
@@ -16,10 +15,10 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(Admin))]
-		public IActionResult GetAdmins()
+		[ProducesResponseType(200)]
+		public async Task<IActionResult> GetAdmins()
 		{
-			var Admins = _adminRepository.GetAdmins();
+			var Admins = await _adminRepository.GetAdmins();
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
@@ -28,14 +27,14 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet("{AdminId}")]
-		[ProducesResponseType(200, Type = typeof(Admin))]
-		public IActionResult GetAdmin(string AdminId)
+		[ProducesResponseType(200)]
+		public async Task<IActionResult> GetAdmin(string AdminId)
 		{
-			if (!_adminRepository.AdminExist(AdminId))
+			if (! await _adminRepository.AdminExist(AdminId))
 			{
 				return NotFound();
 			}
-			var Admin = _adminRepository.GetAdmin(AdminId);
+			var Admin = await _adminRepository.GetAdmin(AdminId);
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
@@ -43,20 +42,25 @@ namespace ServicesApp.Controllers
 			return Ok(Admin);
 		}
 
-		//[HttpGet("Login")]
-		//[ProducesResponseType(200, Type = typeof(Admin))]
-		//public IActionResult Login([FromQuery] string email, [FromQuery] string password)
-		//{
-		//	var Admin = _adminRepository.GetAdmin(email, password);
-		//	if (Admin == null)
-		//	{
-		//		return NotFound();
-		//	}
-		//	if (!ModelState.IsValid)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	return Ok(Admin);
-		//}
+		[HttpDelete("{AdminId}")]
+		[ProducesResponseType(200)]
+		public async Task<IActionResult> DeleteAdmin(string AdminId)
+		{
+			if (!await _adminRepository.AdminExist(AdminId))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			if (!await _adminRepository.DeleteAdmin(AdminId))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully deleted");
+		}
 	}
 }

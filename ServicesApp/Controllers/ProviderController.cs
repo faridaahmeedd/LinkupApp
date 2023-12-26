@@ -51,30 +51,7 @@ namespace ServicesApp.Controllers
 			return Ok(mapProvider);
 		}
 
-
-		//[HttpGet("offers/{ProviderId}")]
-		//[ProducesResponseType(200, Type = typeof(List<ServiceOfferDto>))]
-		//public IActionResult GetServicesByProvider(string ProviderId)
-		//{
-		//	if (!_providerRepository.ProviderExist(ProviderId))
-		//	{
-		//		return NotFound();
-		//	}
-		//	var offers = _providerRepository.GetOffersByProvider(ProviderId);
-		//	var mapOffers= _mapper.Map<List<ServiceOfferDto>>(offers);
-		//	if (offers == null)
-		//	{
-		//		return NotFound();
-		//	}
-		//	if (!ModelState.IsValid)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	return Ok(mapOffers);
-		//}
-
-
-		[HttpPost("Update")]
+		[HttpPost("Profile")]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
@@ -125,7 +102,6 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, result.Errors);
 			}
 			return Ok("Successfully deleted");
-			// TODO : GET SERVICES BY Provider MAKE SURE THERE IS NO SERVICES BEFORE DELETING Provider
 		}
 	}
 }

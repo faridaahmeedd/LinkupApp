@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231226150625_ServicesApp")]
-    partial class ServicesApp
+    [Migration("20231226192947_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1e1a831a-5644-4411-8c89-76774963ff7f",
+                            Id = "dcfc3537-e636-458a-a50a-647ba39c7cdd",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "fd05bf1a-0661-41bd-a497-533bbd4875e9",
+                            Id = "e2758cb1-26c8-4ab0-a4cd-fa26395c073c",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "82479b50-271f-4dc3-ad4b-dd68a660246d",
+                            Id = "61f9bd59-7d5c-4197-8bff-5691609740f2",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -294,6 +294,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<bool>("Accepted")
                         .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("Duration")
+                        .HasColumnType("time");
 
                     b.Property<int>("Fees")
                         .HasColumnType("int");

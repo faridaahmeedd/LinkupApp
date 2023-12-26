@@ -5,14 +5,14 @@ namespace ServicesApp.Interfaces
 {
 	public interface IServiceOfferRepository
 	{
-		public ICollection<ServiceOffer> GetOffers();
-		public ServiceOffer GetOffer(int id);
-		public bool OfferExist(int id);
-		public bool CreateOffer(ServiceOffer offer);
-		public bool UpdateOffer(ServiceOffer updatedOffer);
-		public bool DeleteOffer(int id);
-		public bool AcceptOffer(int id);
-
-		public bool Save();
+		ICollection<ServiceOffer> GetOffers();
+		ServiceOffer GetOffer(int id);
+		bool OfferExist(int id);
+		bool CreateOffer(ServiceOffer offer);
+		bool UpdateOffer(ServiceOffer updatedOffer);
+		bool DeleteOffer(int id);
+		bool AcceptOffer(int id);
+		ICollection<ServiceOffer> GetPendingOffers(string providerId);
+		bool Save();
 	}
 }

@@ -7,9 +7,8 @@ namespace ServicesApp.Dto.Service
 		public required int RequestId { get; set; }
 		public required string ProviderId { get; set; }
         public required int Fees { get; set; }
-		public required int TimeSlotId { get; set; }//1  2h 1:30 then add totime in time slot
-        public required int TakeTime { get; set; }
-        //public bool Accepted { get; set; }
-        
-    }
+		public required int TimeSlotId { get; set; }
+        public required TimeOnly Duration { get; set; }
+		//public bool Accepted { get; set; }
+	}
 }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class ServicesApp : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -274,6 +274,7 @@ namespace ServicesApp.Migrations
                     Fees = table.Column<int>(type: "int", nullable: false),
                     Accepted = table.Column<bool>(type: "bit", nullable: false),
                     TimeSlotId = table.Column<int>(type: "int", nullable: false),
+                    Duration = table.Column<TimeOnly>(type: "time", nullable: false),
                     ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     RequestId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -320,9 +321,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1e1a831a-5644-4411-8c89-76774963ff7f", "1", "Customer", "Customer" },
-                    { "82479b50-271f-4dc3-ad4b-dd68a660246d", "3", "Admin", "Admin" },
-                    { "fd05bf1a-0661-41bd-a497-533bbd4875e9", "2", "Provider", "Provider" }
+                    { "61f9bd59-7d5c-4197-8bff-5691609740f2", "3", "Admin", "Admin" },
+                    { "dcfc3537-e636-458a-a50a-647ba39c7cdd", "1", "Customer", "Customer" },
+                    { "e2758cb1-26c8-4ab0-a4cd-fa26395c073c", "2", "Provider", "Provider" }
                 });
 
             migrationBuilder.CreateIndex(

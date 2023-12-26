@@ -91,33 +91,21 @@ namespace ServicesApp.Controllers
 				return StatusCode(422, ModelState);
 			}
 			var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
-			Console.WriteLine(serviceOfferDto.TimeSlotId);
 
-			
-			if(_timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId) == null)
+			offerMap.Provider = _providerRepository.GetProvider(serviceOfferDto.ProviderId);
+			offerMap.Request = _requestRepository.GetService(serviceOfferDto.RequestId);
+
+			if (_timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId) == null)
 			{
                 ModelState.AddModelError("", "Time slot not found");
                 return StatusCode(422, ModelState);
             }
-		
-            // Retrieve the TimeSlot information
-            var timeSlot = _timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId);
 
-            // Assuming TakeTime is a valid TimeOnly duration            
-			var toTime = timeSlot.FromTime.AddMinutes(serviceOfferDto.TakeTime);
-            timeSlot.ToTime = toTime;
-
-            Console.WriteLine(toTime);
-
-            if (!_timeSlotsRepository.UpdateToTime(timeSlot))
-            {
-                ModelState.AddModelError("", "Failed to update TimeSlot");
-                return StatusCode(500, ModelState);
-            }
-
-            
-			offerMap.Provider = _providerRepository.GetProvider(serviceOfferDto.ProviderId);
-			offerMap.Request = _requestRepository.GetService(serviceOfferDto.RequestId);
+			if (!_timeSlotsRepository.CheckConflict(offerMap))
+			{
+				ModelState.AddModelError("", "Conflict in time slots");
+				return StatusCode(500, ModelState);
+			}
 
 			if (!_offerRepository.CreateOffer(offerMap))
 			{
@@ -174,6 +162,11 @@ namespace ServicesApp.Controllers
 			if (!_offerRepository.AcceptOffer(OfferId))
 			{
 				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			if (!_timeSlotsRepository.UpdateToTime(OfferId))
+			{
+				ModelState.AddModelError("", "Failed to update TimeSlot");
 				return StatusCode(500, ModelState);
 			}
 			return Ok("Offer Accepted");

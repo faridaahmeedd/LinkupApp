@@ -3,9 +3,10 @@
     public class ServiceOffer
 	{
 		public int Id { get; set; }
-		public int Fees { get; set; }
+		public required int Fees { get; set; }
 		public bool Accepted { get; set; } = false;
-		public int TimeSlotId { get; set; }
+		public required int TimeSlotId { get; set; }
+		public required TimeOnly Duration { get; set; }
 		public required Provider Provider { get; set; }
         public required ServiceRequest Request { get; set; }
 	}

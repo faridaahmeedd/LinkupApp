@@ -33,7 +33,6 @@ namespace ServicesApp.Repository
 
 		public  bool CreateService(ServiceRequest service)
 		{
-		
 			_context.Add(service);
 			return Save();
 		}

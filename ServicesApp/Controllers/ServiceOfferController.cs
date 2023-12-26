@@ -5,6 +5,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Repository;
+using System;
 
 namespace ServicesApp.Controllers
 {
@@ -15,16 +16,19 @@ namespace ServicesApp.Controllers
 		private readonly IServiceOfferRepository _offerRepository;
 		private readonly IServiceRequestRepository _requestRepository;
 		private readonly IProviderRepository _providerRepository;
+		private readonly ITimeSlotsRepository _timeSlotsRepository;
 		private readonly IMapper _mapper;
 
 		public ServiceOfferController(IServiceRequestRepository RequestRepository, 
 			IServiceOfferRepository OfferRepository,
 			IProviderRepository ProviderRepository,
+			ITimeSlotsRepository TimeSlotsRepository,
 			IMapper mapper)
 		{
 			_offerRepository = OfferRepository;
 			_requestRepository = RequestRepository;
 			_providerRepository = ProviderRepository;
+			_timeSlotsRepository = TimeSlotsRepository;
 			_mapper = mapper;
 		}
 
@@ -86,11 +90,22 @@ namespace ServicesApp.Controllers
 				ModelState.AddModelError("", "Time slot is not available for this request");
 				return StatusCode(422, ModelState);
 			}
-
 			var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 
 			offerMap.Provider = _providerRepository.GetProvider(serviceOfferDto.ProviderId);
 			offerMap.Request = _requestRepository.GetService(serviceOfferDto.RequestId);
+
+			if (_timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId) == null)
+			{
+                ModelState.AddModelError("", "Time slot not found");
+                return StatusCode(422, ModelState);
+            }
+
+			if (!_timeSlotsRepository.CheckConflict(offerMap))
+			{
+				ModelState.AddModelError("", "Conflict in time slots");
+				return StatusCode(500, ModelState);
+			}
 
 			if (!_offerRepository.CreateOffer(offerMap))
 			{
@@ -147,6 +162,11 @@ namespace ServicesApp.Controllers
 			if (!_offerRepository.AcceptOffer(OfferId))
 			{
 				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			if (!_timeSlotsRepository.UpdateToTime(OfferId))
+			{
+				ModelState.AddModelError("", "Failed to update TimeSlot");
 				return StatusCode(500, ModelState);
 			}
 			return Ok("Offer Accepted");

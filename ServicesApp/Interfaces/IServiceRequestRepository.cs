@@ -14,9 +14,8 @@ namespace ServicesApp.Interfaces
 		bool Save();
 		ICollection<ServiceOffer> GetOffersOfService(int id);
 		ServiceOffer AcceptedOffer(int serviceId);
-
-        public bool TimeSlotsExistInService(int ServiceId, int timeSlotId);
-		public bool CompleteService(int id);
+        bool TimeSlotsExistInService(int ServiceId, int timeSlotId);
+		bool CompleteService(int id);
 
     }
 }

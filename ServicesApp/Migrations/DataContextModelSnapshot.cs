@@ -51,21 +51,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "21aab849-614f-426c-abe4-ff3ab17db251",
+                            Id = "dcfc3537-e636-458a-a50a-647ba39c7cdd",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "528bfe07-e919-4322-923e-2ae63d1d31e8",
+                            Id = "e2758cb1-26c8-4ab0-a4cd-fa26395c073c",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "03d10884-294c-4f23-b492-41d89066ce1d",
+                            Id = "61f9bd59-7d5c-4197-8bff-5691609740f2",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -291,6 +291,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<bool>("Accepted")
                         .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("Duration")
+                        .HasColumnType("time");
 
                     b.Property<int>("Fees")
                         .HasColumnType("int");

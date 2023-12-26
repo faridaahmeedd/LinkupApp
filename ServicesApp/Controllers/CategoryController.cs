@@ -125,7 +125,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
 		// [Authorize]
-		public IActionResult DeleteCategory(int CategoryId)
+		public async Task<IActionResult> DeleteCategory(int CategoryId)
 		{
 			if (!_categoryRepository.CategoryExist(CategoryId))
 			{
@@ -136,7 +136,7 @@ namespace ServicesApp.Controllers
 				return BadRequest(ModelState);
 			}
 
-			if (!_categoryRepository.DeleteCategory(CategoryId))
+			if (!await _categoryRepository.DeleteCategory(CategoryId))
 			{
 				ModelState.AddModelError("", "Something went wrong.");
 				return StatusCode(500, ModelState);

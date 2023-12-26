@@ -8,9 +8,9 @@ namespace ServicesApp.Models
 		public int Id { get; set; }
 		public required string Description { get; set; }
 		public byte[]? Image { get; set; }
-		public required Category Category { get; set; }
-		public string Status { get; set; } = "intial" ;
-		public required Customer Customer { get; set; }
+		public  Category? Category { get; set; }
+		public string Status { get; set; } = "Requested" ;
+		public  Customer? Customer { get; set; }
 		public ICollection<ServiceOffer>? Offers { get; set; }
 		public required ICollection<TimeSlot> TimeSlots { get; set; }
 		

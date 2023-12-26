@@ -51,21 +51,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "956cd045-b346-4359-98e8-0ff4a65590df",
+                            Id = "21aab849-614f-426c-abe4-ff3ab17db251",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "e9860e5d-74ac-4a3a-b383-4198b94ae385",
+                            Id = "528bfe07-e919-4322-923e-2ae63d1d31e8",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "7e3d7e17-106e-40ae-8b9d-b2e6f3fa7d02",
+                            Id = "03d10884-294c-4f23-b492-41d89066ce1d",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -321,7 +321,7 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("CustomerId")
@@ -520,9 +520,7 @@ namespace ServicesApp.Migrations
                 {
                     b.HasOne("ServicesApp.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
                         .WithMany("Services")

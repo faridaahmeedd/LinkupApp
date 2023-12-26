@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -62,10 +63,26 @@ namespace ServicesApp.Repository
 
 		public async Task<IdentityResult> DeleteProvider(string id)
 		{
-			var Provider = await _userManager.FindByIdAsync(id);
-			var result = await _userManager.DeleteAsync(Provider);
-			return result;
-		}
+            var Provider = _context.Providers.Include(c => c.Offers).SingleOrDefault(c => c.Id == id);
+
+            if (Provider != null)
+            {
+                foreach (var offer in Provider.Offers)
+                {
+                    offer.Provider = null;
+                }
+                // Save changes
+                await _context.SaveChangesAsync();
+
+                // Delete 
+                var _provider = await _userManager.FindByIdAsync(id);
+                var result = await _userManager.DeleteAsync(_provider);
+
+                return result;
+            }
+            return null;
+        }
+
 
 		public bool Save()
 		{

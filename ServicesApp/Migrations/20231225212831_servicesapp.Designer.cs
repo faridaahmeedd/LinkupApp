@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231225173149_intial")]
-    partial class intial
+    [Migration("20231225212831_servicesapp")]
+    partial class servicesapp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "144cfe0a-d056-4844-99b3-0cd5de43ec7e",
+                            Id = "21aab849-614f-426c-abe4-ff3ab17db251",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958",
+                            Id = "528bfe07-e919-4322-923e-2ae63d1d31e8",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "831f1147-aa54-4038-ac59-aafc37bbb7f2",
+                            Id = "03d10884-294c-4f23-b492-41d89066ce1d",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -324,7 +324,7 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("CustomerId")
@@ -523,9 +523,7 @@ namespace ServicesApp.Migrations
                 {
                     b.HasOne("ServicesApp.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
                         .WithMany("Services")

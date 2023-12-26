@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
+using Nager.Country;
+
 
 namespace ServicesApp.Controllers
 {
@@ -106,6 +108,16 @@ namespace ServicesApp.Controllers
                 return BadRequest(ModelState);
             }
 			return Ok("Successfully deleted");
+		}
+
+		[HttpGet("Countries")]
+		[ProducesResponseType(200)]
+		public IActionResult GetCountries()
+		{
+			var countryProvider = new CountryProvider();
+			var countries = countryProvider.GetCountries();
+			var countryNames = countries.Select(c => c.CommonName).ToList();
+			return Ok(countryNames);
 		}
 
 		//[HttpGet("services/{CustomerId}")]

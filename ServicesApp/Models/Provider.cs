@@ -16,6 +16,7 @@ namespace ServicesApp.Models
 		public DateOnly BirthDate { get; set; }
 		public String? JobTitle { get; set; }
         public String? Description { get; set; }
+		public int Balance { get; set; }
 		public ICollection<ServiceOffer>? Offers { get; set; }
 		// SKILLS
 	}

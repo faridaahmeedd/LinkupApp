@@ -171,30 +171,28 @@ namespace ServicesApp.Controllers
 			}
 			return Ok("Offer Accepted");
 		}
-      
 
-        // change status pending
-        //[HttpDelete()]
-        //[ProducesResponseType(204)]
-        //[ProducesResponseType(400)]
-        //[ProducesResponseType(404)]
-        //public IActionResult DeleteOffer(int OfferId)
-        //{
-        //	if (!_offerRepository.OfferExist(OfferId))
-        //	{
-        //		return NotFound();
-        //	}
-        //	if (!ModelState.IsValid)
-        //	{
-        //		return BadRequest(ModelState);
-        //	}
+	   [HttpDelete()]
+	   [ProducesResponseType(204)]
+	   [ProducesResponseType(400)]
+	   [ProducesResponseType(404)]
+		public IActionResult DeleteOffer(int OfferId)
+		{
+			if (!_offerRepository.OfferExist(OfferId))
+			{
+				return NotFound();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
 
-        //	if (!_offerRepository.DeleteOffer(OfferId))
-        //	{
-        //		ModelState.AddModelError("", "Something went wrong.");
-        //		return StatusCode(500, ModelState);
-        //	}
-        //	return Ok("Successfully deleted");
-        //}
-    }
+			if (!_offerRepository.DeleteOffer(OfferId))
+			{
+				ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ModelState);
+			}
+			return Ok("Successfully deleted");
+		}
+	}
 }

@@ -67,12 +67,34 @@ namespace ServicesApp.Repository
 			return false;
 		}
 		//request -- offer req---offer delete (accepted & in same day)
+
 		public bool DeleteOffer(int id)
 		{
-			var offer = _context.Offers.Where(p => p.Id == id).FirstOrDefault();
+			var offer = _context.Offers.Include(c => c.Provider).Where(p => p.Id == id).FirstOrDefault();
+			if (offer.Accepted == true)
+			{
+				var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
+
+				DateTime offerTime = timeSlot.Date.ToDateTime(timeSlot.FromTime);
+				DateTime TimeAfter24 = DateTime.Now.AddHours(24);
+				TimeSpan timeDifference = TimeAfter24 - offerTime;
+
+				// Check if the difference is greater than or equal to 24 hours
+				if (offerTime <= TimeAfter24)
+				{
+					offer.Provider.Balance += (offer.Fees * 10) / 100;
+				}
+			}
 			_context.Remove(offer!);
 			return Save();
 		}
+
+		//public bool DeleteOffer(int id)
+		//{
+		//	var offer = _context.Offers.Where(p => p.Id == id).FirstOrDefault();
+		//	_context.Remove(offer!);
+		//	return Save();
+		//}
 
 		public bool Save()
 		{

@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231227092400_admin")]
-    partial class admin
+    [Migration("20231227133735_balance")]
+    partial class balance
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0ad05a8b-b758-4a10-9a97-d5ad16cbf438",
+                            Id = "e569dc5e-2761-4222-bddb-2c69d85b2021",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "51e462a6-5221-4556-b9a0-767aee6db293",
+                            Id = "b52ef47a-a265-412f-bc0c-26e286727936",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "dd239ed6-4ffe-427e-80c1-3ceb097a548a",
+                            Id = "5bfd7445-1950-44fc-82f0-e0aefa229ebc",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -369,6 +369,9 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Balance")
+                        .HasColumnType("int");
+
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
@@ -405,6 +408,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Balance")
+                        .HasColumnType("int");
 
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");

@@ -1,4 +1,5 @@
 ﻿using ServicesApp.Dto;
+using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
@@ -16,6 +17,7 @@ namespace ServicesApp.Interfaces
 		ServiceOffer AcceptedOffer(int serviceId);
         bool TimeSlotsExistInService(int ServiceId, int timeSlotId);
 		bool CompleteService(int id);
+		ICollection<ServiceDetailsDto> GetAllServicesDetails();
 
     }
 }

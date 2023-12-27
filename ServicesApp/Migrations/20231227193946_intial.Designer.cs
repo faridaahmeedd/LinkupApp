@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231227133735_balance")]
-    partial class balance
+    [Migration("20231227193946_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e569dc5e-2761-4222-bddb-2c69d85b2021",
+                            Id = "2dcd638b-266d-436c-b9d8-8b8650a2aaa8",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "b52ef47a-a265-412f-bc0c-26e286727936",
+                            Id = "1772f796-cfb0-405c-98e1-afff08184083",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "5bfd7445-1950-44fc-82f0-e0aefa229ebc",
+                            Id = "193b2919-3db3-469b-a1a6-50aba196bdd1",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"

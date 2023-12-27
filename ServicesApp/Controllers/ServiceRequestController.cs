@@ -224,5 +224,19 @@ namespace ServicesApp.Controllers
             }
         }
 
+
+        [HttpGet("AllServicesDetails")]
+        public IActionResult GetAllServicesDetails()
+        {
+            var serviceDetails = _serviceRepository.GetAllServicesDetails();
+
+            if (serviceDetails == null || serviceDetails.Count == 0)
+            {
+                return NotFound("No Service Details Found.");
+            }
+
+            return Ok(serviceDetails);
+        }
+
     }
 }

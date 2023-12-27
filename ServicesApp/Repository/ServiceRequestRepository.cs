@@ -2,6 +2,7 @@
 using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Dto;
+using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using System;
@@ -136,6 +137,42 @@ namespace ServicesApp.Repository
             }
 
             return null;
+        }
+
+        public ICollection<ServiceDetailsDto> GetAllServicesDetails()
+        {
+            var serviceDetails = _context.Requests
+                .Include(r => r.Category)
+                .Include(r => r.Customer)
+                 .Include(r => r.Offers)
+                .Include(r => r.TimeSlots)
+                .Select(r => new ServiceDetailsDto
+                {
+                    Id = r.Id,
+                    Description = r.Description,
+                    Status = r.Status,
+                    CustomerName = r.Customer.FName,
+                    CustomerId = r.Customer.Id,
+                    CategoryName = r.Category.Name,
+                    TimeSlots = r.TimeSlots.Select(t => new TimeSlotDto
+                    {
+                        Id = t.Id,
+                        Date = t.Date,
+                        FromTime = t.FromTime
+                    }).ToList(),
+                    Offers = r.Offers.Select(t => new ServiceOfferDto
+                    {
+                        Fees = t.Fees,
+                        Duration = t.Duration,
+                        TimeSlotId = t.TimeSlotId,
+                        ProviderId = t.Provider.Id,  //
+                        RequestId = t.Request.Id     //
+                    }).ToList()
+
+                })
+                .ToList();
+
+            return serviceDetails;
         }
     }
 }

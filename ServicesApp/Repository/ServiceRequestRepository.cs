@@ -3,7 +3,10 @@ using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Dto;
 using ServicesApp.Interfaces;
-using ServicesApp.Models; 
+using ServicesApp.Models;
+using System;
+using System.ComponentModel;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ServicesApp.Repository
 {
@@ -59,7 +62,22 @@ namespace ServicesApp.Repository
 
         public bool DeleteService(int id)
 		{
-			var service = _context.Requests.Where(p => p.Id == id).FirstOrDefault();
+			var service = _context.Requests.Include(c => c.Customer).Where(p => p.Id == id).FirstOrDefault();
+            if(service.Status == "Pending")
+            {
+				var offer = _context.Offers.Include(c => c.Request).Where(p => p.Request.Id == id && p.Accepted == true).FirstOrDefault();
+                var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
+
+				DateTime offerTime = timeSlot.Date.ToDateTime(timeSlot.FromTime);
+				DateTime TimeAfter24 = DateTime.Now.AddHours(24); 
+				TimeSpan timeDifference = TimeAfter24 - offerTime;    
+
+				// Check if the difference is greater than or equal to 24 hours
+				if (offerTime <= TimeAfter24)
+                {
+					service.Customer.Balance += (offer.Fees * 10)/100 ;
+				}
+            }
 			_context.Remove(service!);
 			return Save();
 		}
@@ -119,7 +137,5 @@ namespace ServicesApp.Repository
 
             return null;
         }
-
-
     }
 }

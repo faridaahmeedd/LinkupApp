@@ -17,6 +17,7 @@ namespace ServicesApp.Core.Models
 		public DateOnly BirthDate { get; set; }
 		public String? Disability { get; set; }
         public String? EmergencyContact { get; set; }
+		public int Balance { get; set; }
 		public ICollection<ServiceRequest>? Services { get; set; }
 	}
 }

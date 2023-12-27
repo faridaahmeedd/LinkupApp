@@ -173,7 +173,6 @@ namespace ServicesApp.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-
 			if (!_serviceRepository.DeleteService(ServiceId))
 			{
 				ModelState.AddModelError("", "Something went wrong.");

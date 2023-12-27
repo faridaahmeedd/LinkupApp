@@ -142,7 +142,6 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ModelState);
 			}
 			return Ok("Successfully deleted");
-			// TODO : GET SERVICE BY CATEGORY MAKE SURE THERE IS NO SERVICES BEFORE DELETING CATEGORY
 		}
 	}
 }

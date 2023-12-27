@@ -127,7 +127,7 @@ namespace ServicesApp.Controllers
 				ModelState.AddModelError("", "Something went wrong.");
 				return StatusCode(500, ModelState);
 			}
-			return Created($"/api/Service/{serviceMap.Id}", serviceMap);
+			return Created($"/api/ServiceRequest/{serviceMap.Id}", "Service Requested Successfully");
 		}
 
 		[HttpPut("update")]
@@ -200,14 +200,12 @@ namespace ServicesApp.Controllers
             }
             if (offers != null)
             {
-
                 var offersMap = _mapper.Map<List<ServiceOfferDto>>(offers);
-
                 return Ok(offersMap);
             }
-
             return NotFound();
         }
+
         [HttpGet("accepted-offer")]
         [ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
         [ProducesResponseType(404)]

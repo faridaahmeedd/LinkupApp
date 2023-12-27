@@ -21,16 +21,16 @@ public class AuthRepository
 	private readonly IMapper _mapper;
 	private readonly ICustomerRepository _customerRepository;
 	private readonly IProviderRepository _providerRepository;
-   
+	private readonly IAdminRepository _adminRepository;
 
-
-    public AuthRepository(
+	public AuthRepository(
 		UserManager<AppUser> userManager,
 		IConfiguration config,
 		RoleManager<IdentityRole> roleManager,
 		IMapper mapper,
 		ICustomerRepository customerRepository,
-		IProviderRepository providerRepository )
+		IProviderRepository providerRepository,
+		IAdminRepository adminRepository)
 	{
 		_userManager = userManager;
 		_config = config;
@@ -38,6 +38,7 @@ public class AuthRepository
 		_mapper = mapper;
 		_customerRepository = customerRepository;
 		_providerRepository = providerRepository;
+		_adminRepository = adminRepository;
 	}
 
 	public async Task<AppUser?> CheckUser(string email)
@@ -81,6 +82,19 @@ public class AuthRepository
 			userMap.SecurityStamp = Guid.NewGuid().ToString();
 			userMap.UserName = registerDto.Email;
 			if (_providerRepository.CreateProvider(userMap))
+			{
+				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
+				await _userManager.AddToRoleAsync(userMap, role);
+				return true;
+			}
+		}
+		if (role == "Admin")
+		{
+			var userMap = _mapper.Map<Admin>(registerDto);
+			userMap.Email = registerDto.Email;
+			userMap.SecurityStamp = Guid.NewGuid().ToString();
+			userMap.UserName = registerDto.Email;
+			if (_adminRepository.CreateAdmin(userMap))
 			{
 				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
 				await _userManager.AddToRoleAsync(userMap, role);

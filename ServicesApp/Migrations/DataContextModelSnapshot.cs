@@ -51,21 +51,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "dcfc3537-e636-458a-a50a-647ba39c7cdd",
+                            Id = "0ad05a8b-b758-4a10-9a97-d5ad16cbf438",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "e2758cb1-26c8-4ab0-a4cd-fa26395c073c",
+                            Id = "51e462a6-5221-4556-b9a0-767aee6db293",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "61f9bd59-7d5c-4197-8bff-5691609740f2",
+                            Id = "dd239ed6-4ffe-427e-80c1-3ceb097a548a",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -176,24 +176,6 @@ namespace ServicesApp.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("ServicesApp.Models.Admin", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.AppUser", b =>

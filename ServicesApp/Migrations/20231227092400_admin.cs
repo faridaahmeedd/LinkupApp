@@ -8,24 +8,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class admin : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Admins",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Admins", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -321,9 +308,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "61f9bd59-7d5c-4197-8bff-5691609740f2", "3", "Admin", "Admin" },
-                    { "dcfc3537-e636-458a-a50a-647ba39c7cdd", "1", "Customer", "Customer" },
-                    { "e2758cb1-26c8-4ab0-a4cd-fa26395c073c", "2", "Provider", "Provider" }
+                    { "0ad05a8b-b758-4a10-9a97-d5ad16cbf438", "1", "Customer", "Customer" },
+                    { "51e462a6-5221-4556-b9a0-767aee6db293", "2", "Provider", "Provider" },
+                    { "dd239ed6-4ffe-427e-80c1-3ceb097a548a", "3", "Admin", "Admin" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -394,9 +381,6 @@ namespace ServicesApp.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Admins");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 

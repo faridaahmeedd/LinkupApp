@@ -81,13 +81,13 @@ namespace ServicesApp.Repository
 			return saved > 0 ? true : false;
 		}
 
-		public ICollection<ServiceOffer> GetPendingOffers(string providerId)
+		public ICollection<ServiceOffer> GetUnCompletedOffers(string providerId)
 		{
 			var offers = _context.Offers.Include(o => o.Request).Where(p => p.Provider.Id == providerId).ToList(); ;
 
 			if (offers != null)
 			{
-				var pendingOffers = offers.Where(o => o.Request.Status == "Pending").ToList();
+				var pendingOffers = offers.Where(o => o.Request.Status != "Completed").ToList();
 				return pendingOffers;
 			}
 

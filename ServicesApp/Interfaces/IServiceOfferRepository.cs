@@ -12,7 +12,7 @@ namespace ServicesApp.Interfaces
 		bool UpdateOffer(ServiceOffer updatedOffer);
 		bool DeleteOffer(int id);
 		bool AcceptOffer(int id);
-		ICollection<ServiceOffer> GetPendingOffers(string providerId);
+		ICollection<ServiceOffer> GetUnCompletedOffers(string providerId);
 		bool Save();
 	}
 }

@@ -71,6 +71,14 @@ builder.Services.AddAuthentication(options =>{
 		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
 	};
 });
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder => {
+        builder.AllowAnyOrigin();
+        builder.AllowAnyMethod();
+        builder.AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -81,6 +89,10 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
+
+app.UseStaticFiles();
+app.UseRouting();
+app.UseCors();
 
 app.UseHttpsRedirection();
 

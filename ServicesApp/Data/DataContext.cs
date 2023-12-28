@@ -36,6 +36,11 @@ namespace ServicesApp.Data
                 .HasMany(p => p.Offers)
                 .WithOne(o => o.Provider)
                 .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder
+                .Entity<Category>()
+                .HasMany(p => p.Services)
+                .WithOne(o => o.Category)
+                .OnDelete(DeleteBehavior.SetNull);
             base.OnModelCreating(modelBuilder);
 		    SeedRoles(modelBuilder);
 			//modelBuilder.HasDefaultSchema("dbo");

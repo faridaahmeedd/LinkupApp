@@ -12,7 +12,7 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231228171949_intialcreate")]
+    [Migration("20231228180953_intialcreate")]
     partial class intialcreate
     {
         /// <inheritdoc />
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2f1e0f95-3dc8-4f31-a913-dede3f3d3473",
+                            Id = "6e83945a-31f7-4a85-9679-e5e12895df12",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "da8d91b5-ae8a-49b8-a248-7419fb5f1c6d",
+                            Id = "43626702-ab6b-4481-89f0-769da1a485c2",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "97397131-34c2-4a4f-8c00-c1fc2e8fa615",
+                            Id = "fee70a81-e665-4566-afc0-5d0c84e3f4fe",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -514,8 +514,9 @@ namespace ServicesApp.Migrations
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
                 {
                     b.HasOne("ServicesApp.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId");
+                        .WithMany("Services")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
                         .WithMany("Services")
@@ -554,6 +555,11 @@ namespace ServicesApp.Migrations
                         .HasForeignKey("ServicesApp.Models.Provider", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Category", b =>
+                {
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>

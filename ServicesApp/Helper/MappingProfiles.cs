@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
+using ServicesApp.Dto.Category;
 using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Users;
 using ServicesApp.Models;
@@ -31,6 +32,8 @@ namespace ServicesApp.Helper
             CreateMap<TimeSlotDto, TimeSlot>();
             CreateMap<AppUser, RegistrationDto>();
             CreateMap<RegistrationDto, AppUser>();
+            CreateMap<Category, CategoryDto>();
+            CreateMap<CategoryDto, Category>();
 
         }
     }

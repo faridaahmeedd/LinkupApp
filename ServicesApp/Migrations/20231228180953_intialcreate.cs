@@ -246,7 +246,8 @@ namespace ServicesApp.Migrations
                         name: "FK_Requests_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Requests_Customer_CustomerId",
                         column: x => x.CustomerId,
@@ -312,9 +313,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "2f1e0f95-3dc8-4f31-a913-dede3f3d3473", "1", "Customer", "Customer" },
-                    { "97397131-34c2-4a4f-8c00-c1fc2e8fa615", "3", "Admin", "Admin" },
-                    { "da8d91b5-ae8a-49b8-a248-7419fb5f1c6d", "2", "Provider", "Provider" }
+                    { "43626702-ab6b-4481-89f0-769da1a485c2", "2", "Provider", "Provider" },
+                    { "6e83945a-31f7-4a85-9679-e5e12895df12", "1", "Customer", "Customer" },
+                    { "fee70a81-e665-4566-afc0-5d0c84e3f4fe", "3", "Admin", "Admin" }
                 });
 
             migrationBuilder.CreateIndex(

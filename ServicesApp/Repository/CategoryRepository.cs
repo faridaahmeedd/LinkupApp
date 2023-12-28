@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ServicesApp.Core.Models;
 using ServicesApp.Data;
+using ServicesApp.Dto.Category;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 
@@ -48,27 +49,11 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
-		public async Task<bool> DeleteCategory(int id)
+		public bool DeleteCategory(int id)
 		{
-			var category =  _context.Categories.Where(p => p.Id == id).FirstOrDefault();
-			
-            if (category != null)
-            {
-				// Remove related requests
-				var res = _context.Requests.Where(p => p.Category == category).ToList();
-				foreach(var item in res)
-				{
-					item.Category = null;
-				}
-
-                // Save changes
-                await _context.SaveChangesAsync();
-
-				// Delete the customer
-				_context.Remove(category);
-
-            }
-            return Save();
+            var category = _context.Categories.Where(p => p.Id == id).FirstOrDefault();
+            _context.Remove(category);
+			return Save();
         }
 
 		public bool Save()

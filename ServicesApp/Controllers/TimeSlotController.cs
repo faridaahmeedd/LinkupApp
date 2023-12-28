@@ -3,7 +3,6 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 using ServicesApp.Interfaces;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using ServicesApp.APIs;
 namespace ServicesApp.Controllers
 {
@@ -82,9 +81,9 @@ namespace ServicesApp.Controllers
 			}
 			if (!_timeSlotRepository.AddTimeSlot(mapTimeSlots))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.CreatedSuccess);
+			return Ok(ApiResponse.SuccessCreated);
 		}
 
 
@@ -105,11 +104,9 @@ namespace ServicesApp.Controllers
 
 			if (!_timeSlotRepository.DeleteTimeSlot(TimeSlotId))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessDeleted);
 		}
-
-
 	}
 }

@@ -79,7 +79,7 @@ namespace ServicesApp.Controllers
 			}
 			if (!_providerRepository.ProviderExist(ProviderId))
 			{
-				return NotFound( ApiResponse.NotFoundUser);
+				return NotFound( ApiResponse.UserNotFound);
 			}
 			if (!_requestRepository.ServiceExist(RequestId))
 			{
@@ -108,7 +108,7 @@ namespace ServicesApp.Controllers
 
 			if (!_offerRepository.CreateOffer(offerMap))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(new
 			{
@@ -142,7 +142,7 @@ namespace ServicesApp.Controllers
 
 			if (!_offerRepository.UpdateOffer(serviceMap))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessUpdated);
 		}
@@ -164,7 +164,7 @@ namespace ServicesApp.Controllers
 			}
 			if (!_offerRepository.AcceptOffer(OfferId))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			if (!_timeSlotsRepository.UpdateToTime(OfferId))
 			{
@@ -190,7 +190,7 @@ namespace ServicesApp.Controllers
 
 			if (!_offerRepository.DeleteOffer(OfferId))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessDeleted);
 		}

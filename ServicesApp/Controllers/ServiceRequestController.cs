@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Repository;
 using ServicesApp.APIs;
 namespace ServicesApp.Controllers
 {
@@ -68,7 +67,7 @@ namespace ServicesApp.Controllers
             }
 			if (!_serviceRepository.CompleteService(ServiceId))
 			{
-                return StatusCode(500, ApiResponse.SomthingWronge);
+                return StatusCode(500, ApiResponse.SomethingWrong);
             }
             return Ok(ApiResponse.ServiceCompletedSuccess);
         }
@@ -100,13 +99,13 @@ namespace ServicesApp.Controllers
 
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
-				return NotFound(ApiResponse.NotFoundUser);
+				return NotFound(ApiResponse.UserNotFound);
             }
 			serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
 
 			if (!_serviceRepository.CreateService(serviceMap))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(new {
                 statusMsg = "success",
@@ -139,7 +138,7 @@ namespace ServicesApp.Controllers
 
             if (!_serviceRepository.UpdateService(serviceMap) )
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessUpdated);
 		}
@@ -160,7 +159,7 @@ namespace ServicesApp.Controllers
 			}
 			if (!_serviceRepository.DeleteService(ServiceId))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessDeleted);
 		}

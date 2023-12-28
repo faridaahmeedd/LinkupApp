@@ -71,7 +71,6 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
-		// [Authorize]
 		public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
 		{
 			if (!ModelState.IsValid)
@@ -83,7 +82,6 @@ namespace ServicesApp.Controllers
 				.FirstOrDefault();
 			if(category != null)
 			{
-				//ModelState.AddModelError("", "Category already exists");
 				return BadRequest(ApiResponse.CategoryAlreadyExist);
 			}
 			
@@ -92,11 +90,9 @@ namespace ServicesApp.Controllers
 
             if (!_categoryRepository.CreateCategory(mapCategory))
 			{
-				//ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500,ApiResponse.SomthingWronge);
+				return StatusCode(500,ApiResponse.SomethingWrong);
 			}
             categoryCreate.Id = mapCategory.Id;
-          //  var url = Url.Link("GetCategoryById", new {CategoryId = categoryCreate.Id });
 			return Ok(new
 			{
                 CategoryId = categoryCreate.Id,
@@ -110,7 +106,6 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		// [Authorize]
 		public IActionResult UpdateCategory([FromBody] CategoryDto categoryUpdate)
 		{
 
@@ -127,8 +122,7 @@ namespace ServicesApp.Controllers
 
             if (!_categoryRepository.UpdateCategory(mapCategory))
 			{
-				//ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessUpdated);
 		}
@@ -137,7 +131,6 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
-		// [Authorize]
 		public IActionResult DeleteCategory(int CategoryId)
 		{
 			if (!_categoryRepository.CategoryExist(CategoryId))
@@ -151,8 +144,7 @@ namespace ServicesApp.Controllers
 
 			if (! _categoryRepository.DeleteCategory(CategoryId))
 			{
-				//ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessDeleted);
 		}

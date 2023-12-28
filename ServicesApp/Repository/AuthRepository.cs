@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
-using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,34 +10,23 @@ using System.Net.Mail;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using System;
 public class AuthRepository
 {
 	private readonly UserManager<AppUser> _userManager;
 	private readonly IConfiguration _config;
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IMapper _mapper;
-	private readonly ICustomerRepository _customerRepository;
-	private readonly IProviderRepository _providerRepository;
-	private readonly IAdminRepository _adminRepository;
 
 	public AuthRepository(
 		UserManager<AppUser> userManager,
 		IConfiguration config,
 		RoleManager<IdentityRole> roleManager,
-		IMapper mapper,
-		ICustomerRepository customerRepository,
-		IProviderRepository providerRepository,
-		IAdminRepository adminRepository)
+		IMapper mapper)
 	{
 		_userManager = userManager;
 		_config = config;
 		_roleManager = roleManager;
 		_mapper = mapper;
-		_customerRepository = customerRepository;
-		_providerRepository = providerRepository;
-		_adminRepository = adminRepository;
 	}
 
 	public async Task<AppUser?> CheckUser(string email)
@@ -81,15 +69,13 @@ public class AuthRepository
 		
         userMap.Email = registerDto.Email;
         userMap.SecurityStamp = Guid.NewGuid().ToString();
-        userMap.UserName = registerDto.Email;
-        var res = await _userManager.CreateAsync(userMap, registerDto.Password);
-        if (res.Succeeded)
+        userMap.UserName = new MailAddress(registerDto.Email).User;
+		var result = await _userManager.CreateAsync(userMap, registerDto.Password);
+        if (result.Succeeded)
         {
-
             await _userManager.AddToRoleAsync(userMap, role);
         }
-
-        return res;
+        return result;
 	}
 
 
@@ -119,19 +105,13 @@ public class AuthRepository
 				expires: expiration,
 				signingCredentials: signingCredentials
 			);
-
 			var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-
 			return (token, expiration);
 		}
-
 		return (null, DateTime.MinValue);
 	}
 
 
-
-
-  
     public async  Task<string> ForgetPassword( string mail )
 	{
         string senderEmail = "linkupp2024@gmail.com";
@@ -147,9 +127,8 @@ public class AuthRepository
         string resetCode = GenerateRandomCode(); 
 
         // Save the confirmation code in your database or a secure storage
-        //user.ConfirmationCode = confirmationCode; 
-       // await _userManager.UpdateAsync(user);
-
+        // user.ConfirmationCode = confirmationCode; 
+        // await _userManager.UpdateAsync(user);
 
         MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
         {
@@ -192,7 +171,7 @@ public class AuthRepository
     {
         var user = await _userManager.FindByEmailAsync(mail);
 
-        if (user == null )
+        if (user == null)
         {
             return false; 
         }
@@ -210,7 +189,4 @@ public class AuthRepository
         }
 		return false;
     }
-
-
-
 }

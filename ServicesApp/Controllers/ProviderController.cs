@@ -41,7 +41,7 @@ namespace ServicesApp.Controllers
 		{
 			if (!_providerRepository.ProviderExist(ProviderId))
 			{
-				return NotFound(ApiResponse.NotFoundUser);
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			var provider = _providerRepository.GetProvider(ProviderId);
 			var mapProvider = _mapper.Map<ProviderDto>(provider);
@@ -64,7 +64,7 @@ namespace ServicesApp.Controllers
 			}
 			if (!_providerRepository.ProviderExist(ProviderId))
 			{
-				return NotFound(ApiResponse.NotFoundUser);
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
@@ -75,7 +75,7 @@ namespace ServicesApp.Controllers
 			var result = await _providerRepository.UpdateProvider(mapProvider);
 			if (!result.Succeeded)
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessUpdated);
 		}
@@ -89,7 +89,7 @@ namespace ServicesApp.Controllers
 		{
 			if (!_providerRepository.ProviderExist(ProviderId))
 			{
-				return NotFound(ApiResponse.NotFoundUser);
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
@@ -98,7 +98,7 @@ namespace ServicesApp.Controllers
 			var result = await _providerRepository.DeleteProvider(ProviderId);
 			if (!result.Succeeded)
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessDeleted);
 		}

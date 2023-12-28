@@ -29,6 +29,8 @@ namespace ServicesApp.Helper
 			CreateMap<Admin, RegistrationDto>();
 			CreateMap<TimeSlot, TimeSlotDto>();
             CreateMap<TimeSlotDto, TimeSlot>();
+            CreateMap<AppUser, RegistrationDto>();
+            CreateMap<RegistrationDto, AppUser>();
 
         }
     }

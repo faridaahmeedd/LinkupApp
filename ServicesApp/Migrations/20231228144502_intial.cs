@@ -310,9 +310,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "214cfc74-d059-4ffe-b0c0-fd2d81674525", "1", "Customer", "Customer" },
-                    { "2608e9a0-9e3d-4762-bb47-47369dba0455", "3", "Admin", "Admin" },
-                    { "3aaf38ae-debd-4529-963f-884359e2d967", "2", "Provider", "Provider" }
+                    { "69b37c4a-69d6-49c0-a030-fbef5e387002", "2", "Provider", "Provider" },
+                    { "bd74e8be-3781-49fa-b243-2189a4187dc3", "1", "Customer", "Customer" },
+                    { "c9429d39-a416-4713-a7d6-c8b0bc442dcd", "3", "Admin", "Admin" }
                 });
 
             migrationBuilder.CreateIndex(

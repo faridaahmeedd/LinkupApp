@@ -39,8 +39,10 @@ namespace ServicesApp.Repository
 
 		public bool CreateCustomer(Customer customer)
 		{
-			// Change Tracker (add,update,modify)
-			_context.Add(customer);
+            // Change Tracker (add,update,modify)
+            Console.WriteLine("create cust repooo ");
+
+            _context.Add(customer);
 			return Save();
 		}
 

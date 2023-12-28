@@ -51,21 +51,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "214cfc74-d059-4ffe-b0c0-fd2d81674525",
+                            Id = "bd74e8be-3781-49fa-b243-2189a4187dc3",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "3aaf38ae-debd-4529-963f-884359e2d967",
+                            Id = "69b37c4a-69d6-49c0-a030-fbef5e387002",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "2608e9a0-9e3d-4762-bb47-47369dba0455",
+                            Id = "c9429d39-a416-4713-a7d6-c8b0bc442dcd",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"

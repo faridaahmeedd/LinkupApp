@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class intialcreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -246,12 +246,14 @@ namespace ServicesApp.Migrations
                         name: "FK_Requests_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Requests_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -274,7 +276,8 @@ namespace ServicesApp.Migrations
                         name: "FK_Offers_Provider_ProviderId",
                         column: x => x.ProviderId,
                         principalTable: "Provider",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Offers_Requests_RequestId",
                         column: x => x.RequestId,
@@ -310,9 +313,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1772f796-cfb0-405c-98e1-afff08184083", "2", "Provider", "Provider" },
-                    { "193b2919-3db3-469b-a1a6-50aba196bdd1", "3", "Admin", "Admin" },
-                    { "2dcd638b-266d-436c-b9d8-8b8650a2aaa8", "1", "Customer", "Customer" }
+                    { "43626702-ab6b-4481-89f0-769da1a485c2", "2", "Provider", "Provider" },
+                    { "6e83945a-31f7-4a85-9679-e5e12895df12", "1", "Customer", "Customer" },
+                    { "fee70a81-e665-4566-afc0-5d0c84e3f4fe", "3", "Admin", "Admin" }
                 });
 
             migrationBuilder.CreateIndex(

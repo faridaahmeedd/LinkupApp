@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Authentication;
 
 [Route("api/[controller]")]
@@ -24,12 +25,21 @@ public class AuthController : ControllerBase
 			}
 			if (await _authRepository.CheckRole(role))
 			{
-				if (await _authRepository.CreateUser(registerDto, role))
+                Console.WriteLine("role controller  ");
+
+                var res = await _authRepository.CreateUser(registerDto, role);
+				if(res.Succeeded)
 				{
-					appUser = await _authRepository.CheckUser(registerDto.Email);
-					return Ok(appUser.Id);
-				}
-				return BadRequest("Error while creating user");
+                    Console.WriteLine("cteate user controller ");
+
+                    appUser = await _authRepository.CheckUser(registerDto.Email);
+                    return Ok(appUser.Id);
+                }
+
+
+                //List<IdentityError> errorList = res.Errors. ToList();
+                //var errors = string.Join(", ", errorList.Select(e => e.Description));
+                return BadRequest(res.Errors);
 			}
 			return BadRequest("Role doesn't exist");
 		}

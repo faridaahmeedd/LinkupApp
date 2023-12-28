@@ -60,48 +60,36 @@ public class AuthRepository
 		return false;
 	}
 
-	public async Task<bool> CreateUser(RegistrationDto registerDto, string role)
+	public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
 	{
-		if(role == "Customer")
+        var userMap = _mapper.Map<AppUser>(registerDto);
+		Console.WriteLine(userMap);
+        if (role == "Customer")
 		{
-			var userMap = _mapper.Map<Customer>(registerDto);
-			userMap.Email = registerDto.Email;
-			userMap.SecurityStamp = Guid.NewGuid().ToString();
-			userMap.UserName = registerDto.Email;
-			if (_customerRepository.CreateCustomer(userMap))
-			{
-				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
-				await _userManager.AddToRoleAsync(userMap, role);
-				return true;
-			}
-		}
-		if (role == "Provider")
+			 userMap = _mapper.Map<Customer>(registerDto);
+        }
+		else if (role == "Provider")
 		{
-			var userMap = _mapper.Map<Provider>(registerDto);
-			userMap.Email = registerDto.Email;
-			userMap.SecurityStamp = Guid.NewGuid().ToString();
-			userMap.UserName = registerDto.Email;
-			if (_providerRepository.CreateProvider(userMap))
-			{
-				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
-				await _userManager.AddToRoleAsync(userMap, role);
-				return true;
-			}
+			 userMap = _mapper.Map<Provider>(registerDto);
+			
 		}
-		if (role == "Admin")
+		else if (role == "Admin")
 		{
-			var userMap = _mapper.Map<Admin>(registerDto);
-			userMap.Email = registerDto.Email;
-			userMap.SecurityStamp = Guid.NewGuid().ToString();
-			userMap.UserName = registerDto.Email;
-			if (_adminRepository.CreateAdmin(userMap))
-			{
-				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
-				await _userManager.AddToRoleAsync(userMap, role);
-				return true;
-			}
+			 userMap = _mapper.Map<Admin>(registerDto);
+			
 		}
-		return false;
+		
+        userMap.Email = registerDto.Email;
+        userMap.SecurityStamp = Guid.NewGuid().ToString();
+        userMap.UserName = registerDto.Email;
+        var res = await _userManager.CreateAsync(userMap, registerDto.Password);
+        if (res.Succeeded)
+        {
+
+            await _userManager.AddToRoleAsync(userMap, role);
+        }
+
+        return res;
 	}
 
 

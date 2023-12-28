@@ -27,13 +27,6 @@ namespace ServicesApp.Repository
 			var result = await _userManager.IsInRoleAsync(admin, "Admin");
 			return result;
         }
-
-		public bool CreateAdmin(Admin admin)
-		{
-			_context.Add(admin);
-			return Save();
-		}
-
 		public async Task<AppUser> GetAdmin(string id)
         {
 			var admin = await _userManager.FindByIdAsync(id);

@@ -36,12 +36,6 @@ namespace ServicesApp.Repository
 			return _context.Offers.Where(p => p.Provider.Id == id).ToList();
 		}
 
-		public bool CreateProvider(Provider Provider)
-		{
-			// Change Tracker (add,update,modify)
-			_context.Add(Provider);
-			return Save();
-		}
 
 		public async Task<IdentityResult> UpdateProvider(Provider ProviderUpdate)
 		{
@@ -61,30 +55,21 @@ namespace ServicesApp.Repository
 			return result;
 		}
 
-		public async Task<IdentityResult> DeleteProvider(string id)
-		{
-            var Provider = _context.Providers.Include(c => c.Offers).SingleOrDefault(c => c.Id == id);
-
-            if (Provider != null)
+        public async Task<IdentityResult> DeleteProvider(string id)
+        {
+            var provider = await _userManager.FindByIdAsync(id);
+            // Delete unaccepted offers
+            var offers = _context.Offers.Include(o => o.Provider).Where(o => o.Provider.Id == id && o.Accepted == false).ToList();
+            if (offers != null)
             {
-                foreach (var offer in Provider.Offers)
-                {
-                    offer.Provider = null;
-                }
-                // Save changes
-                await _context.SaveChangesAsync();
-
-                // Delete 
-                var _provider = await _userManager.FindByIdAsync(id);
-                var result = await _userManager.DeleteAsync(_provider);
-
-                return result;
+                _context.RemoveRange(offers);
+                _context.SaveChanges();
             }
-            return null;
+            var result = await _userManager.DeleteAsync(provider);
+            return result;
         }
 
-
-		public bool Save()
+        public bool Save()
 		{
 			//sql code is generated here
 			var saved = _context.SaveChanges();

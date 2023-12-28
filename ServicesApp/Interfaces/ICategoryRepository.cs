@@ -1,4 +1,5 @@
-﻿using ServicesApp.Models;
+﻿using ServicesApp.Dto.Category;
+using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
 {
@@ -10,7 +11,7 @@ namespace ServicesApp.Interfaces
 		bool CategoryExist(int id);
 		bool CreateCategory(Category category);
 		bool UpdateCategory(Category category);
-		Task<bool> DeleteCategory(int id);
+		bool DeleteCategory(int id);
 		bool Save();
 	}
 }

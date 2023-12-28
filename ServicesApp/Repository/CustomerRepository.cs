@@ -37,12 +37,7 @@ namespace ServicesApp.Repository
 			return _context.Requests.Where(p => p.Customer.Id == id).ToList();
 		}
 
-		public bool CreateCustomer(Customer customer)
-		{
-			// Change Tracker (add,update,modify)
-			_context.Add(customer);
-			return Save();
-		}
+	
 
 		public async Task<IdentityResult> UpdateCustomer(Customer customerUpdate)
 		{
@@ -61,35 +56,20 @@ namespace ServicesApp.Repository
 			return result;
 		}
 
-		public async Task<IdentityResult> DeleteCustomer(string id)
-		{
-            var customer = _context.Customers.Include(c => c.Services).SingleOrDefault(c => c.Id == id);
-
-            if (customer != null)
+        public async Task<IdentityResult> DeleteCustomer(string id)
+        {
+            var customer = await _userManager.FindByIdAsync(id);
+            // Delete requests where status = Requested
+            var requests = _context.Requests.Include(r => r.Customer).Where(r => r.Customer.Id == id && r.Status == "Requested").ToList();
+            if (requests != null)
             {
-                // Remove related requests
-                //_context.Requests.RemoveRange(customer.Services);
-				foreach (var service in customer.Services)
-				{
-					if(service.Status == "Requested")
-					{
-						_context.Remove(service);
-					}
-					service.Customer = null;
-				}
-				// Save changes
-                await _context.SaveChangesAsync();
-
-                // Delete the customer
-                var _customer = await _userManager.FindByIdAsync(id);
-                var result = await _userManager.DeleteAsync(_customer);
-
-                return result;
+                _context.RemoveRange(requests);
+                _context.SaveChanges();
             }
-			return null;
+            var result = await _userManager.DeleteAsync(customer);
+            return result;
         }
 
-        
 
         public bool Save()
 		{

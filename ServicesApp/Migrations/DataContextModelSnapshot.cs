@@ -51,21 +51,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2dcd638b-266d-436c-b9d8-8b8650a2aaa8",
+                            Id = "6e83945a-31f7-4a85-9679-e5e12895df12",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "1772f796-cfb0-405c-98e1-afff08184083",
+                            Id = "43626702-ab6b-4481-89f0-769da1a485c2",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "193b2919-3db3-469b-a1a6-50aba196bdd1",
+                            Id = "fee70a81-e665-4566-afc0-5d0c84e3f4fe",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -494,7 +494,8 @@ namespace ServicesApp.Migrations
                 {
                     b.HasOne("ServicesApp.Models.Provider", "Provider")
                         .WithMany("Offers")
-                        .HasForeignKey("ProviderId");
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Offers")
@@ -510,12 +511,14 @@ namespace ServicesApp.Migrations
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
                 {
                     b.HasOne("ServicesApp.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId");
+                        .WithMany("Services")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
                         .WithMany("Services")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Category");
 
@@ -549,6 +552,11 @@ namespace ServicesApp.Migrations
                         .HasForeignKey("ServicesApp.Models.Provider", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Category", b =>
+                {
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using ServicesApp.APIs;
 
 namespace ServicesApp.Controllers
 {
@@ -28,7 +29,7 @@ namespace ServicesApp.Controllers
 			var mapProviders = _mapper.Map<List<ProviderDto>>(providers);
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(mapProviders);
 		}
@@ -40,13 +41,13 @@ namespace ServicesApp.Controllers
 		{
 			if (!_providerRepository.ProviderExist(ProviderId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.NotFoundUser);
 			}
 			var provider = _providerRepository.GetProvider(ProviderId);
 			var mapProvider = _mapper.Map<ProviderDto>(provider);
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(mapProvider);
 		}
@@ -59,25 +60,24 @@ namespace ServicesApp.Controllers
 		{
 			if (ProviderUpdate == null)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			if (!_providerRepository.ProviderExist(ProviderId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.NotFoundUser);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			var mapProvider = _mapper.Map<Provider>(ProviderUpdate);
 			mapProvider.Id = ProviderId;
 			var result = await _providerRepository.UpdateProvider(mapProvider);
 			if (!result.Succeeded)
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, result.Errors);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully updated");
+			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 
@@ -89,19 +89,18 @@ namespace ServicesApp.Controllers
 		{
 			if (!_providerRepository.ProviderExist(ProviderId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.NotFoundUser);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			var result = await _providerRepository.DeleteProvider(ProviderId);
 			if (!result.Succeeded)
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, result.Errors);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully deleted");
+			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

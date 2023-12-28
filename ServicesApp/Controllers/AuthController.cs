@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Authentication;
-
+using ServicesApp.APIs;
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
@@ -21,29 +21,31 @@ public class AuthController : ControllerBase
 			var appUser = await _authRepository.CheckUser(registerDto.Email);
 			if (appUser != null)
 			{
-				return BadRequest("User already exists");
+				return BadRequest(ApiResponse.UserAlreadyExist);
 			}
 			if (await _authRepository.CheckRole(role))
 			{
-                Console.WriteLine("role controller  ");
+                
 
                 var res = await _authRepository.CreateUser(registerDto, role);
 				if(res.Succeeded)
 				{
-                    Console.WriteLine("cteate user controller ");
-
+                   
                     appUser = await _authRepository.CheckUser(registerDto.Email);
-                    return Ok(appUser.Id);
+                    return Ok(new
+					{
+                        statusMsg = "success",
+                        message = "User Created Successfully.",
+                        userId = appUser.Id
+
+                    }) ;
                 }
 
-
-                //List<IdentityError> errorList = res.Errors. ToList();
-                //var errors = string.Join(", ", errorList.Select(e => e.Description));
-                return BadRequest(res.Errors);
+                return BadRequest(res.Errors);   //// ----->
 			}
-			return BadRequest("Role doesn't exist");
+			return BadRequest(ApiResponse.RoleDoesNotExist);
 		}
-		return BadRequest();
+		return BadRequest(ApiResponse.NotValid);
 	}
 
 	[HttpPost("Login")]
@@ -57,12 +59,14 @@ public class AuthController : ControllerBase
 			{
 				return Ok(new
 				{
-					Token = token,
+                    statusMsg = "success",
+                    message = "Logged in Successfully.",
+                    Token = token,
 					Expiration = expiration,
 				});
 			}
 		}
-		return Unauthorized();
+		return Unauthorized(ApiResponse.UnAutharized);
 	}
 
 	[HttpPost("ForgetPassword")]
@@ -72,9 +76,15 @@ public class AuthController : ControllerBase
 
         if (resetCode != string.Empty)
 		{
-			return Ok(resetCode);
+			return Ok(new {
+                code=  resetCode,
+				statusMsg = "success",
+                message = "Reset Code Sent Successfully.",
+
+            }
+            );
 		}
-		return BadRequest("Can not send mail");
+		return BadRequest(ApiResponse.CanNotSentMail);
 	}
 
     [HttpPut("ResetPassword")]
@@ -88,10 +98,10 @@ public class AuthController : ControllerBase
 
 			if (resetPassword)
 			{
-                return Ok("Password Changed Successfully.");
+                return Ok(ApiResponse.PassChanged);
 
             }
         }
-        return BadRequest("Can not Change Password.");
+        return BadRequest(ApiResponse.CanNotChangePass);
     }
 }

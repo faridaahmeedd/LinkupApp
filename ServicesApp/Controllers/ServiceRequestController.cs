@@ -4,7 +4,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Repository;
-//TODO : timeslot get   - timeslot update (was 2 slots -- > 1 slot) ? - Image
+using ServicesApp.APIs;
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -33,7 +33,7 @@ namespace ServicesApp.Controllers
 			var Service = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServices());
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(Service);
 		}
@@ -44,12 +44,12 @@ namespace ServicesApp.Controllers
 		{
 			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.RequestNotFound);
 			}
 			var Service = _mapper.Map<ServiceRequestDto>(_serviceRepository.GetService(ServiceId));
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(Service);
 		}
@@ -60,36 +60,20 @@ namespace ServicesApp.Controllers
         {
             if (!_serviceRepository.ServiceExist(ServiceId))
             {
-                return NotFound();
+                return NotFound(ApiResponse.RequestNotFound);
             }
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(ApiResponse.NotValid);
             }
 			if (!_serviceRepository.CompleteService(ServiceId))
 			{
-                ModelState.AddModelError("", "Something went wrong.");
-                return StatusCode(500, ModelState);
+                return StatusCode(500, ApiResponse.SomthingWronge);
             }
-            return Ok("Succefully completed");
+            return Ok(ApiResponse.ServiceCompletedSuccess);
         }
 
-        //[HttpGet("timeslots/{ServiceId}")]
-        //[ProducesResponseType(200, Type = typeof(TimeSlot))]
-        //public IActionResult GetTimeSlotsOfRequest(int ServiceId)
-        //{
-        //	if (!_serviceRepository.ServiceExist(ServiceId))
-        //	{
-        //		return NotFound();
-        //	}
-
-        //	var timeSlots = _mapper.Map<List<TimeSlotDto>>(_serviceRepository.GetTimeSlotsOfRequest(ServiceId));
-        //	if (!ModelState.IsValid)
-        //	{
-        //		return BadRequest(ModelState);
-        //	}
-        //	return Ok(timeSlots);
-        //}
+    
 
         [HttpPost]
 		[ProducesResponseType(204)]
@@ -99,35 +83,37 @@ namespace ServicesApp.Controllers
 		{
 			if (serviceRequestDto == null)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
 
 			if (!_categoryRepository.CategoryExist(CategoryId))
 			{
-				ModelState.AddModelError("", "Category doesn't exist");
-				return StatusCode(422, ModelState);
+				return NotFound( ApiResponse.CategoryNotFound);
 			}
 			serviceMap.Category = _categoryRepository.GetCategory(CategoryId);
 
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
-				ModelState.AddModelError("", "Customer doesn't exist");
-				return StatusCode(422, ModelState);
-			}
+				return NotFound(ApiResponse.NotFoundUser);
+            }
 			serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
 
 			if (!_serviceRepository.CreateService(serviceMap))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Created($"/api/ServiceRequest/{serviceMap.Id}", "Service Requested Successfully");
+			return Ok(new {
+                statusMsg = "success",
+                message = "Service Created Successfully.",
+				serviceId = serviceMap.Id
+
+            });
 		}
 
 		[HttpPut("update")]
@@ -138,25 +124,24 @@ namespace ServicesApp.Controllers
 		{
 			if (serviceRequestDto == null)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.RequestNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
             serviceMap.Id = ServiceId;
 
             if (!_serviceRepository.UpdateService(serviceMap) )
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully updated");
+			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 		[HttpDelete("{ServiceId}")]
@@ -167,18 +152,17 @@ namespace ServicesApp.Controllers
 		{
 			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.RequestNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			if (!_serviceRepository.DeleteService(ServiceId))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully deleted");
+			return Ok(ApiResponse.SuccessDeleted);
 		}
 
         [HttpGet("GetOffersOfService/{id}")]
@@ -189,20 +173,20 @@ namespace ServicesApp.Controllers
            
             if (!_serviceRepository.ServiceExist(id))
             {
-                return NotFound();
+                return NotFound(ApiResponse.RequestNotFound);
             }
             var offers = _serviceRepository.GetOffersOfService(id);
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(ApiResponse.NotValid);
             }
             if (offers != null)
             {
                 var offersMap = _mapper.Map<List<ServiceOfferDto>>(offers);
                 return Ok(offersMap);
             }
-            return NotFound();
+            return NotFound(ApiResponse.OfferNotFound);
         }
 
         [HttpGet("accepted-offer")]
@@ -220,7 +204,7 @@ namespace ServicesApp.Controllers
             }
             else
             {
-                return NotFound();
+                return NotFound(ApiResponse.OfferNotFound);
             }
         }
 
@@ -232,7 +216,7 @@ namespace ServicesApp.Controllers
 
             if (serviceDetails == null || serviceDetails.Count == 0)
             {
-                return NotFound("No Service Details Found.");
+                return NotFound(ApiResponse.RequestNotFound);
             }
 
             return Ok(serviceDetails);

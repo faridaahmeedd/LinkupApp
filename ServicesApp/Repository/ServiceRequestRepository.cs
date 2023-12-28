@@ -165,8 +165,8 @@ namespace ServicesApp.Repository
                         Fees = t.Fees,
                         Duration = t.Duration,
                         TimeSlotId = t.TimeSlotId,
-                        ProviderId = t.Provider.Id,  //
-                        RequestId = t.Request.Id     //
+                        //ProviderId = t.Provider.Id,  //
+                        //RequestId = t.Request.Id     //
                     }).ToList()
 
                 })

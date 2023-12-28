@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Service;
@@ -6,6 +7,7 @@ using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Repository;
 using System;
+using ServicesApp.APIs;
 
 namespace ServicesApp.Controllers
 {
@@ -39,7 +41,7 @@ namespace ServicesApp.Controllers
 			var offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOffers());
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(offers);
 		}
@@ -50,12 +52,12 @@ namespace ServicesApp.Controllers
 		{
 			if (!_offerRepository.OfferExist(OfferId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.OfferNotFound);
 			}
 			var Service = _mapper.Map<ServiceOfferDto>(_offerRepository.GetOffer(OfferId));
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(Service);
 		}
@@ -63,56 +65,58 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
-		public IActionResult CreateOffer([FromBody] ServiceOfferDto serviceOfferDto)
+		public IActionResult CreateOffer([FromBody] ServiceOfferDto serviceOfferDto,
+			[FromQuery] string ProviderId , [FromQuery]int  RequestId)
 		{
 			if (serviceOfferDto == null)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
-			if (!_providerRepository.ProviderExist(serviceOfferDto.ProviderId))
+			if (!_providerRepository.ProviderExist(ProviderId))
 			{
-				ModelState.AddModelError("", "Provider doesn't exist");
-				return StatusCode(422, ModelState);
+				return NotFound( ApiResponse.NotFoundUser);
 			}
-			if (!_requestRepository.ServiceExist(serviceOfferDto.RequestId))
+			if (!_requestRepository.ServiceExist(RequestId))
 			{
-				ModelState.AddModelError("", "Service request doesn't exist");
-				return StatusCode(422, ModelState);
+				return NotFound( ApiResponse.RequestNotFound);
 			}
 
-			if (!_requestRepository.TimeSlotsExistInService(serviceOfferDto.RequestId, serviceOfferDto.TimeSlotId))
+			if (!_requestRepository.TimeSlotsExistInService(RequestId, serviceOfferDto.TimeSlotId))
 			{
-				ModelState.AddModelError("", "Time slot is not available for this request");
-				return StatusCode(422, ModelState);
+				return NotFound(ApiResponse.TimeSlotNotFound);
+
 			}
 			var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 
-			offerMap.Provider = _providerRepository.GetProvider(serviceOfferDto.ProviderId);
-			offerMap.Request = _requestRepository.GetService(serviceOfferDto.RequestId);
+			offerMap.Provider = _providerRepository.GetProvider(ProviderId);
+			offerMap.Request = _requestRepository.GetService(RequestId);
 
 			if (_timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId) == null)
 			{
-                ModelState.AddModelError("", "Time slot not found");
-                return StatusCode(422, ModelState);
+                return NotFound(ApiResponse.TimeSlotNotFound);
             }
 
 			if (!_timeSlotsRepository.CheckConflict(offerMap))
 			{
-				ModelState.AddModelError("", "Conflict in time slots");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.TimeSlotConflict);
 			}
 
 			if (!_offerRepository.CreateOffer(offerMap))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Created($"/api/Service/{offerMap.Id}", offerMap);
+			return Ok(new
+			{
+                statusMsg = "success",
+                message = "Offer Created Successfully.",
+				OfferId = offerMap.Id
+
+            });
 		}
 
 		[HttpPut()]
@@ -123,25 +127,24 @@ namespace ServicesApp.Controllers
 		{
 			if (serviceOfferDto == null)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			if (!_offerRepository.OfferExist(OfferId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.OfferNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			var serviceMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 			serviceMap.Id = OfferId;
 
 			if (!_offerRepository.UpdateOffer(serviceMap))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully updated");
+			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 		[HttpPut("Accept")]
@@ -153,23 +156,21 @@ namespace ServicesApp.Controllers
 		
 			if (!_offerRepository.OfferExist(OfferId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.OfferNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			if (!_offerRepository.AcceptOffer(OfferId))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
 			if (!_timeSlotsRepository.UpdateToTime(OfferId))
 			{
-				ModelState.AddModelError("", "Failed to update TimeSlot");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.FailedUpdated);
 			}
-			return Ok("Offer Accepted");
+			return Ok(ApiResponse.OfferAccepted);
 		}
 
 	   [HttpDelete()]
@@ -180,19 +181,18 @@ namespace ServicesApp.Controllers
 		{
 			if (!_offerRepository.OfferExist(OfferId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.OfferNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 
 			if (!_offerRepository.DeleteOffer(OfferId))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully deleted");
+			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

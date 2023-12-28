@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Interfaces;
+using System.Web.Helpers;
+using ServicesApp.APIs;
 
 namespace ServicesApp.Controllers
 {
@@ -9,7 +11,7 @@ namespace ServicesApp.Controllers
 	{
 		private readonly IAdminRepository _adminRepository;
 
-		public AdminController(IAdminRepository adminRepository)
+		public AdminController(IAdminRepository adminRepository )
 		{
 			_adminRepository = adminRepository;
 		}
@@ -21,7 +23,7 @@ namespace ServicesApp.Controllers
 			var Admins = await _adminRepository.GetAdmins();
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(Admins);
 		}
@@ -32,12 +34,12 @@ namespace ServicesApp.Controllers
 		{
 			if (! await _adminRepository.AdminExist(AdminId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.NotFoundUser);
 			}
 			var Admin = await _adminRepository.GetAdmin(AdminId);
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(Admin);
 		}
@@ -48,19 +50,19 @@ namespace ServicesApp.Controllers
 		{
 			if (!await _adminRepository.AdminExist(AdminId))
 			{
-				return NotFound();
-			}
-			if (!ModelState.IsValid)
+
+                return NotFound(ApiResponse.NotFoundUser);
+            }
+            if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 
 			if (!await _adminRepository.DeleteAdmin(AdminId))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully deleted");
+			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

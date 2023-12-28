@@ -134,8 +134,8 @@ public class AuthRepository
   
     public async  Task<string> ForgetPassword( string mail )
 	{
-        string senderEmail = "shrookayman617@gmail.com";
-        string senderPassword = "duzi ugle sqrh wtgx"; 
+        string senderEmail = "linkupp2024@gmail.com";
+        string senderPassword = "mbyo noyk dfbb fhlr"; 
         string recipientEmail = mail;
 
         var user = await _userManager.FindByEmailAsync(mail);

@@ -6,6 +6,7 @@ using ServicesApp.Repository;
 using ServicesApp.Dto.Category;
 using ServicesApp.Core.Models;
 using AutoMapper;
+using ServicesApp.APIs;
 
 namespace ServicesApp.Controllers
 {
@@ -30,7 +31,7 @@ namespace ServicesApp.Controllers
 			var category = _categoryRepository.GetCategories();
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(category);
 		}
@@ -41,12 +42,12 @@ namespace ServicesApp.Controllers
 		{
 			if (!_categoryRepository.CategoryExist(CategoryId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.CategoryNotFound);
 			}
 			var category = _categoryRepository.GetCategory(CategoryId);
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(category);
 		}
@@ -58,11 +59,11 @@ namespace ServicesApp.Controllers
 			var category = _categoryRepository.GetCategory(CategoryName);
 			if (category == null)
 			{
-				return NotFound();
+				return NotFound(ApiResponse.CategoryNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(category);
 		}
@@ -73,33 +74,36 @@ namespace ServicesApp.Controllers
 		// [Authorize]
 		public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
 		{
-			if(categoryCreate == null)
-			{
-				return BadRequest(ModelState);
+			if (!ModelState.IsValid)
+            {
+				return BadRequest(ApiResponse.NotValid);
 			}
 			var category = _categoryRepository.GetCategories()
 				.Where(c => c.Name.Trim().ToUpper() == categoryCreate.Name.ToUpper())
 				.FirstOrDefault();
 			if(category != null)
 			{
-				ModelState.AddModelError("", "Category already exists");
-				return StatusCode(422, ModelState);
+				//ModelState.AddModelError("", "Category already exists");
+				return BadRequest(ApiResponse.CategoryAlreadyExist);
 			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
+			
             var mapCategory = _mapper.Map<Category>(categoryCreate);
           
 
             if (!_categoryRepository.CreateCategory(mapCategory))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500,ModelState);
+				//ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500,ApiResponse.SomthingWronge);
 			}
             categoryCreate.Id = mapCategory.Id;
-            var url = Url.Link("GetCategoryById", new {CategoryId = categoryCreate.Id });
-			return Created(url, categoryCreate);
+          //  var url = Url.Link("GetCategoryById", new {CategoryId = categoryCreate.Id });
+			return Ok(new
+			{
+                CategoryId = categoryCreate.Id,
+                statusMsg = "success",
+                message = "Category Created Successfully."
+
+            });
 		}
 
 		[HttpPut("update")]
@@ -110,26 +114,23 @@ namespace ServicesApp.Controllers
 		public IActionResult UpdateCategory([FromBody] CategoryDto categoryUpdate)
 		{
 
-			if(categoryUpdate == null)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ApiResponse.NotValid);
+            }
+            if (!_categoryRepository.CategoryExist(categoryUpdate.Id))
 			{
-				return BadRequest(ModelState);
+				return NotFound(ApiResponse.CategoryNotFound);
 			}
-			if (!_categoryRepository.CategoryExist(categoryUpdate.Id))
-			{
-				return NotFound();
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
+			
             var mapCategory = _mapper.Map<Category>(categoryUpdate);
 
             if (!_categoryRepository.UpdateCategory(mapCategory))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				//ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully updated");
+			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 		[HttpDelete("{CategoryId}")]
@@ -141,19 +142,19 @@ namespace ServicesApp.Controllers
 		{
 			if (!_categoryRepository.CategoryExist(CategoryId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.CategoryNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 
 			if (! _categoryRepository.DeleteCategory(CategoryId))
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				//ModelState.AddModelError("", "Something went wrong.");
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully deleted");
+			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

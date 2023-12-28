@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
-using Nager.Country;
-
+using ServicesApp.APIs;
 
 namespace ServicesApp.Controllers
 {
@@ -30,7 +29,7 @@ namespace ServicesApp.Controllers
 			var mapCustomers = _mapper.Map<List<CustomerDto>>(customers);
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(mapCustomers);
 		}
@@ -41,14 +40,14 @@ namespace ServicesApp.Controllers
 		public IActionResult GetCustomer(string CustomerId) {
 			if(!_customerRepository.CustomerExist(CustomerId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.NotFoundUser);
 			}
 			var customer = _customerRepository.GetCustomer(CustomerId);
 			var mapCustomer = _mapper.Map<CustomerDto>(customer);
 
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			return Ok(mapCustomer);
 		}
@@ -61,25 +60,24 @@ namespace ServicesApp.Controllers
 		{
 			if (customerUpdate == null)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.NotFoundUser);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			var mapCustomer = _mapper.Map<Customer>(customerUpdate);
 			mapCustomer.Id = CustomerId;
 			var result = await _customerRepository.UpdateCustomer(mapCustomer);
 			if (! result.Succeeded)
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, result.Errors);
+				return StatusCode(500,ApiResponse.SomthingWronge);
 			}
-			return Ok("Successfully updated");
+			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 
@@ -91,34 +89,22 @@ namespace ServicesApp.Controllers
 		{
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
-				return NotFound();
+				return NotFound(ApiResponse.NotFoundUser);
 			}
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ModelState);
+				return BadRequest(ApiResponse.NotValid);
 			}
 			var result = await _customerRepository.DeleteCustomer(CustomerId);
 			if (!result.Succeeded)
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, result.Errors);
+				return StatusCode(500, ApiResponse.SomthingWronge);
 			}
-			if(result == null)
-			{
-                return BadRequest(ModelState);
-            }
-			return Ok("Successfully deleted");
+			
+			return Ok(ApiResponse.SuccessDeleted);
 		}
 
-		[HttpGet("Countries")]
-		[ProducesResponseType(200)]
-		public IActionResult GetCountries()
-		{
-			var countryProvider = new CountryProvider();
-			var countries = countryProvider.GetCountries();
-			var countryNames = countries.Select(c => c.CommonName).ToList();
-			return Ok(countryNames);
-		}
+	
 
 		//[HttpGet("services/{CustomerId}")]
 		//[ProducesResponseType(200, Type = typeof(List<ServiceRequestDto>))]

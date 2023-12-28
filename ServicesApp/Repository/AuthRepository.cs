@@ -60,7 +60,7 @@ public class AuthRepository
 		return false;
 	}
 
-	public async Task<bool> CreateUser(RegistrationDto registerDto, string role)
+	public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
 	{
 		if(role == "Customer")
 		{
@@ -68,40 +68,55 @@ public class AuthRepository
 			userMap.Email = registerDto.Email;
 			userMap.SecurityStamp = Guid.NewGuid().ToString();
 			userMap.UserName = registerDto.Email;
-			if (_customerRepository.CreateCustomer(userMap))
-			{
-				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
-				await _userManager.AddToRoleAsync(userMap, role);
-				return true;
+            var result = await _userManager.AddPasswordAsync(userMap, registerDto.Password);
+
+            if  (result.Succeeded)
+            {
+				if (_customerRepository.CreateCustomer(userMap))
+                {
+					await _userManager.AddToRoleAsync(userMap, role);
+				}	
+				
+				
 			}
-		}
+            return result;
+        }
 		if (role == "Provider")
 		{
 			var userMap = _mapper.Map<Provider>(registerDto);
 			userMap.Email = registerDto.Email;
 			userMap.SecurityStamp = Guid.NewGuid().ToString();
 			userMap.UserName = registerDto.Email;
-			if (_providerRepository.CreateProvider(userMap))
-			{
-				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
-				await _userManager.AddToRoleAsync(userMap, role);
-				return true;
-			}
-		}
+            var result = await _userManager.AddPasswordAsync(userMap, registerDto.Password);
+
+            if (result.Succeeded)
+            {
+                if (_providerRepository.CreateProvider(userMap))
+                {
+                    await _userManager.AddToRoleAsync(userMap, role);
+                }
+              
+            }
+            return result;
+        }
 		if (role == "Admin")
 		{
 			var userMap = _mapper.Map<Admin>(registerDto);
 			userMap.Email = registerDto.Email;
 			userMap.SecurityStamp = Guid.NewGuid().ToString();
 			userMap.UserName = registerDto.Email;
-			if (_adminRepository.CreateAdmin(userMap))
-			{
-				await _userManager.AddPasswordAsync(userMap, registerDto.Password);
-				await _userManager.AddToRoleAsync(userMap, role);
-				return true;
-			}
-		}
-		return false;
+            var result = await _userManager.AddPasswordAsync(userMap, registerDto.Password);
+            if (result.Succeeded)
+            {
+                if (_adminRepository.CreateAdmin(userMap))
+                { 
+                    await _userManager.AddToRoleAsync(userMap, role);
+                }
+                
+            }
+            return result;
+        }
+		return null;
 	}
 
 

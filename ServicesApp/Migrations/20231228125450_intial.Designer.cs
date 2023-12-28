@@ -12,7 +12,7 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231227193946_intial")]
+    [Migration("20231228125450_intial")]
     partial class intial
     {
         /// <inheritdoc />
@@ -54,21 +54,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2dcd638b-266d-436c-b9d8-8b8650a2aaa8",
+                            Id = "214cfc74-d059-4ffe-b0c0-fd2d81674525",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "1772f796-cfb0-405c-98e1-afff08184083",
+                            Id = "3aaf38ae-debd-4529-963f-884359e2d967",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "193b2919-3db3-469b-a1a6-50aba196bdd1",
+                            Id = "2608e9a0-9e3d-4762-bb47-47369dba0455",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"

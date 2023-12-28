@@ -24,12 +24,15 @@ public class AuthController : ControllerBase
 			}
 			if (await _authRepository.CheckRole(role))
 			{
-				if (await _authRepository.CreateUser(registerDto, role))
+				var res = await _authRepository.CreateUser(registerDto, role);
+				if (res.Succeeded)
 				{
-					appUser = await _authRepository.CheckUser(registerDto.Email);
-					return Ok(appUser.Id);
-				}
-				return BadRequest("Error while creating user");
+                    appUser = await _authRepository.CheckUser(registerDto.Email);
+                    return Ok(appUser.Id);
+                }
+				
+				
+				return BadRequest(res.Errors);
 			}
 			return BadRequest("Role doesn't exist");
 		}

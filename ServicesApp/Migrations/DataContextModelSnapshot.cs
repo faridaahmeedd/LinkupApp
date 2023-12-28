@@ -51,21 +51,21 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bd74e8be-3781-49fa-b243-2189a4187dc3",
+                            Id = "2f1e0f95-3dc8-4f31-a913-dede3f3d3473",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "69b37c4a-69d6-49c0-a030-fbef5e387002",
+                            Id = "da8d91b5-ae8a-49b8-a248-7419fb5f1c6d",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "c9429d39-a416-4713-a7d6-c8b0bc442dcd",
+                            Id = "97397131-34c2-4a4f-8c00-c1fc2e8fa615",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -494,7 +494,8 @@ namespace ServicesApp.Migrations
                 {
                     b.HasOne("ServicesApp.Models.Provider", "Provider")
                         .WithMany("Offers")
-                        .HasForeignKey("ProviderId");
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Offers")
@@ -515,7 +516,8 @@ namespace ServicesApp.Migrations
 
                     b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
                         .WithMany("Services")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Category");
 

@@ -26,9 +26,18 @@ namespace ServicesApp.Data
             base.OnModelCreating(modelBuilder);
 			modelBuilder.Entity<AppUser>().Ignore(c => c.PhoneNumber)
 											   .Ignore(c => c.PhoneNumberConfirmed);
-                                               
+            modelBuilder
+                .Entity<Customer>()
+                .HasMany(c => c.Services)
+                .WithOne(s => s.Customer)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder
+                .Entity<Provider>() 
+                .HasMany(p => p.Offers)
+                .WithOne(o => o.Provider)
+                .OnDelete(DeleteBehavior.SetNull);
             base.OnModelCreating(modelBuilder);
-			SeedRoles(modelBuilder);
+		    SeedRoles(modelBuilder);
 			//modelBuilder.HasDefaultSchema("dbo");
 			//modelBuilder.Entity<IdentityUser>().ToTable("Users");
 			//modelBuilder.Entity<IdentityRole>().ToTable("Roles");

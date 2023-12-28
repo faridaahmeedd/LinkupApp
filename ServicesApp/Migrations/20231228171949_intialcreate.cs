@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class intialcreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -251,7 +251,8 @@ namespace ServicesApp.Migrations
                         name: "FK_Requests_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -274,7 +275,8 @@ namespace ServicesApp.Migrations
                         name: "FK_Offers_Provider_ProviderId",
                         column: x => x.ProviderId,
                         principalTable: "Provider",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Offers_Requests_RequestId",
                         column: x => x.RequestId,
@@ -310,9 +312,9 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "69b37c4a-69d6-49c0-a030-fbef5e387002", "2", "Provider", "Provider" },
-                    { "bd74e8be-3781-49fa-b243-2189a4187dc3", "1", "Customer", "Customer" },
-                    { "c9429d39-a416-4713-a7d6-c8b0bc442dcd", "3", "Admin", "Admin" }
+                    { "2f1e0f95-3dc8-4f31-a913-dede3f3d3473", "1", "Customer", "Customer" },
+                    { "97397131-34c2-4a4f-8c00-c1fc2e8fa615", "3", "Admin", "Admin" },
+                    { "da8d91b5-ae8a-49b8-a248-7419fb5f1c6d", "2", "Provider", "Provider" }
                 });
 
             migrationBuilder.CreateIndex(

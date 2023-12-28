@@ -7,7 +7,7 @@
 		public bool Accepted { get; set; } = false;
 		public required int TimeSlotId { get; set; }
 		public required TimeOnly Duration { get; set; }
-		public required Provider Provider { get; set; }
+		public  Provider? Provider { get; set; }
         public required ServiceRequest Request { get; set; }
 	}
 }

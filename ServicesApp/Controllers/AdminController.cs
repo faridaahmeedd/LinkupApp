@@ -34,7 +34,7 @@ namespace ServicesApp.Controllers
 		{
 			if (! await _adminRepository.AdminExist(AdminId))
 			{
-				return NotFound(ApiResponse.NotFoundUser);
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			var Admin = await _adminRepository.GetAdmin(AdminId);
 			if (!ModelState.IsValid)
@@ -51,7 +51,7 @@ namespace ServicesApp.Controllers
 			if (!await _adminRepository.AdminExist(AdminId))
 			{
 
-                return NotFound(ApiResponse.NotFoundUser);
+                return NotFound(ApiResponse.UserNotFound);
             }
             if (!ModelState.IsValid)
 			{
@@ -60,7 +60,7 @@ namespace ServicesApp.Controllers
 
 			if (!await _adminRepository.DeleteAdmin(AdminId))
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessDeleted);
 		}

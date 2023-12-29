@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231228180953_intialcreate")]
-    partial class intialcreate
+    [Migration("20231228214514_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,6 +72,13 @@ namespace ServicesApp.Migrations
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
+                        },
+                        new
+                        {
+                            Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958",
+                            ConcurrencyStamp = "4",
+                            Name = "MainAdmin",
+                            NormalizedName = "MainAdmin"
                         });
                 });
 
@@ -160,6 +167,13 @@ namespace ServicesApp.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "8e445865-a24d-4543-a6c6-9443d048cdb9",
+                            RoleId = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -240,6 +254,23 @@ namespace ServicesApp.Migrations
                     b.ToTable("AspNetUsers", (string)null);
 
                     b.UseTptMappingStrategy();
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "dbe1210a-ed1e-4460-aee5-9a5b8c5ea9f7",
+                            Email = "MainAdmin@gmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = true,
+                            NormalizedEmail = "MAINADMIN@GMAIL.COM",
+                            NormalizedUserName = "MAINADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAED/FijLDYcBvPxxLQfNxX3CK4+rVIqbtazuDk1HZbfzkfYsziK8hTjRzWNYytcxb/Q==",
+                            SecurityStamp = "a69f5ed0-973b-442e-ae3e-4bd58c95e0a1",
+                            TwoFactorEnabled = false,
+                            UserName = "MainAdmin"
+                        });
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Category", b =>

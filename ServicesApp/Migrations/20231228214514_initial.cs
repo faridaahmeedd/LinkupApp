@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class intialcreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -314,9 +314,20 @@ namespace ServicesApp.Migrations
                 values: new object[,]
                 {
                     { "43626702-ab6b-4481-89f0-769da1a485c2", "2", "Provider", "Provider" },
+                    { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "4", "MainAdmin", "MainAdmin" },
                     { "6e83945a-31f7-4a85-9679-e5e12895df12", "1", "Customer", "Customer" },
                     { "fee70a81-e665-4566-afc0-5d0c84e3f4fe", "3", "Admin", "Admin" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "dbe1210a-ed1e-4460-aee5-9a5b8c5ea9f7", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAED/FijLDYcBvPxxLQfNxX3CK4+rVIqbtazuDk1HZbfzkfYsziK8hTjRzWNYytcxb/Q==", "a69f5ed0-973b-442e-ae3e-4bd58c95e0a1", false, "MainAdmin" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[] { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "8e445865-a24d-4543-a6c6-9443d048cdb9" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

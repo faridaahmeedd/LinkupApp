@@ -40,7 +40,7 @@ namespace ServicesApp.Controllers
 		public IActionResult GetCustomer(string CustomerId) {
 			if(!_customerRepository.CustomerExist(CustomerId))
 			{
-				return NotFound(ApiResponse.NotFoundUser);
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			var customer = _customerRepository.GetCustomer(CustomerId);
 			var mapCustomer = _mapper.Map<CustomerDto>(customer);
@@ -64,7 +64,7 @@ namespace ServicesApp.Controllers
 			}
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
-				return NotFound(ApiResponse.NotFoundUser);
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
@@ -75,7 +75,7 @@ namespace ServicesApp.Controllers
 			var result = await _customerRepository.UpdateCustomer(mapCustomer);
 			if (! result.Succeeded)
 			{
-				return StatusCode(500,ApiResponse.SomthingWronge);
+				return StatusCode(500,ApiResponse.SomethingWrong);
 			}
 			return Ok(ApiResponse.SuccessUpdated);
 		}
@@ -89,7 +89,7 @@ namespace ServicesApp.Controllers
 		{
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
-				return NotFound(ApiResponse.NotFoundUser);
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			if (!ModelState.IsValid)
 			{
@@ -98,7 +98,7 @@ namespace ServicesApp.Controllers
 			var result = await _customerRepository.DeleteCustomer(CustomerId);
 			if (!result.Succeeded)
 			{
-				return StatusCode(500, ApiResponse.SomthingWronge);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 			
 			return Ok(ApiResponse.SuccessDeleted);

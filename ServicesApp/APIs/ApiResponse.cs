@@ -2,22 +2,22 @@
 {
     public static  class ApiResponse
     {
-        public static readonly object NotFoundUser = new
-        {
-            statusMsg = "fail",
-            message = "Not Found."
-        };
-        public static readonly object NotValid= new
+        public static readonly object NotValid = new
         {
             statusMsg = "fail",
             message = "Not Valid."
         };
-        public static readonly object SomthingWronge = new
+        public static readonly object SomethingWrong = new
         {
             statusMsg = "fail",
             message = "Something went Wrong."
         };
-        public static readonly object SuccessDeleted = new
+		public static readonly object SuccessCreated = new
+		{
+			statusMsg = "success",
+			message = "Created Successfully."
+		};
+		public static readonly object SuccessDeleted = new
         {
             statusMsg = "success",
             message = "Successfully Deleted."
@@ -27,16 +27,11 @@
             statusMsg = "success",
             message = "Successfully Updated."
         };
-        public static readonly object UserAlreadyExist = new
-        {
-            statusMsg = "fail",
-            message = "User Already Exists."
-        };
-        public static readonly object RoleDoesNotExist = new
-        {
-            statusMsg = "fail",
-            message = "Role Doesn't Exist."
-        };
+		public static readonly object FailedUpdated = new
+		{
+			statusMsg = "fail",
+			message = "Failed to Update."
+		};
         public static readonly object UnAutharized = new
         {
             statusMsg = "fail",
@@ -57,17 +52,33 @@
             statusMsg = "fail",
             message = "Can not Change Password."
         };
-        public static readonly object CategoryNotFound = new
-        {
-            statusMsg = "fail",
-            message = "Category Not Found."
-        };
-        public static readonly object CategoryAlreadyExist= new
+		public static readonly object UserAlreadyExist = new
+		{
+			statusMsg = "fail",
+			message = "User Already Exists."
+		};
+		public static readonly object CategoryAlreadyExist= new
         {
             statusMsg = "fail",
             message = "Category Already Exists."
         };
-        public static readonly object OfferNotFound = new
+
+		public static readonly object RoleDoesNotExist = new
+		{
+			statusMsg = "fail",
+			message = "Role Doesn't Exist."
+		};
+		public static readonly object UserNotFound = new
+		{
+			statusMsg = "fail",
+			message = "Not Found."
+		};
+		public static readonly object CategoryNotFound = new
+		{
+			statusMsg = "fail",
+			message = "Category Not Found."
+		};
+		public static readonly object OfferNotFound = new
         {
             statusMsg = "fail",
             message = "Offer Not Found."
@@ -81,11 +92,6 @@
         {
             statusMsg = "fail",
             message = "Time Slot is not Found."
-        };
-        public static readonly object FailedUpdated = new
-        {
-            statusMsg = "fail",
-            message = "Failed to Update."
         };
         public static readonly object TimeSlotConflict = new
         {
@@ -102,15 +108,5 @@
             statusMsg = "success",
             message = "Service Completed Successfully."
         };
-        public static readonly object CreatedSuccess = new
-        {
-            statusMsg = "success",
-            message = "Created Successfully."
-        };
-
-
-
-
-
     }
 }

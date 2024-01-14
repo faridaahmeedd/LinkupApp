@@ -8,6 +8,8 @@ using ServicesApp.Models;
 using ServicesApp.Repository;
 using System;
 using ServicesApp.APIs;
+using System.Collections.Generic;
+using ServicesApp.Core.Models;
 
 namespace ServicesApp.Controllers
 {
@@ -100,13 +102,21 @@ namespace ServicesApp.Controllers
 			{
                 return NotFound(ApiResponse.TimeSlotNotFound);
             }
-
-			if (!_timeSlotsRepository.CheckConflict(offerMap))
+            //if ( _offerRepository.ProviderAlreadyOffered(ProviderId, RequestId)) //->
+            //{
+            //    return BadRequest (ApiResponse.
+			//    );
+            //}
+            if (!_timeSlotsRepository.CheckConflict(offerMap))
 			{
 				return StatusCode(500, ApiResponse.TimeSlotConflict);
 			}
+            if (!_providerRepository.CheckProviderBalance(ProviderId))  //->
+            {
+                return BadRequest(ApiResponse.PayFine);
+            }
 
-			if (!_offerRepository.CreateOffer(offerMap))
+            if (!_offerRepository.CreateOffer(offerMap))
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
@@ -194,5 +204,38 @@ namespace ServicesApp.Controllers
 			}
 			return Ok(ApiResponse.SuccessDeleted);
 		}
-	}
+
+
+        [HttpGet("providerOffers/{providerId}")]
+        [ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
+        public IActionResult GetOffersOfProvider(string providerId)
+        {
+            if (!_providerRepository.ProviderExist(providerId))
+            {
+                return NotFound(ApiResponse.UserNotFound);
+            }
+            var Offers = _mapper.Map < List< ServiceOfferDto >>(_offerRepository.GetOfffersOfProvider(providerId));
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ApiResponse.NotValid);
+            }
+            return Ok(Offers);
+        }
+
+
+        [HttpGet("providerAlreadyOffers/{providerId}")]
+        [ProducesResponseType(200)]
+        public IActionResult ProviderAleadyOffer(string providerId , int requestId)
+        {
+            if (_offerRepository.ProviderAlreadyOffered(providerId , requestId))
+            {
+                return NotFound(ApiResponse.AlreadyOffered);
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ApiResponse.NotValid);
+            }
+            return Ok(ApiResponse.ProviderCanOffer);
+        }
+    }
 }

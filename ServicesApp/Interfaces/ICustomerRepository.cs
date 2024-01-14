@@ -12,6 +12,7 @@ namespace ServicesApp.Interfaces
 		ICollection<ServiceRequest> GetServicesByCustomer(string id);
 		Task<IdentityResult> UpdateCustomer(Customer customerUpdate);
 		Task<IdentityResult> DeleteCustomer(string id);
+		bool CheckCustomerBalance(string id);
         bool Save();
 	}
 }

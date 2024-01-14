@@ -68,12 +68,22 @@ namespace ServicesApp.Repository
             var result = await _userManager.DeleteAsync(provider);
             return result;
         }
-
+		
         public bool Save()
 		{
 			//sql code is generated here
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;
 		}
-	}
+        public bool CheckProviderBalance(string id)
+        {
+            var existingProvider = _context.Providers.Where(p => p.Id == id).FirstOrDefault();
+            if (existingProvider.Balance > 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
 }

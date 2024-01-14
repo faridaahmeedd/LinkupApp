@@ -2,6 +2,7 @@
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using System;
 
 namespace ServicesApp.Repository
 {
@@ -66,8 +67,6 @@ namespace ServicesApp.Repository
 			}
 			return false;
 		}
-		//request -- offer req---offer delete (accepted & in same day)
-
 		public bool DeleteOffer(int id)
 		{
 			var offer = _context.Offers.Include(c => c.Provider).Where(p => p.Id == id).FirstOrDefault();
@@ -115,5 +114,28 @@ namespace ServicesApp.Repository
 
 			return null;
 		}
-	}
+        public ICollection<ServiceOffer> GetOfffersOfProvider(string providerId)
+		{
+            var offers = _context.Offers.Include(o=> o.Request).Where(p => p.Provider.Id == providerId).ToList(); 
+            return offers;
+        }
+
+        public bool ProviderAlreadyOffered(string providerId , int requestId)
+        {
+			var providerOffers = GetOfffersOfProvider( providerId);
+
+           
+            if (providerOffers != null)
+			{
+				foreach (var offer in providerOffers)
+                {
+                    if (offer.Request.Id == requestId)
+					{
+						return true;
+					}
+				}
+			}
+            return false;
+        }
+    }
 }

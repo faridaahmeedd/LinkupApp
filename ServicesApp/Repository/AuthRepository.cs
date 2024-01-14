@@ -10,6 +10,9 @@ using System.Net.Mail;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.IO;
+
+
 public class AuthRepository
 {
 	private readonly UserManager<AppUser> _userManager;
@@ -74,7 +77,26 @@ public class AuthRepository
         if (result.Succeeded)
         {
             await _userManager.AddToRoleAsync(userMap, role);
-        }
+            string senderEmail = "linkupp2024@gmail.com";
+            string senderPassword = "mbyo noyk dfbb fhlr";
+            string recipientEmail = userMap.Email;
+            MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+            {
+                 Subject = "Welcome to Linkup Service Hub",
+             
+                 Body = File.ReadAllText("Mails/RegistrationMail.html"),
+                 IsBodyHtml = true,
+            };
+
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(senderEmail, senderPassword),
+                EnableSsl = true
+            };
+
+             smtpClient.Send(mailMessage);
+            }
         return result;
 	}
 

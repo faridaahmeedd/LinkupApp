@@ -95,15 +95,22 @@ namespace ServicesApp.Controllers
 			{
 				return NotFound( ApiResponse.CategoryNotFound);
 			}
-			serviceMap.Category = _categoryRepository.GetCategory(CategoryId);
+            if (!_serviceRepository.CheckServiceMinFees(serviceMap, CategoryId))
+            {
+                return NotFound(ApiResponse.MinFees);  
+            }
+            serviceMap.Category = _categoryRepository.GetCategory(CategoryId);
 
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
 				return NotFound(ApiResponse.UserNotFound);
             }
 			serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
-
-			if (!_serviceRepository.CreateService(serviceMap))
+            if (!_customerRepository.CheckCustomerBalance(CustomerId))
+            {
+                return BadRequest( ApiResponse.PayFine);
+            }
+            if (!_serviceRepository.CreateService(serviceMap))
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}

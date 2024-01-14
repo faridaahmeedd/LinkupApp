@@ -71,7 +71,7 @@
 		public static readonly object UserNotFound = new
 		{
 			statusMsg = "fail",
-			message = "Not Found."
+			message = "User Not Found."
 		};
 		public static readonly object CategoryNotFound = new
 		{
@@ -107,6 +107,31 @@
         {
             statusMsg = "success",
             message = "Service Completed Successfully."
+        };
+        public static readonly object MinFees = new
+        {
+            statusMsg = "fail",
+            message = "Fees Can not be less than Category Minimum Fees."
+        };
+        public static readonly object AlreadyOffered = new
+        {
+            statusMsg = "fail",
+            message = "You are Already Offered this Service."
+        };
+        public static readonly object PasswordInValid = new
+        {
+            statusMsg = "fail",
+            message = "Invalid Password."
+        };
+        public static readonly object PayFine = new
+        {
+            statusMsg = "fail",
+            message = "Please Pay For the Previous Service First"
+        };
+        public static readonly object ProviderCanOffer = new
+        {
+            statusMsg = "success",
+            message = "Provider Can Offer." 
         };
     }
 }

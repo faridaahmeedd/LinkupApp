@@ -37,26 +37,30 @@ namespace ServicesApp.Repository
 
 		public  bool CreateService(ServiceRequest service)
 		{
-			_context.Add(service);
+            _context.Add(service);
 			return Save();
 		}
-
+        public bool CheckServiceMinFees(ServiceRequest service , int categoryId)
+        {
+            var existingCategory = _context.Categories.Find(categoryId);
+            if (service.Fees < existingCategory.MinFees)
+            {
+                return false;
+            }
+            return true;
+        }
         public bool UpdateService(ServiceRequest updatedService)
         {
             var existingService = _context.Requests.Find(updatedService.Id);
-            Console.WriteLine(existingService);
-            Console.WriteLine("before");
             if (existingService != null)
             {
                 existingService.Description = updatedService.Description;
                 existingService.Image = updatedService.Image; //TODO
 
                 _context.SaveChanges();
-                Console.WriteLine("After");
 
                 return true;
             }
-            Console.WriteLine("error");
 
             return false;
         }
@@ -164,9 +168,7 @@ namespace ServicesApp.Repository
                     {
                         Fees = t.Fees,
                         Duration = t.Duration,
-                        TimeSlotId = t.TimeSlotId,
-                        //ProviderId = t.Provider.Id,  //
-                        //RequestId = t.Request.Id     //
+                        TimeSlotId = t.TimeSlotId
                     }).ToList()
 
                 })

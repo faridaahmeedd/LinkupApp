@@ -12,6 +12,8 @@ namespace ServicesApp.Interfaces
 		ICollection<ServiceOffer> GetOffersByProvider(string id);
 		Task<IdentityResult> UpdateProvider(Provider ProviderUpdate);
 		Task<IdentityResult> DeleteProvider(string id);
-		bool Save();
+		bool CheckProviderBalance(string id);
+
+        bool Save();
 	}
 }

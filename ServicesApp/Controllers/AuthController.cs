@@ -41,8 +41,9 @@ public class AuthController : ControllerBase
                     }) ;
                 }
 
-                return BadRequest(res.Errors);   //// ----->
-			}
+                return BadRequest(ApiResponse.PasswordInValid);
+             
+            }
 			return BadRequest(ApiResponse.RoleDoesNotExist);
 		}
 		return BadRequest(ApiResponse.NotValid);

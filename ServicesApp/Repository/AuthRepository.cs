@@ -101,7 +101,7 @@ public class AuthRepository
 	}
 
 
-	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
+	public async Task<(string Token, DateTime Expiration , string Roles)> LoginUser(LoginDto loginDto)
 	{
 		var appUser = await _userManager.FindByEmailAsync(loginDto.Email);
 		if (appUser != null && await _userManager.CheckPasswordAsync(appUser, loginDto.Password))
@@ -115,8 +115,9 @@ public class AuthRepository
 
 			var roles = await _userManager.GetRolesAsync(appUser);
 			authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            Console.WriteLine(roles );
 
-			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
 			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 			var expiration = DateTime.Now.AddMonths(5);
 
@@ -128,9 +129,9 @@ public class AuthRepository
 				signingCredentials: signingCredentials
 			);
 			var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-			return (token, expiration);
+			return (token, expiration , roles.FirstOrDefault() );
 		}
-		return (null, DateTime.MinValue);
+		return (null, DateTime.MinValue , null);
 	}
 
 
@@ -211,4 +212,6 @@ public class AuthRepository
         }
 		return false;
     }
+
+
 }

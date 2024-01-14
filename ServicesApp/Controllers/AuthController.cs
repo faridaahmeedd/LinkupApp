@@ -54,7 +54,7 @@ public class AuthController : ControllerBase
 	{
 		if (ModelState.IsValid)
 		{
-			var (token, expiration) = await _authRepository.LoginUser(loginDto);
+			var (token, expiration , role) = await _authRepository.LoginUser(loginDto);
 
 			if (token != null)
 			{
@@ -64,6 +64,7 @@ public class AuthController : ControllerBase
                     message = "Logged in Successfully.",
                     Token = token,
 					Expiration = expiration,
+					Role = role
 				});
 			}
 		}

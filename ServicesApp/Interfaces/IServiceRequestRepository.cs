@@ -13,7 +13,9 @@ namespace ServicesApp.Interfaces
 		bool UpdateService(ServiceRequest service);
 		bool DeleteService(int id);
 		bool Save();
-		ICollection<ServiceOffer> GetOffersOfService(int id);
+		bool CheckServiceMinFees(ServiceRequest service, int categoryId);
+
+        ICollection<ServiceOffer> GetOffersOfService(int id);
 		ServiceOffer AcceptedOffer(int serviceId);
         bool TimeSlotsExistInService(int ServiceId, int timeSlotId);
 		bool CompleteService(int id);

@@ -77,5 +77,16 @@ namespace ServicesApp.Repository
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;
 		}
+
+		public bool CheckCustomerBalance(string id)
+		{
+			var existingCustomer = _context.Customers.Where(p => p.Id == id).FirstOrDefault();
+			if(existingCustomer.Balance >0)
+			{
+				return false;
+			}
+
+            return true;
+		}
 	}
 }

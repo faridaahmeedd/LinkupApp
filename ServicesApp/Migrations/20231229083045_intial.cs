@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class intial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -237,7 +237,8 @@ namespace ServicesApp.Migrations
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Fees = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -322,7 +323,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "dbe1210a-ed1e-4460-aee5-9a5b8c5ea9f7", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAED/FijLDYcBvPxxLQfNxX3CK4+rVIqbtazuDk1HZbfzkfYsziK8hTjRzWNYytcxb/Q==", "a69f5ed0-973b-442e-ae3e-4bd58c95e0a1", false, "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "901e8e9d-9539-4ebe-a9a8-78838a3ebf62", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEA14EUbSIlFaqtshUU/FBe5ZG8hoCe/j0JmkMSOGer7gAMbYk6ZKNl6ewLAMUpQNHw==", "581668af-b2e3-482e-b9de-9dd2a8f8d0be", false, "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

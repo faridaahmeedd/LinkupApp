@@ -11,7 +11,8 @@ namespace ServicesApp.Models
 		public  Category? Category { get; set; }
 		public string Status { get; set; } = "Requested" ;
 		public  Customer? Customer { get; set; }
-		public ICollection<ServiceOffer>? Offers { get; set; }
+        public int? Fees { get; set; }
+        public ICollection<ServiceOffer>? Offers { get; set; }
 		public required ICollection<TimeSlot> TimeSlots { get; set; }
 		
 	}

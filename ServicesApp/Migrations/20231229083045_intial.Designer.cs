@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231228214514_initial")]
-    partial class initial
+    [Migration("20231229083045_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -260,14 +260,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "dbe1210a-ed1e-4460-aee5-9a5b8c5ea9f7",
+                            ConcurrencyStamp = "901e8e9d-9539-4ebe-a9a8-78838a3ebf62",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAED/FijLDYcBvPxxLQfNxX3CK4+rVIqbtazuDk1HZbfzkfYsziK8hTjRzWNYytcxb/Q==",
-                            SecurityStamp = "a69f5ed0-973b-442e-ae3e-4bd58c95e0a1",
+                            PasswordHash = "AQAAAAIAAYagAAAAEA14EUbSIlFaqtshUU/FBe5ZG8hoCe/j0JmkMSOGer7gAMbYk6ZKNl6ewLAMUpQNHw==",
+                            SecurityStamp = "581668af-b2e3-482e-b9de-9dd2a8f8d0be",
                             TwoFactorEnabled = false,
                             UserName = "MainAdmin"
                         });
@@ -349,6 +349,9 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Fees")
+                        .HasColumnType("int");
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");

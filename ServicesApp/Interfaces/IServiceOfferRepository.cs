@@ -14,5 +14,8 @@ namespace ServicesApp.Interfaces
 		bool AcceptOffer(int id);
 		ICollection<ServiceOffer> GetUnCompletedOffers(string providerId);
 		bool Save();
-	}
+		ICollection<ServiceOffer> GetOfffersOfProvider(string providerId);
+		bool ProviderAlreadyOffered(string providerId, int requestId);
+
+    }
 }

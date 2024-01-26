@@ -40,7 +40,6 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
-
         public bool DeleteTimeSlot(int id)
 		{
 			_context.Remove(id);

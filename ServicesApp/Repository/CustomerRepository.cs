@@ -32,13 +32,6 @@ namespace ServicesApp.Repository
 			return _context.Customers.OrderBy(p => p.Id).ToList();
 		}
 
-		public ICollection<ServiceRequest> GetServicesByCustomer(string id)
-		{
-			return _context.Requests.Where(p => p.Customer.Id == id).ToList();
-		}
-
-	
-
 		public async Task<IdentityResult> UpdateCustomer(Customer customerUpdate)
 		{
 			var existingCustomer = await _userManager.FindByIdAsync(customerUpdate.Id);
@@ -69,7 +62,6 @@ namespace ServicesApp.Repository
             var result = await _userManager.DeleteAsync(customer);
             return result;
         }
-
 
         public bool Save()
 		{

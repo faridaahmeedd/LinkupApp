@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
-using Azure.Core;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Repository;
-using System;
 using ServicesApp.APIs;
-using System.Collections.Generic;
-using ServicesApp.Core.Models;
 
 namespace ServicesApp.Controllers
 {
@@ -223,7 +217,7 @@ namespace ServicesApp.Controllers
         }
 
 
-        [HttpGet("providerAlreadyOffers/{providerId}")]
+        [HttpGet("providerAlreadyOffered/{providerId}")]
         [ProducesResponseType(200)]
         public IActionResult ProviderAleadyOffer(string providerId , int requestId)
         {

@@ -53,7 +53,29 @@ namespace ServicesApp.Controllers
 			return Ok(Service);
 		}
 
-        [HttpGet("Complete")]
+
+		[HttpGet("CustomerRequests/{CustomerId}")]
+		[ProducesResponseType(200, Type = typeof(List<ServiceRequestDto>))]
+		public IActionResult GetServicesByCustomer(string CustomerId)
+		{
+			if (!_customerRepository.CustomerExist(CustomerId))
+			{
+				return NotFound();
+			}
+			var services = _serviceRepository.GetServicesByCustomer(CustomerId);
+			if (services == null)
+			{
+				return NotFound();
+			}
+			var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			return Ok(mapServices);
+		}
+
+		[HttpGet("Complete")]
         [ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
         public IActionResult CompleteService(int ServiceId)
         {
@@ -71,8 +93,6 @@ namespace ServicesApp.Controllers
             }
             return Ok(ApiResponse.ServiceCompletedSuccess);
         }
-
-    
 
         [HttpPost]
 		[ProducesResponseType(204)]

@@ -2,13 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.APIs;
+using ServicesApp.Interfaces;
+
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
-	private readonly AuthRepository _authRepository;
+	private readonly IAuthRepository _authRepository;
 
-	public AuthController(AuthRepository authenticationRepository)
+	public AuthController(IAuthRepository authenticationRepository)
 	{
 		_authRepository = authenticationRepository;
 	}
@@ -25,12 +27,9 @@ public class AuthController : ControllerBase
 			}
 			if (await _authRepository.CheckRole(role))
 			{
-                
-
                 var res = await _authRepository.CreateUser(registerDto, role);
 				if(res.Succeeded)
 				{
-                   
                     appUser = await _authRepository.CheckUser(registerDto.Email);
                     return Ok(new
 					{
@@ -40,9 +39,7 @@ public class AuthController : ControllerBase
 
                     }) ;
                 }
-
                 return BadRequest(ApiResponse.PasswordInValid);
-             
             }
 			return BadRequest(ApiResponse.RoleDoesNotExist);
 		}

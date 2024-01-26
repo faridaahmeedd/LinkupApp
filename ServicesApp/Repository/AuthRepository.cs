@@ -10,10 +10,9 @@ using System.Net.Mail;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using System.IO;
+using ServicesApp.Interfaces;
 
-
-public class AuthRepository
+public class AuthRepository : IAuthRepository
 {
 	private readonly UserManager<AppUser> _userManager;
 	private readonly IConfiguration _config;
@@ -54,7 +53,6 @@ public class AuthRepository
 	public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
 	{
         var userMap = _mapper.Map<AppUser>(registerDto);
-		Console.WriteLine(userMap);
         if (role == "Customer")
 		{
 			 userMap = _mapper.Map<Customer>(registerDto);
@@ -62,12 +60,10 @@ public class AuthRepository
 		else if (role == "Provider")
 		{
 			 userMap = _mapper.Map<Provider>(registerDto);
-			
 		}
 		else if (role == "Admin")
 		{
 			 userMap = _mapper.Map<Admin>(registerDto);
-			
 		}
 		
         userMap.Email = registerDto.Email;
@@ -96,7 +92,7 @@ public class AuthRepository
             };
 
              smtpClient.Send(mailMessage);
-            }
+        }
         return result;
 	}
 
@@ -129,13 +125,13 @@ public class AuthRepository
 				signingCredentials: signingCredentials
 			);
 			var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-			return (token, expiration , roles.FirstOrDefault() );
+			return (token, expiration, roles.FirstOrDefault());
 		}
 		return (null, DateTime.MinValue , null);
 	}
 
 
-    public async  Task<string> ForgetPassword( string mail )
+    public async Task<string> ForgetPassword(string mail)
 	{
         string senderEmail = "linkupp2024@gmail.com";
         string senderPassword = "mbyo noyk dfbb fhlr"; 
@@ -147,7 +143,7 @@ public class AuthRepository
 			return string.Empty;
 		}
 
-        string resetCode = GenerateRandomCode(); 
+        string resetCode = GenerateRandomCode();
 
         // Save the confirmation code in your database or a secure storage
         // user.ConfirmationCode = confirmationCode; 
@@ -181,14 +177,13 @@ public class AuthRepository
         return string.Empty;
 	}
 
-    private string GenerateRandomCode(int length = 6)
+    public string GenerateRandomCode(int length = 6)
     {
         const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         Random random = new Random();
         return new string(Enumerable.Repeat(chars, length)
             .Select(s => s[random.Next(s.Length)]).ToArray());
     }
-
 
     public async Task<bool> ResetPassword(string mail, string newPassword)
     {
@@ -199,19 +194,14 @@ public class AuthRepository
             return false; 
         }
 
-        // Reset the user's password
-       // var jjj = await _userManager.ChangePasswordAsync()
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
 
         if (result.Succeeded)
         {
-           
             await _userManager.UpdateAsync(user);
             return true; 
         }
 		return false;
     }
-
-
 }

@@ -154,7 +154,7 @@ public class AuthRepository : IAuthRepository
 		htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
 		htmlContent = htmlContent.Replace("{UserNamePlaceholder}", user.UserName);
 		AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-		  $"<img src='cid:Logo' /><br/>" + htmlContent, null, "text/html");
+		  $"<div style='text-align: center;'> <img src='cid:Logo' style=\"width: 100px;\"/> </div>" + htmlContent, null, "text/html");
 		htmlView.LinkedResources.Add(LinkedImage);
 
 		MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)

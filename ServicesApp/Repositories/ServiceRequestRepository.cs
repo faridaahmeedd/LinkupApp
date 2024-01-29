@@ -30,6 +30,11 @@ namespace ServicesApp.Repository
 			return _context.Requests.Where(p => p.Id == id).FirstOrDefault();
 		}
 
+		public ICollection<ServiceRequest> GetServicesByCustomer(string id)
+		{
+			return _context.Requests.Where(p => p.Customer.Id == id).ToList();
+		}
+
 		public bool ServiceExist(int id)
 		{
 			return _context.Requests.Any(p => p.Id == id);

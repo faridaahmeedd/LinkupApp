@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231229083045_intial")]
-    partial class intial
+    [Migration("20240126230757_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -260,14 +260,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "901e8e9d-9539-4ebe-a9a8-78838a3ebf62",
+                            ConcurrencyStamp = "43e9c8f0-3a25-4fb8-b580-81589ab0b099",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEA14EUbSIlFaqtshUU/FBe5ZG8hoCe/j0JmkMSOGer7gAMbYk6ZKNl6ewLAMUpQNHw==",
-                            SecurityStamp = "581668af-b2e3-482e-b9de-9dd2a8f8d0be",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDgOvIzRjSV57+9VN2LtZwi2jViMx3iYAm95ZDbfiLKl5JIMCEZ7ShJ8SlCYdMIYfw==",
+                            SecurityStamp = "a22fb270-0e03-4125-a428-f598228d7250",
                             TwoFactorEnabled = false,
                             UserName = "MainAdmin"
                         });

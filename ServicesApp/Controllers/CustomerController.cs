@@ -103,29 +103,5 @@ namespace ServicesApp.Controllers
 			
 			return Ok(ApiResponse.SuccessDeleted);
 		}
-
-	
-
-		//[HttpGet("services/{CustomerId}")]
-		//[ProducesResponseType(200, Type = typeof(List<ServiceRequestDto>))]
-		//public IActionResult GetServicesByCustomer(string CustomerId)
-		//{
-		//	if (!_customerRepository.CustomerExist(CustomerId))
-		//	{
-		//		return NotFound();
-		//	}
-		//	var services = _customerRepository.GetServicesByCustomer(CustomerId);
-		//	if(services == null)
-		//	{
-		//		return NotFound();
-		//	}
-
-		//	var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
-		//	if (!ModelState.IsValid)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	return Ok(mapServices);
-		//}
 	}
 }

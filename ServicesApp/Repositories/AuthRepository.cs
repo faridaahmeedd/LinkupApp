@@ -11,6 +11,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using ServicesApp.Interfaces;
+using System.Net.Mime;
 
 public class AuthRepository : IAuthRepository
 {
@@ -79,7 +80,6 @@ public class AuthRepository : IAuthRepository
             MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
             {
                  Subject = "Welcome to Linkup Service Hub",
-             
                  Body = File.ReadAllText("Mails/RegistrationMail.html"),
                  IsBodyHtml = true,
             };
@@ -139,24 +139,33 @@ public class AuthRepository : IAuthRepository
 
         var user = await _userManager.FindByEmailAsync(mail);
 		if (user == null){
-			
 			return string.Empty;
 		}
 
-        string resetCode = GenerateRandomCode();
+		var resetCode = GenerateRandomCode();
+		// Save the confirmation code in your database or a secure storage
+		// user.ConfirmationCode = confirmationCode; 
+		// await _userManager.UpdateAsync(user);
 
-        // Save the confirmation code in your database or a secure storage
-        // user.ConfirmationCode = confirmationCode; 
-        // await _userManager.UpdateAsync(user);
+		LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
+		LinkedImage.ContentId = "Logo";
+		LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
+		string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
+		htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
+		htmlContent = htmlContent.Replace("{UserNamePlaceholder}", user.UserName);
+		AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
+		  $"<div style='text-align: center;'> <img src='cid:Logo' style=\"width: 100px;\"/> </div>" + htmlContent, null, "text/html");
+		htmlView.LinkedResources.Add(LinkedImage);
 
-        MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-        {
-            Subject = "Linkup Reset Password Email",
-            Body = $"Reset Code : {resetCode}",
-            IsBodyHtml = true , 
-        }; 
+		MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+		{
+			Subject = "Linkup Reset Password",
+			IsBodyHtml = true, 
+        };
 
-        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+		mailMessage.AlternateViews.Add(htmlView);
+
+		SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
             Credentials = new NetworkCredential(senderEmail, senderPassword),
@@ -166,14 +175,12 @@ public class AuthRepository : IAuthRepository
         try
         {
             smtpClient.Send(mailMessage);
-            Console.WriteLine("Email sent successfully!");
             return resetCode;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
         }
-
         return string.Empty;
 	}
 

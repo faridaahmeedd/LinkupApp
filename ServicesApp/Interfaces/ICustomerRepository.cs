@@ -9,7 +9,6 @@ namespace ServicesApp.Interfaces
 		ICollection<Customer> GetCustomers();
 		Customer GetCustomer(string id);
 		bool CustomerExist(string id);
-		ICollection<ServiceRequest> GetServicesByCustomer(string id);
 		Task<IdentityResult> UpdateCustomer(Customer customerUpdate);
 		Task<IdentityResult> DeleteCustomer(string id);
 		bool CheckCustomerBalance(string id);

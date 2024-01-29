@@ -57,16 +57,15 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
-		public IActionResult AddTimeSlot([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
+		public IActionResult AddTimeSlots([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
-			if (timeSlots == null)
+			if (!ModelState.IsValid || timeSlots == null)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
-
-			if (!ModelState.IsValid)
+			if (timeSlots.Count > 3)
 			{
-				return BadRequest(ApiResponse.NotValid);
+				return BadRequest(ApiResponse.TimeSlotsExceededMax);
 			}
 			if (!_requestRepository.ServiceExist(ServiceId))
 			{
@@ -79,7 +78,38 @@ namespace ServicesApp.Controllers
 				mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
 				mapTimeSlots.Add(mapItem);
 			}
-			if (!_timeSlotRepository.AddTimeSlot(mapTimeSlots))
+			if (!_timeSlotRepository.AddTimeSlots(mapTimeSlots))
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+			return Ok(ApiResponse.SuccessCreated);
+		}
+
+		[HttpPut]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		public IActionResult UpdateTimeSlots([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
+		{
+			if (!ModelState.IsValid || timeSlots == null)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			if (timeSlots.Count > 3)
+			{
+				return BadRequest(ApiResponse.TimeSlotsExceededMax);
+			}
+			if (!_requestRepository.ServiceExist(ServiceId))
+			{
+				return NotFound(ApiResponse.RequestNotFound);
+			}
+			List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
+			foreach (var item in timeSlots)
+			{
+				var mapItem = _mapper.Map<TimeSlot>(item);
+				mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
+				mapTimeSlots.Add(mapItem);
+			}
+			if (!_timeSlotRepository.UpdateTimeSlots(mapTimeSlots, ServiceId))
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
@@ -87,26 +117,26 @@ namespace ServicesApp.Controllers
 		}
 
 
-		[HttpDelete("{TimeSlotId}")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult DeleteTimeSlot(int TimeSlotId)
-		{
-			if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
-			{
-				return NotFound(ApiResponse.TimeSlotNotFound);
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
+		//[HttpDelete("{TimeSlotId}")]
+		//[ProducesResponseType(204)]
+		//[ProducesResponseType(400)]
+		//[ProducesResponseType(404)]
+		//public IActionResult DeleteTimeSlot(int TimeSlotId)
+		//{
+		//	if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
+		//	{
+		//		return NotFound(ApiResponse.TimeSlotNotFound);
+		//	}
+		//	if (!ModelState.IsValid)
+		//	{
+		//		return BadRequest(ApiResponse.NotValid);
+		//	}
 
-			if (!_timeSlotRepository.DeleteTimeSlot(TimeSlotId))
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-			return Ok(ApiResponse.SuccessDeleted);
-		}
+		//	if (!_timeSlotRepository.DeleteTimeSlot(TimeSlotId))
+		//	{
+		//		return StatusCode(500, ApiResponse.SomethingWrong);
+		//	}
+		//	return Ok(ApiResponse.SuccessDeleted);
+		//}
 	}
 }

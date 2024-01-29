@@ -40,7 +40,7 @@
         public static readonly object CanNotSentMail = new
         {
             statusMsg = "fail",
-            message = "Can not send mail"
+            message = "Can not send mail."
         };
         public static readonly object PassChanged = new
         {
@@ -126,12 +126,17 @@
         public static readonly object PayFine = new
         {
             statusMsg = "fail",
-            message = "Please Pay For the Previous Service First"
+            message = "Please Pay For the Previous Service First."
         };
         public static readonly object ProviderCanOffer = new
         {
             statusMsg = "success",
             message = "Provider Can Offer." 
         };
-    }
+		public static readonly object TimeSlotsExceededMax = new
+		{
+			statusMsg = "fail",
+			message = "You can only add up to three time slots."
+		};
+	}
 }

@@ -28,8 +28,9 @@ namespace ServicesApp.Repository
 
 		public Category GetCategory(string name)
 		{
-			return _context.Categories.Where(p => p.Name == name).FirstOrDefault();
+			return _context.Categories.Where(p => p.Name.Trim().ToUpper() == name.ToUpper()).FirstOrDefault();
 		}
+
 		public bool CategoryExist(int id)
 		{
 			return _context.Categories.Any(p => p.Id == id);

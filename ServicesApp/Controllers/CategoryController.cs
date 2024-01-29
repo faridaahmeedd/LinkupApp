@@ -76,9 +76,7 @@ namespace ServicesApp.Controllers
             {
 				return BadRequest(ApiResponse.NotValid);
 			}
-			var category = _categoryRepository.GetCategories()
-				.Where(c => c.Name.Trim().ToUpper() == categoryCreate.Name.ToUpper())
-				.FirstOrDefault();
+			var category = _categoryRepository.GetCategory(categoryCreate.Name);
 			if(category != null)
 			{
 				return BadRequest(ApiResponse.CategoryAlreadyExist);
@@ -86,7 +84,6 @@ namespace ServicesApp.Controllers
 			
             var mapCategory = _mapper.Map<Category>(categoryCreate);
           
-
             if (!_categoryRepository.CreateCategory(mapCategory))
 			{
 				return StatusCode(500,ApiResponse.SomethingWrong);
@@ -97,7 +94,6 @@ namespace ServicesApp.Controllers
                 CategoryId = categoryCreate.Id,
                 statusMsg = "success",
                 message = "Category Created Successfully."
-
             });
 		}
 

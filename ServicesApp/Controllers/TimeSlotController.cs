@@ -113,7 +113,7 @@ namespace ServicesApp.Controllers
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessCreated);
+			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 

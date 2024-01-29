@@ -77,18 +77,8 @@ namespace ServicesApp.Repository
 					}
 				}
 			}
-
-			// Remove existing time slots marked for removal
-			foreach (var timeSlotToRemove in timeSlotsToRemove)
-			{
-				_context.Remove(timeSlotToRemove);
-			}
-
-			// Add new time slots
-			foreach (var newTimeSlot in newTimeSlots)
-			{
-				_context.Add(newTimeSlot);
-			}
+			_context.RemoveRange(timeSlotsToRemove);
+			_context.AddRange(newTimeSlots);
 
 			return Save();
 		}

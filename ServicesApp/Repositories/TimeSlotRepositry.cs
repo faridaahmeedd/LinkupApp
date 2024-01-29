@@ -31,7 +31,7 @@ namespace ServicesApp.Repository
 			return _context.TimeSlots.Where(p => p.ServiceRequest.Id == ServiceId).ToList();
 		}
 
-		public bool AddTimeSlot(List<TimeSlot> timeSlots)
+		public bool AddTimeSlots(List<TimeSlot> timeSlots)
 		{
 			foreach (var item in timeSlots)
 			{
@@ -40,9 +40,46 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
-        public bool DeleteTimeSlot(int id)
+		public bool DeleteTimeSlot(int id)
 		{
 			_context.Remove(id);
+			return Save();
+		}
+
+		public bool UpdateTimeSlots(List<TimeSlot> newTimeSlots, int serviceId)
+		{
+			ICollection<TimeSlot> existingTimeSlots = GetTimeSlotsOfService(serviceId);
+			List<TimeSlot> timeSlotsToRemove = new List<TimeSlot>();
+
+			foreach (var existingTimeSlot in existingTimeSlots.ToList())
+			{
+				var matchingNewTimeSlot = newTimeSlots.FirstOrDefault(newSlot =>
+					newSlot.Date == existingTimeSlot.Date && newSlot.FromTime == existingTimeSlot.FromTime);
+
+				if (matchingNewTimeSlot != null)
+				{
+					// Matching time slots remain as it is
+					newTimeSlots.Remove(matchingNewTimeSlot); // Remove to avoid adding it again
+				}
+				else
+				{
+					// Time slot not found in the new list => update/delete it
+					if (newTimeSlots.Count > 0)
+					{
+						var updatedTimeSlot = _context.TimeSlots.FirstOrDefault(p => p.Id == existingTimeSlot.Id);
+						updatedTimeSlot.Date = newTimeSlots[0].Date;
+						updatedTimeSlot.FromTime = newTimeSlots[0].FromTime;
+						newTimeSlots.RemoveAt(0);
+					}
+					else
+					{
+						timeSlotsToRemove.Add(existingTimeSlot);
+					}
+				}
+			}
+			_context.RemoveRange(timeSlotsToRemove);
+			_context.AddRange(newTimeSlots);
+
 			return Save();
 		}
 

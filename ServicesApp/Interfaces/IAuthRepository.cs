@@ -9,7 +9,7 @@ namespace ServicesApp.Interfaces
 		Task<AppUser?> CheckUser(string email);
 		Task<bool> CheckRole(string role);
 		Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role);
-		Task<(string Token, DateTime Expiration, string Roles)> LoginUser(LoginDto loginDto);
+		Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto);
 		Task<string> ForgetPassword(string mail);
 		string GenerateRandomCode(int length);
 		Task<bool> ResetPassword(string mail, string newPassword);

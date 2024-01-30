@@ -4,11 +4,13 @@ using ServicesApp.Core.Models;
 using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
 using ServicesApp.APIs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
 	[ApiController]
+	[Authorize(Roles = "Customer,Admin,MainAdmin")]
 	public class CustomerController : ControllerBase
 	{
 		private readonly ICustomerRepository _customerRepository;

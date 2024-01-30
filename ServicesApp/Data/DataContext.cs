@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ServicesApp.Core.Models;
 using ServicesApp.Models;
-using System.Collections.Generic;
-using System.Net.Mail;
-using System.Reflection.Emit;
 
 namespace ServicesApp.Data
 {

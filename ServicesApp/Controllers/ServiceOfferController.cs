@@ -4,6 +4,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.APIs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ServicesApp.Controllers
 {
@@ -32,6 +33,7 @@ namespace ServicesApp.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceOfferDto>))]
+		[Authorize(Roles = "Admin, MainAdmin")]
 		public IActionResult GetOffers()
 		{
 			var offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOffers());
@@ -42,6 +44,7 @@ namespace ServicesApp.Controllers
 			return Ok(offers);
 		}
 
+		[Authorize]
 		[HttpGet("{ServiceId}")]
 		[ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
 		public IActionResult GetOffer(int OfferId)
@@ -61,6 +64,7 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
+		[Authorize(Roles = "Provider")]
 		public IActionResult CreateOffer([FromBody] ServiceOfferDto serviceOfferDto,
 			[FromQuery] string ProviderId , [FromQuery]int  RequestId)
 		{
@@ -119,7 +123,6 @@ namespace ServicesApp.Controllers
                 statusMsg = "success",
                 message = "Offer Created Successfully.",
 				OfferId = offerMap.Id
-
             });
 		}
 
@@ -127,6 +130,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
+		[Authorize(Roles = "Provider")]
 		public IActionResult UpdateOffer([FromQuery] int OfferId, [FromBody] ServiceOfferDto serviceOfferDto)
 		{
 			if (serviceOfferDto == null)
@@ -155,9 +159,9 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
+		[Authorize(Roles = "Customer")]
 		public IActionResult AcceptOffer([FromQuery] int OfferId)
 		{
-		
 			if (!_offerRepository.OfferExist(OfferId))
 			{
 				return NotFound(ApiResponse.OfferNotFound);
@@ -177,10 +181,11 @@ namespace ServicesApp.Controllers
 			return Ok(ApiResponse.OfferAccepted);
 		}
 
-	   [HttpDelete()]
-	   [ProducesResponseType(204)]
-	   [ProducesResponseType(400)]
-	   [ProducesResponseType(404)]
+	    [HttpDelete()]
+	    [ProducesResponseType(204)]
+	    [ProducesResponseType(400)]
+	    [ProducesResponseType(404)]
+		[Authorize(Roles = "Provider")]
 		public IActionResult DeleteOffer(int OfferId)
 		{
 			if (!_offerRepository.OfferExist(OfferId))
@@ -202,7 +207,8 @@ namespace ServicesApp.Controllers
 
         [HttpGet("providerOffers/{providerId}")]
         [ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
-        public IActionResult GetOffersOfProvider(string providerId)
+		[Authorize(Roles = "Provider")]
+		public IActionResult GetOffersOfProvider(string providerId)
         {
             if (!_providerRepository.ProviderExist(providerId))
             {
@@ -219,7 +225,8 @@ namespace ServicesApp.Controllers
 
         [HttpGet("providerAlreadyOffered/{providerId}")]
         [ProducesResponseType(200)]
-        public IActionResult ProviderAleadyOffer(string providerId , int requestId)
+		[Authorize(Roles = "Provider")]
+		public IActionResult ProviderAleadyOffer(string providerId , int requestId)
         {
             if (_offerRepository.ProviderAlreadyOffered(providerId , requestId))
             {

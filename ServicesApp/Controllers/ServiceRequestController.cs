@@ -4,6 +4,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.APIs;
+using Microsoft.AspNetCore.Authorization;
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -27,6 +28,7 @@ namespace ServicesApp.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceRequestDto>))]
+		[Authorize(Roles = "Admin,MainAdmin")]
 		public IActionResult GetServices()
 		{
 			var Service = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServices());
@@ -39,6 +41,7 @@ namespace ServicesApp.Controllers
 
 		[HttpGet("{ServiceId}")]
 		[ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
+		[Authorize]
 		public IActionResult GetService(int ServiceId)
 		{
 			if (!_serviceRepository.ServiceExist(ServiceId))
@@ -56,6 +59,7 @@ namespace ServicesApp.Controllers
 
 		[HttpGet("CustomerRequests/{CustomerId}")]
 		[ProducesResponseType(200, Type = typeof(List<ServiceRequestDto>))]
+		[Authorize(Roles = "Customer,Admin,MainAdmin")]
 		public IActionResult GetServicesByCustomer(string CustomerId)
 		{
 			if (!_customerRepository.CustomerExist(CustomerId))
@@ -77,7 +81,8 @@ namespace ServicesApp.Controllers
 
 		[HttpGet("Complete")]
         [ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
-        public IActionResult CompleteService(int ServiceId)
+		[Authorize(Roles = "Provider")]
+		public IActionResult CompleteService(int ServiceId)
         {
             if (!_serviceRepository.ServiceExist(ServiceId))
             {
@@ -97,6 +102,7 @@ namespace ServicesApp.Controllers
         [HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
+		[Authorize(Roles = "Customer")]
 		public IActionResult CreateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, 
 			[FromBody] ServiceRequestDto serviceRequestDto)
 		{
@@ -146,6 +152,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
+		[Authorize(Roles = "Customer")]
 		public IActionResult UpdateService([FromQuery] int ServiceId, [FromBody] ServiceRequestDto serviceRequestDto )
 		{
 			if (serviceRequestDto == null)
@@ -174,6 +181,7 @@ namespace ServicesApp.Controllers
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
+		[Authorize(Roles = "Customer,Admin,MainAdmin")]
 		public IActionResult DeleteService(int ServiceId)
 		{
 			if (!_serviceRepository.ServiceExist(ServiceId))
@@ -194,9 +202,9 @@ namespace ServicesApp.Controllers
         [HttpGet("GetOffersOfService/{id}")]
         [ProducesResponseType(200, Type = typeof(ICollection<ServiceOfferDto>))]
         [ProducesResponseType(404)]
-        public IActionResult GetOffersOfService(int id)
+		[Authorize(Roles = "Customer,Admin,MainAdmin")]
+		public IActionResult GetOffersOfService(int id)
         {
-           
             if (!_serviceRepository.ServiceExist(id))
             {
                 return NotFound(ApiResponse.RequestNotFound);
@@ -218,7 +226,8 @@ namespace ServicesApp.Controllers
         [HttpGet("accepted-offer")]
         [ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
         [ProducesResponseType(404)]
-        public IActionResult GetAcceptedOffer(int serviceId)
+		[Authorize(Roles = "Customer,Admin,MainAdmin")]
+		public IActionResult GetAcceptedOffer(int serviceId)
         {
             var acceptedOffer = _serviceRepository.AcceptedOffer(serviceId);
 
@@ -236,7 +245,8 @@ namespace ServicesApp.Controllers
 
 
         [HttpGet("AllServicesDetails")]
-        public IActionResult GetAllServicesDetails()
+		[Authorize(Roles = "Admin,MainAdmin")]
+		public IActionResult GetAllServicesDetails()
         {
             var serviceDetails = _serviceRepository.GetAllServicesDetails();
 

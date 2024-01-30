@@ -51,7 +51,7 @@ public class AuthController : ControllerBase
 	{
 		if (ModelState.IsValid)
 		{
-			var (token, expiration , role) = await _authRepository.LoginUser(loginDto);
+			var (token, expiration) = await _authRepository.LoginUser(loginDto);
 
 			if (token != null)
 			{
@@ -60,8 +60,7 @@ public class AuthController : ControllerBase
                     statusMsg = "success",
                     message = "Logged in Successfully.",
                     Token = token,
-					Expiration = expiration,
-					Role = role
+					Expiration = expiration
 				});
 			}
 		}
@@ -79,9 +78,7 @@ public class AuthController : ControllerBase
                 code=  resetCode,
 				statusMsg = "success",
                 message = "Reset Code Sent Successfully.",
-
-            }
-            );
+            });
 		}
 		return BadRequest(ApiResponse.CanNotSentMail);
 	}

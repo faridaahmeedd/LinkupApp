@@ -4,11 +4,13 @@ using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.APIs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ServicesApp.Controllers
 {
 	[Route("/api/[controller]")]
 	[ApiController]
+	[Authorize(Roles = "Provider,Admin,MainAdmin")]
 	public class ProviderController : ControllerBase
 	{
 		private readonly IProviderRepository _providerRepository;

@@ -12,6 +12,7 @@ namespace ServicesApp.Controllers
 {
 	[Route("/api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class CategoryController : ControllerBase
 	{
 		private readonly ICategoryRepository _categoryRepository;
@@ -68,6 +69,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpPost]
+		[Authorize(Roles = "Admin, MainAdmin")]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
@@ -98,6 +100,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpPut("update")]
+		[Authorize(Roles = "Admin, MainAdmin")]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
@@ -123,6 +126,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpDelete("{CategoryId}")]
+		[Authorize(Roles = "Admin, MainAdmin")]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]

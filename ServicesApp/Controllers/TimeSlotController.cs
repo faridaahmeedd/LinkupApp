@@ -4,11 +4,13 @@ using ServicesApp.Models;
 using ServicesApp.Interfaces;
 using AutoMapper;
 using ServicesApp.APIs;
+using Microsoft.AspNetCore.Authorization;
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    public class TimeSlotController : ControllerBase
+	[Authorize]
+	public class TimeSlotController : ControllerBase
     {
         private readonly ITimeSlotsRepository _timeSlotRepository;
 		private readonly IServiceRequestRepository _requestRepository;
@@ -57,6 +59,7 @@ namespace ServicesApp.Controllers
 		[HttpPost]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
+		[Authorize(Roles = "Customer")]
 		public IActionResult AddTimeSlots([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
 			if (!ModelState.IsValid || timeSlots == null)
@@ -88,6 +91,7 @@ namespace ServicesApp.Controllers
 		[HttpPut]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(400)]
+		[Authorize(Roles = "Customer")]
 		public IActionResult UpdateTimeSlots([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
 			if (!ModelState.IsValid || timeSlots == null)

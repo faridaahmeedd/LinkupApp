@@ -2,11 +2,13 @@
 using ServicesApp.Interfaces;
 using System.Web.Helpers;
 using ServicesApp.APIs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ServicesApp.Controllers
 {
 	[Route("/api/[controller]")]
 	[ApiController]
+	[Authorize(Roles = "MainAdmin")]
 	public class AdminController : ControllerBase
 	{
 		private readonly IAdminRepository _adminRepository;

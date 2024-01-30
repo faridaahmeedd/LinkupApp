@@ -11,7 +11,6 @@ namespace ServicesApp.Dto.Service
         public string Status { get; set; }
         public String CustomerName { get; set; }
         public String CustomerId { get; set; }
-
         public ICollection<ServiceOfferDto>? Offers { get; set; }
         public required ICollection<TimeSlotDto> TimeSlots { get; set; }
     }

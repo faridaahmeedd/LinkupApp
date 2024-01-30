@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.APIs;
 using ServicesApp.Interfaces;
+using ServicesApp.Core.Models;
+using ServicesApp.Repository;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -15,8 +17,8 @@ public class AuthController : ControllerBase
 		_authRepository = authenticationRepository;
 	}
 
-	[HttpPost("Register")]
-	public async Task<IActionResult> Register([FromBody] RegistrationDto registerDto, string role)
+	[HttpPost("Register/{Role}")]
+	public async Task<IActionResult> Register([FromBody] RegistrationDto registerDto, string Role)
 	{
 		if (ModelState.IsValid)
 		{
@@ -25,9 +27,9 @@ public class AuthController : ControllerBase
 			{
 				return BadRequest(ApiResponse.UserAlreadyExist);
 			}
-			if (await _authRepository.CheckRole(role))
+			if (await _authRepository.CheckRole(Role))
 			{
-                var res = await _authRepository.CreateUser(registerDto, role);
+                var res = await _authRepository.CreateUser(registerDto, Role);
 				if(res.Succeeded)
 				{
                     appUser = await _authRepository.CheckUser(registerDto.Email);
@@ -36,7 +38,6 @@ public class AuthController : ControllerBase
                         statusMsg = "success",
                         message = "User Created Successfully.",
                         userId = appUser.Id
-
                     }) ;
                 }
                 return BadRequest(ApiResponse.PasswordInValid);
@@ -47,7 +48,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("Login")]
-	public async Task<IActionResult> Login(LoginDto loginDto)
+	public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
 	{
 		if (ModelState.IsValid)
 		{
@@ -65,13 +66,22 @@ public class AuthController : ControllerBase
 				});
 			}
 		}
-		return Unauthorized(ApiResponse.UnAutharized);
+		return Unauthorized(ApiResponse.Unuthorized);
 	}
 
-	[HttpPost("ForgetPassword")]
-	public  async Task<IActionResult> ForgetPassword(string mail)
+	[HttpPost("ForgetPassword/{Mail}")]
+	public  async Task<IActionResult> ForgetPassword(string Mail)
 	{
-        var resetCode = await _authRepository.ForgetPassword(mail);
+		if (!ModelState.IsValid)
+		{
+			return BadRequest(ApiResponse.NotValid);
+		}
+		var user = await _authRepository.CheckUser(Mail);
+		if (user == null)
+		{
+			return NotFound(ApiResponse.UserNotFound);
+		}
+		var resetCode = await _authRepository.ForgetPassword(Mail);
 
         if (resetCode != string.Empty)
 		{
@@ -79,9 +89,7 @@ public class AuthController : ControllerBase
                 code=  resetCode,
 				statusMsg = "success",
                 message = "Reset Code Sent Successfully.",
-
-            }
-            );
+            });
 		}
 		return BadRequest(ApiResponse.CanNotSentMail);
 	}
@@ -89,7 +97,16 @@ public class AuthController : ControllerBase
     [HttpPut("ResetPassword")]
     public async Task<IActionResult> ResetPassword([FromBody] RegistrationDto registrationDto)
     {
-        if (registrationDto.Password == registrationDto.ConfirmPassword)
+		if (!ModelState.IsValid)
+		{
+			return BadRequest(ApiResponse.NotValid);
+		}
+		var user = await _authRepository.CheckUser(registrationDto.Email);
+		if (user == null)
+		{
+			return NotFound(ApiResponse.UserNotFound);
+		}
+		if (registrationDto.Password == registrationDto.ConfirmPassword)
         {
 			Console.Write(registrationDto.Password);
             
@@ -98,7 +115,6 @@ public class AuthController : ControllerBase
 			if (resetPassword)
 			{
                 return Ok(ApiResponse.PassChanged);
-
             }
         }
         return BadRequest(ApiResponse.CanNotChangePass);

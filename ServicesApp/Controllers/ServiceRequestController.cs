@@ -26,38 +26,39 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceRequestDto>))]
 		public IActionResult GetServices()
 		{
-			var Service = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServices());
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
-			return Ok(Service);
+			var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServices());
+			return Ok(services);
 		}
 
 		[HttpGet("{ServiceId}")]
-		[ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
 		public IActionResult GetService(int ServiceId)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
 			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
 				return NotFound(ApiResponse.RequestNotFound);
 			}
-			var Service = _mapper.Map<ServiceRequestDto>(_serviceRepository.GetService(ServiceId));
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			return Ok(Service);
+			var service = _mapper.Map<ServiceRequestDto>(_serviceRepository.GetService(ServiceId));
+			return Ok(service);
 		}
 
 
 		[HttpGet("CustomerRequests/{CustomerId}")]
-		[ProducesResponseType(200, Type = typeof(List<ServiceRequestDto>))]
 		public IActionResult GetServicesByCustomer(string CustomerId)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
 			if (!_customerRepository.CustomerExist(CustomerId))
 			{
 				return NotFound();
@@ -68,24 +69,30 @@ namespace ServicesApp.Controllers
 				return NotFound();
 			}
 			var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
 			return Ok(mapServices);
 		}
 
-		[HttpGet("Complete")]
-        [ProducesResponseType(200, Type = typeof(ServiceRequestDto))]
+		[HttpGet("UncompletedServices")]
+		public IActionResult GetUncompletedServices()
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
+			return Ok(services);
+		}
+
+		[HttpGet("Complete/{ServiceId}")]
         public IActionResult CompleteService(int ServiceId)
-        {
-            if (!_serviceRepository.ServiceExist(ServiceId))
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!_serviceRepository.ServiceExist(ServiceId))
             {
                 return NotFound(ApiResponse.RequestNotFound);
-            }
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ApiResponse.NotValid);
             }
 			if (!_serviceRepository.CompleteService(ServiceId))
 			{
@@ -94,18 +101,10 @@ namespace ServicesApp.Controllers
             return Ok(ApiResponse.ServiceCompletedSuccess);
         }
 
-        [HttpPost]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		public IActionResult CreateService([FromQuery] string CustomerId, [FromQuery] int CategoryId, 
-			[FromBody] ServiceRequestDto serviceRequestDto)
+        [HttpPost("{CustomerId}/{CategoryId}")]
+		public IActionResult CreateService(string CustomerId, int CategoryId, [FromBody] ServiceRequestDto serviceRequestDto)
 		{
-			if (serviceRequestDto == null)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-
-			if (!ModelState.IsValid)
+			if (!ModelState.IsValid || serviceRequestDto == null)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
@@ -138,27 +137,19 @@ namespace ServicesApp.Controllers
                 statusMsg = "success",
                 message = "Service Created Successfully.",
 				serviceId = serviceMap.Id
-
             });
 		}
 
-		[HttpPut("update")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult UpdateService([FromQuery] int ServiceId, [FromBody] ServiceRequestDto serviceRequestDto )
+		[HttpPut("{ServiceId}")]
+		public IActionResult UpdateService(int ServiceId, [FromBody] ServiceRequestDto serviceRequestDto)
 		{
-			if (serviceRequestDto == null)
+			if (!ModelState.IsValid || serviceRequestDto == null)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
 			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
 				return NotFound(ApiResponse.RequestNotFound);
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
 			}
 			var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
             serviceMap.Id = ServiceId;
@@ -171,18 +162,15 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpDelete("{ServiceId}")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
 		public IActionResult DeleteService(int ServiceId)
 		{
-			if (!_serviceRepository.ServiceExist(ServiceId))
-			{
-				return NotFound(ApiResponse.RequestNotFound);
-			}
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!_serviceRepository.ServiceExist(ServiceId))
+			{
+				return NotFound(ApiResponse.RequestNotFound);
 			}
 			if (!_serviceRepository.DeleteService(ServiceId))
 			{
@@ -191,22 +179,18 @@ namespace ServicesApp.Controllers
 			return Ok(ApiResponse.SuccessDeleted);
 		}
 
-        [HttpGet("GetOffersOfService/{id}")]
-        [ProducesResponseType(200, Type = typeof(ICollection<ServiceOfferDto>))]
-        [ProducesResponseType(404)]
-        public IActionResult GetOffersOfService(int id)
+        [HttpGet("ServiceOffers/{serviceId}")]
+        public IActionResult GetOffersOfService(int serviceId)
         {
-           
-            if (!_serviceRepository.ServiceExist(id))
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!_serviceRepository.ServiceExist(serviceId))
             {
                 return NotFound(ApiResponse.RequestNotFound);
             }
-            var offers = _serviceRepository.GetOffersOfService(id);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ApiResponse.NotValid);
-            }
+            var offers = _serviceRepository.GetOffersOfService(serviceId);
             if (offers != null)
             {
                 var offersMap = _mapper.Map<List<ServiceOfferDto>>(offers);
@@ -215,18 +199,14 @@ namespace ServicesApp.Controllers
             return NotFound(ApiResponse.OfferNotFound);
         }
 
-        [HttpGet("accepted-offer")]
-        [ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
-        [ProducesResponseType(404)]
+        [HttpGet("AcceptedOffer/{serviceId}")]
         public IActionResult GetAcceptedOffer(int serviceId)
         {
-            var acceptedOffer = _serviceRepository.AcceptedOffer(serviceId);
-
+			var acceptedOffer = _serviceRepository.AcceptedOffer(serviceId);
             if (acceptedOffer != null)
             {
-                var offersMap = _mapper.Map<ServiceOfferDto>(acceptedOffer);
-
-                return Ok(offersMap);
+                var offerMap = _mapper.Map<ServiceOfferDto>(acceptedOffer);
+                return Ok(offerMap);
             }
             else
             {
@@ -234,19 +214,15 @@ namespace ServicesApp.Controllers
             }
         }
 
-
-        [HttpGet("AllServicesDetails")]
-        public IActionResult GetAllServicesDetails()
-        {
-            var serviceDetails = _serviceRepository.GetAllServicesDetails();
-
-            if (serviceDetails == null || serviceDetails.Count == 0)
-            {
-                return NotFound(ApiResponse.RequestNotFound);
-            }
-
-            return Ok(serviceDetails);
-        }
-
+		[HttpGet("AllServicesDetails")]
+		public IActionResult GetAllServicesDetails()
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			var serviceDetails = _serviceRepository.GetAllServicesDetails();
+			return Ok(serviceDetails);
+		}
     }
 }

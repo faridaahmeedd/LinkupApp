@@ -9,6 +9,7 @@ namespace ServicesApp.Interfaces
 		ICollection<ServiceRequest> GetServices();
 		ServiceRequest GetService(int id);
 		ICollection<ServiceRequest> GetServicesByCustomer(string id);
+		ICollection<ServiceRequest> GetUncompletedServices();
 		bool ServiceExist(int id);
 		bool CreateService(ServiceRequest service);
 		bool UpdateService(ServiceRequest service);

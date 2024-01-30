@@ -24,52 +24,47 @@ namespace ServicesApp.Controllers
         }
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<Category>))]
 		public IActionResult GetCategories()
 		{
-			var category = _categoryRepository.GetCategories();
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
+			var category = _categoryRepository.GetCategories();
 			return Ok(category);
 		}
 
-		[HttpGet("Id/{CategoryId:int}", Name ="GetCategoryById")]
-		[ProducesResponseType(200, Type = typeof(Category))]
+		[HttpGet("{CategoryId:int}", Name ="GetCategoryById")]
 		public IActionResult GetCategory(int CategoryId)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
 			if (!_categoryRepository.CategoryExist(CategoryId))
 			{
 				return NotFound(ApiResponse.CategoryNotFound);
 			}
 			var category = _categoryRepository.GetCategory(CategoryId);
+			return Ok(category);
+		}
+
+		[HttpGet("{CategoryName:minlength(3)}")]
+		public IActionResult GetCategory(String CategoryName)
+		{
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
-			return Ok(category);
-		}
-
-		[HttpGet("{CategoryName:minlength(1)}")]
-		[ProducesResponseType(200, Type = typeof(Category))]
-		public IActionResult GetCategory(String CategoryName)
-		{
 			var category = _categoryRepository.GetCategory(CategoryName);
 			if (category == null)
 			{
 				return NotFound(ApiResponse.CategoryNotFound);
 			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
 			return Ok(category);
 		}
 
 		[HttpPost]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
 		public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
 		{
 			if (!ModelState.IsValid)
@@ -81,7 +76,6 @@ namespace ServicesApp.Controllers
 			{
 				return BadRequest(ApiResponse.CategoryAlreadyExist);
 			}
-			
             var mapCategory = _mapper.Map<Category>(categoryCreate);
           
             if (!_categoryRepository.CreateCategory(mapCategory))
@@ -97,13 +91,9 @@ namespace ServicesApp.Controllers
             });
 		}
 
-		[HttpPut("update")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
+		[HttpPut()]
 		public IActionResult UpdateCategory([FromBody] CategoryDto categoryUpdate)
 		{
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ApiResponse.NotValid);
@@ -112,7 +102,6 @@ namespace ServicesApp.Controllers
 			{
 				return NotFound(ApiResponse.CategoryNotFound);
 			}
-			
             var mapCategory = _mapper.Map<Category>(categoryUpdate);
 
             if (!_categoryRepository.UpdateCategory(mapCategory))
@@ -123,20 +112,16 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpDelete("{CategoryId}")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
 		public IActionResult DeleteCategory(int CategoryId)
 		{
-			if (!_categoryRepository.CategoryExist(CategoryId))
-			{
-				return NotFound(ApiResponse.CategoryNotFound);
-			}
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
-
+			if (!_categoryRepository.CategoryExist(CategoryId))
+			{
+				return NotFound(ApiResponse.CategoryNotFound);
+			}
 			if (! _categoryRepository.DeleteCategory(CategoryId))
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);

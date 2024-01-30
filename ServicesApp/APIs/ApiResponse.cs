@@ -32,7 +32,7 @@
 			statusMsg = "fail",
 			message = "Failed to Update."
 		};
-        public static readonly object UnAutharized = new
+        public static readonly object Unuthorized = new
         {
             statusMsg = "fail",
             message = "Invalid Email or Password."

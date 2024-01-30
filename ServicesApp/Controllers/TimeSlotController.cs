@@ -22,42 +22,38 @@ namespace ServicesApp.Controllers
         }
 
 		[HttpGet("{TimeSlotId}")]
-		[ProducesResponseType(200, Type = typeof(TimeSlotDto))]
 		public IActionResult GetTimeSlot(int TimeSlotId)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
 			if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
 			{
 				return NotFound(ApiResponse.TimeSlotNotFound);
 			}
 			var TimeSlot = _mapper.Map<TimeSlotDto>(_timeSlotRepository.GetTimeSlot(TimeSlotId));
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
 			return Ok(TimeSlot);
 		}
 
 
 		[HttpGet("service/{ServiceId}")]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<TimeSlotDto>))]
 		public IActionResult GetTimeSlotsOfService(int ServiceId)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
 			if (!_requestRepository.ServiceExist(ServiceId))
 			{
 				return NotFound(ApiResponse.RequestNotFound);
 			}
 			var TimeSlot = _mapper.Map<List<TimeSlotDto>>(_timeSlotRepository.GetTimeSlotsOfService(ServiceId));
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
 			return Ok(TimeSlot);
 		}
 
-		[HttpPost]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		public IActionResult AddTimeSlots([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
+		[HttpPost("{ServiceId}")]
+		public IActionResult AddTimeSlots(int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
 			if (!ModelState.IsValid || timeSlots == null)
 			{
@@ -85,10 +81,8 @@ namespace ServicesApp.Controllers
 			return Ok(ApiResponse.SuccessCreated);
 		}
 
-		[HttpPut]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		public IActionResult UpdateTimeSlots([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
+		[HttpPut("{ServiceId}")]
+		public IActionResult UpdateTimeSlots(int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
 			if (!ModelState.IsValid || timeSlots == null)
 			{

@@ -31,45 +31,39 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceOfferDto>))]
 		public IActionResult GetOffers()
 		{
-			var offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOffers());
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
+			var offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOffers());
 			return Ok(offers);
 		}
 
-		[HttpGet("{ServiceId}")]
-		[ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
+		[HttpGet("{OfferId}")]
 		public IActionResult GetOffer(int OfferId)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
 			if (!_offerRepository.OfferExist(OfferId))
 			{
 				return NotFound(ApiResponse.OfferNotFound);
 			}
 			var Service = _mapper.Map<ServiceOfferDto>(_offerRepository.GetOffer(OfferId));
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
 			return Ok(Service);
 		}
 
-		[HttpPost]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		public IActionResult CreateOffer([FromBody] ServiceOfferDto serviceOfferDto,
-			[FromQuery] string ProviderId , [FromQuery]int  RequestId)
+		[HttpPost("{ProviderId}/{RequestId}")]
+		public IActionResult CreateOffer(string ProviderId, int RequestId, [FromBody] ServiceOfferDto serviceOfferDto)
 		{
-			if (serviceOfferDto == null)
+			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
-
-			if (!ModelState.IsValid)
+			if (serviceOfferDto == null)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
@@ -123,12 +117,13 @@ namespace ServicesApp.Controllers
             });
 		}
 
-		[HttpPut()]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult UpdateOffer([FromQuery] int OfferId, [FromBody] ServiceOfferDto serviceOfferDto)
+		[HttpPut("{OfferId}")]
+		public IActionResult UpdateOffer(int OfferId, [FromBody] ServiceOfferDto serviceOfferDto)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
 			if (serviceOfferDto == null)
 			{
 				return BadRequest(ApiResponse.NotValid);
@@ -136,10 +131,6 @@ namespace ServicesApp.Controllers
 			if (!_offerRepository.OfferExist(OfferId))
 			{
 				return NotFound(ApiResponse.OfferNotFound);
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
 			}
 			var serviceMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 			serviceMap.Id = OfferId;
@@ -151,20 +142,16 @@ namespace ServicesApp.Controllers
 			return Ok(ApiResponse.SuccessUpdated);
 		}
 
-		[HttpPut("Accept")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult AcceptOffer([FromQuery] int OfferId)
+		[HttpPut("Accept/{OfferId}")]
+		public IActionResult AcceptOffer(int OfferId)
 		{
-		
-			if (!_offerRepository.OfferExist(OfferId))
-			{
-				return NotFound(ApiResponse.OfferNotFound);
-			}
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!_offerRepository.OfferExist(OfferId))
+			{
+				return NotFound(ApiResponse.OfferNotFound);
 			}
 			if (!_offerRepository.AcceptOffer(OfferId))
 			{
@@ -177,21 +164,17 @@ namespace ServicesApp.Controllers
 			return Ok(ApiResponse.OfferAccepted);
 		}
 
-	   [HttpDelete()]
-	   [ProducesResponseType(204)]
-	   [ProducesResponseType(400)]
-	   [ProducesResponseType(404)]
+	    [HttpDelete("{OfferId}")]
 		public IActionResult DeleteOffer(int OfferId)
 		{
-			if (!_offerRepository.OfferExist(OfferId))
-			{
-				return NotFound(ApiResponse.OfferNotFound);
-			}
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
-
+			if (!_offerRepository.OfferExist(OfferId))
+			{
+				return NotFound(ApiResponse.OfferNotFound);
+			}
 			if (!_offerRepository.DeleteOffer(OfferId))
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
@@ -201,35 +184,41 @@ namespace ServicesApp.Controllers
 
 
         [HttpGet("providerOffers/{providerId}")]
-        [ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
         public IActionResult GetOffersOfProvider(string providerId)
         {
-            if (!_providerRepository.ProviderExist(providerId))
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!_providerRepository.ProviderExist(providerId))
             {
                 return NotFound(ApiResponse.UserNotFound);
             }
             var Offers = _mapper.Map < List< ServiceOfferDto >>(_offerRepository.GetOfffersOfProvider(providerId));
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ApiResponse.NotValid);
-            }
             return Ok(Offers);
         }
 
 
-        [HttpGet("providerAlreadyOffered/{providerId}")]
-        [ProducesResponseType(200)]
-        public IActionResult ProviderAleadyOffer(string providerId , int requestId)
+        [HttpGet("ProviderCanOffer/{providerId}/{requestId}")]
+        public IActionResult ProviderCanOffer(string providerId, int requestId)
         {
-            if (_offerRepository.ProviderAlreadyOffered(providerId , requestId))
-            {
-                return NotFound(ApiResponse.AlreadyOffered);
-            }
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ApiResponse.NotValid);
-            }
-            return Ok(ApiResponse.ProviderCanOffer);
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!_providerRepository.ProviderExist(providerId))
+			{
+				return NotFound(ApiResponse.UserNotFound);
+			}
+			if (!_requestRepository.ServiceExist(requestId))
+			{
+				return NotFound(ApiResponse.RequestNotFound);
+			}
+			if (_offerRepository.ProviderAlreadyOffered(providerId, requestId))
+			{
+				return BadRequest(ApiResponse.AlreadyOffered);
+			}
+			return Ok(ApiResponse.ProviderCanOffer);
         }
     }
 }

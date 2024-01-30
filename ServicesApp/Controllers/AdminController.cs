@@ -17,47 +17,42 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAdmins()
 		{
-			var Admins = await _adminRepository.GetAdmins();
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
+			var Admins = await _adminRepository.GetAdmins();
 			return Ok(Admins);
 		}
 
 		[HttpGet("{AdminId}")]
-		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAdmin(string AdminId)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
 			if (! await _adminRepository.AdminExist(AdminId))
 			{
 				return NotFound(ApiResponse.UserNotFound);
 			}
 			var Admin = await _adminRepository.GetAdmin(AdminId);
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
 			return Ok(Admin);
 		}
 
 		[HttpDelete("{AdminId}")]
-		[ProducesResponseType(200)]
 		public async Task<IActionResult> DeleteAdmin(string AdminId)
 		{
-			if (!await _adminRepository.AdminExist(AdminId))
-			{
-
-                return NotFound(ApiResponse.UserNotFound);
-            }
-            if (!ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
-
+			if (!await _adminRepository.AdminExist(AdminId))
+			{
+                return NotFound(ApiResponse.UserNotFound);
+            }
 			if (!await _adminRepository.DeleteAdmin(AdminId))
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);

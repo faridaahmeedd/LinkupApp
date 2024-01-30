@@ -69,30 +69,37 @@ public class AuthRepository : IAuthRepository
 		
         userMap.Email = registerDto.Email;
         userMap.SecurityStamp = Guid.NewGuid().ToString();
-        userMap.UserName = new MailAddress(registerDto.Email).User;
+		userMap.UserName = registerDto.Email;
 		var result = await _userManager.CreateAsync(userMap, registerDto.Password);
-        if (result.Succeeded)
-        {
-            await _userManager.AddToRoleAsync(userMap, role);
-            string senderEmail = "linkupp2024@gmail.com";
-            string senderPassword = "mbyo noyk dfbb fhlr";
-            string recipientEmail = userMap.Email;
-            MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-            {
-                 Subject = "Welcome to Linkup Service Hub",
-                 Body = File.ReadAllText("Mails/RegistrationMail.html"),
-                 IsBodyHtml = true,
-            };
+		if (result.Succeeded)
+		{
+			await _userManager.AddToRoleAsync(userMap, role);
+			string senderEmail = "linkupp2024@gmail.com";
+			string senderPassword = "mbyo noyk dfbb fhlr";
+			string recipientEmail = userMap.Email;
+			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+			{
+				Subject = "Welcome to Linkup Service Hub",
+				Body = File.ReadAllText("Mails/RegistrationMail.html"),
+				IsBodyHtml = true,
+			};
 
-            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential(senderEmail, senderPassword),
-                EnableSsl = true
-            };
-
-             smtpClient.Send(mailMessage);
-        }
+			SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+			{
+				Port = 587,
+				Credentials = new NetworkCredential(senderEmail, senderPassword),
+				EnableSsl = true
+			};
+			try
+			{
+				smtpClient.Send(mailMessage);
+				Console.WriteLine("Email sent successfully");
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error sending email");
+			}
+		}
         return result;
 	}
 
@@ -175,6 +182,7 @@ public class AuthRepository : IAuthRepository
         try
         {
             smtpClient.Send(mailMessage);
+			smtpClient.Dispose();
             return resetCode;
         }
         catch (Exception ex)

@@ -22,43 +22,21 @@ namespace ServicesApp.Controllers
 
 
         [HttpGet]
-		[ProducesResponseType(200, Type = typeof(Customer))]
 		public IActionResult GetCustomers()
 		{
-			var customers = _customerRepository.GetCustomers();
-			var mapCustomers = _mapper.Map<List<CustomerDto>>(customers);
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
+			var customers = _customerRepository.GetCustomers();
+			var mapCustomers = _mapper.Map<List<CustomerDto>>(customers);
 			return Ok(mapCustomers);
 		}
 
 
 		[HttpGet("{CustomerId}", Name = "GetCustomerById")]
-		[ProducesResponseType(200, Type = typeof(Customer))]
 		public IActionResult GetCustomer(string CustomerId) {
-			if(!_customerRepository.CustomerExist(CustomerId))
-			{
-				return NotFound(ApiResponse.UserNotFound);
-			}
-			var customer = _customerRepository.GetCustomer(CustomerId);
-			var mapCustomer = _mapper.Map<CustomerDto>(customer);
-
 			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			return Ok(mapCustomer);
-		}
-
-		[HttpPost("Profile")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public async Task<IActionResult> CreateProfile(CustomerDto customerUpdate, string CustomerId)
-		{
-			if (customerUpdate == null)
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
@@ -66,9 +44,21 @@ namespace ServicesApp.Controllers
 			{
 				return NotFound(ApiResponse.UserNotFound);
 			}
-			if (!ModelState.IsValid)
+			var customer = _customerRepository.GetCustomer(CustomerId);
+			var mapCustomer = _mapper.Map<CustomerDto>(customer);
+			return Ok(mapCustomer);
+		}
+
+		[HttpPut("Profile/{CustomerId}")]
+		public async Task<IActionResult> UpdateProfile(string CustomerId, [FromBody] CustomerDto customerUpdate)
+		{
+			if (!ModelState.IsValid || customerUpdate == null)
 			{
 				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!_customerRepository.CustomerExist(CustomerId))
+			{
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			var mapCustomer = _mapper.Map<Customer>(customerUpdate);
 			mapCustomer.Id = CustomerId;
@@ -80,27 +70,22 @@ namespace ServicesApp.Controllers
 			return Ok(ApiResponse.SuccessUpdated);
 		}
 
-
 		[HttpDelete("{CustomerId}")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
 		public async Task<IActionResult> DeleteCustomer(string CustomerId)
 		{
-			if (!_customerRepository.CustomerExist(CustomerId))
-			{
-				return NotFound(ApiResponse.UserNotFound);
-			}
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!_customerRepository.CustomerExist(CustomerId))
+			{
+				return NotFound(ApiResponse.UserNotFound);
 			}
 			var result = await _customerRepository.DeleteCustomer(CustomerId);
 			if (!result.Succeeded)
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			
 			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}

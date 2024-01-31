@@ -118,10 +118,10 @@
             statusMsg = "fail",
             message = "You are Already Offered this Service."
         };
-        public static readonly object InvalidEmailOrPass = new
+        public static readonly object InvalidPass = new
         {
             statusMsg = "fail",
-            message = "Invalid Email or Password."
+            message = "Invalid Password."
         };
         public static readonly object PayFine = new
         {

@@ -24,33 +24,34 @@ public class AuthController : ControllerBase
 			{
 				return BadRequest(ApiResponse.NotValid);
 			}
+			if (!await _authRepository.CheckRole(Role))
+			{
+				return BadRequest(ApiResponse.RoleDoesNotExist);
+			}
 			var appUser = await _authRepository.CheckUser(registerDto.Email);
 			if (appUser != null)
 			{
 				return BadRequest(ApiResponse.UserAlreadyExist);
 			}
-			if (await _authRepository.CheckRole(Role))
+			var res = await _authRepository.CreateUser(registerDto, Role);
+			if (res.Succeeded)
 			{
-				var res = await _authRepository.CreateUser(registerDto, Role);
-				if (res.Succeeded)
+				appUser = await _authRepository.CheckUser(registerDto.Email);
+				return Ok(new
 				{
-					appUser = await _authRepository.CheckUser(registerDto.Email);
-					return Ok(new
-					{
-						statusMsg = "success",
-						message = "User Created Successfully.",
-						userId = appUser.Id
-					});
-				}
-				foreach (var error in res.Errors)
+					statusMsg = "success",
+					message = "User Created Successfully.",
+					userId = appUser.Id
+				});
+			}
+			foreach (var error in res.Errors)
+			{
+				if (error.Code.StartsWith("Password"))
 				{
-					if (error.Code.StartsWith("Password"))
-					{
-						return BadRequest(ApiResponse.InvalidEmailOrPass);
-					}
+					return BadRequest(ApiResponse.InvalidPass);
 				}
 			}
-			return BadRequest(ApiResponse.RoleDoesNotExist);
+			return BadRequest(ApiResponse.NotValid);
 		}
 		catch
 		{

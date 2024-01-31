@@ -10,10 +10,9 @@ namespace ServicesApp.Interfaces
 		Provider GetProvider(string id);
 		bool ProviderExist(string id);
 		ICollection<ServiceOffer> GetOffersByProvider(string id);
-		Task<IdentityResult> UpdateProvider(Provider ProviderUpdate);
-		Task<IdentityResult> DeleteProvider(string id);
+		Task<bool> UpdateProvider(Provider ProviderUpdate);
+		Task<bool> DeleteProvider(string id);
 		bool CheckProviderBalance(string id);
-
         bool Save();
 	}
 }

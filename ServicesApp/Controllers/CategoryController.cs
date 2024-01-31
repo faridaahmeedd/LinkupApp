@@ -26,107 +26,139 @@ namespace ServicesApp.Controllers
 		[HttpGet]
 		public IActionResult GetCategories()
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var categories = _categoryRepository.GetCategories();
+				return Ok(categories);
 			}
-			var category = _categoryRepository.GetCategories();
-			return Ok(category);
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
 		[HttpGet("{CategoryId:int}", Name ="GetCategoryById")]
 		public IActionResult GetCategory(int CategoryId)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_categoryRepository.CategoryExist(CategoryId))
+				{
+					return NotFound(ApiResponse.CategoryNotFound);
+				}
+				var category = _categoryRepository.GetCategory(CategoryId);
+				return Ok(category);
 			}
-			if (!_categoryRepository.CategoryExist(CategoryId))
+			catch
 			{
-				return NotFound(ApiResponse.CategoryNotFound);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			var category = _categoryRepository.GetCategory(CategoryId);
-			return Ok(category);
 		}
 
 		[HttpGet("{CategoryName:minlength(3)}")]
 		public IActionResult GetCategory(String CategoryName)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var category = _categoryRepository.GetCategory(CategoryName);
+				if (category == null)
+				{
+					return NotFound(ApiResponse.CategoryNotFound);
+				}
+				return Ok(category);
 			}
-			var category = _categoryRepository.GetCategory(CategoryName);
-			if (category == null)
+			catch
 			{
-				return NotFound(ApiResponse.CategoryNotFound);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(category);
 		}
 
 		[HttpPost]
 		public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
 		{
-			if (!ModelState.IsValid)
-            {
-				return BadRequest(ApiResponse.NotValid);
-			}
-			var category = _categoryRepository.GetCategory(categoryCreate.Name);
-			if(category != null)
+			try
 			{
-				return BadRequest(ApiResponse.CategoryAlreadyExist);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var category = _categoryRepository.GetCategory(categoryCreate.Name);
+				if (category != null)
+				{
+					return BadRequest(ApiResponse.CategoryAlreadyExist);
+				}
+				var mapCategory = _mapper.Map<Category>(categoryCreate);
+
+				_categoryRepository.CreateCategory(mapCategory);
+				return Ok(new
+				{
+					statusMsg = "success",
+					message = "Category Created Successfully.",
+					CategoryId = mapCategory.Id,
+				});
 			}
-            var mapCategory = _mapper.Map<Category>(categoryCreate);
-          
-            if (!_categoryRepository.CreateCategory(mapCategory))
+			catch
 			{
-				return StatusCode(500,ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-            categoryCreate.Id = mapCategory.Id;
-			return Ok(new
-			{
-                CategoryId = categoryCreate.Id,
-                statusMsg = "success",
-                message = "Category Created Successfully."
-            });
 		}
 
 		[HttpPut()]
 		public IActionResult UpdateCategory([FromBody] CategoryDto categoryUpdate)
 		{
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ApiResponse.NotValid);
-            }
-            if (!_categoryRepository.CategoryExist(categoryUpdate.Id))
+			try
 			{
-				return NotFound(ApiResponse.CategoryNotFound);
-			}
-            var mapCategory = _mapper.Map<Category>(categoryUpdate);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_categoryRepository.CategoryExist(categoryUpdate.Id))
+				{
+					return NotFound(ApiResponse.CategoryNotFound);
+				}
+				var mapCategory = _mapper.Map<Category>(categoryUpdate);
 
-            if (!_categoryRepository.UpdateCategory(mapCategory))
+				_categoryRepository.UpdateCategory(mapCategory);
+				return Ok(ApiResponse.SuccessUpdated);
+			}
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 		[HttpDelete("{CategoryId}")]
 		public IActionResult DeleteCategory(int CategoryId)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_categoryRepository.CategoryExist(CategoryId))
+				{
+					return NotFound(ApiResponse.CategoryNotFound);
+				}
+				_categoryRepository.DeleteCategory(CategoryId);
+				return Ok(ApiResponse.SuccessDeleted);
 			}
-			if (!_categoryRepository.CategoryExist(CategoryId))
-			{
-				return NotFound(ApiResponse.CategoryNotFound);
-			}
-			if (! _categoryRepository.DeleteCategory(CategoryId))
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

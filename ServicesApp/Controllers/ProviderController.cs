@@ -24,75 +24,95 @@ namespace ServicesApp.Controllers
 		[HttpGet]
 		public IActionResult GetProviders()
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var providers = _providerRepository.GetProviders();
+				var mapProviders = _mapper.Map<List<ProviderDto>>(providers);
+				return Ok(mapProviders);
 			}
-			var providers = _providerRepository.GetProviders();
-			var mapProviders = _mapper.Map<List<ProviderDto>>(providers);
-			return Ok(mapProviders);
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
 
 		[HttpGet("{ProviderId}", Name = "GetProviderById")]
 		public IActionResult GetProvider(string ProviderId)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var provider = _providerRepository.GetProvider(ProviderId);
+				var mapProvider = _mapper.Map<ProviderDto>(provider);
+				return Ok(mapProvider);
 			}
-			if (!_providerRepository.ProviderExist(ProviderId))
+			catch
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			var provider = _providerRepository.GetProvider(ProviderId);
-			var mapProvider = _mapper.Map<ProviderDto>(provider);
-			return Ok(mapProvider);
 		}
 
 		[HttpPut("Profile/{ProviderId}")]
 		public async Task<IActionResult> UpdateProfile(string ProviderId, [FromBody] ProviderDto ProviderUpdate)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (ProviderUpdate == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var mapProvider = _mapper.Map<Provider>(ProviderUpdate);
+				mapProvider.Id = ProviderId;
+				await _providerRepository.UpdateProvider(mapProvider);
+				return Ok(ApiResponse.SuccessUpdated);
 			}
-			if (ProviderUpdate == null)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			if (!_providerRepository.ProviderExist(ProviderId))
-			{
-				return NotFound(ApiResponse.UserNotFound);
-			}
-			var mapProvider = _mapper.Map<Provider>(ProviderUpdate);
-			mapProvider.Id = ProviderId;
-			var result = await _providerRepository.UpdateProvider(mapProvider);
-			if (!result.Succeeded)
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 
 		[HttpDelete("{ProviderId}")]
 		public async Task<IActionResult> DeleteProvider(string ProviderId)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				await _providerRepository.DeleteProvider(ProviderId);
+				return Ok(ApiResponse.SuccessDeleted);
 			}
-			if (!_providerRepository.ProviderExist(ProviderId))
-			{
-				return NotFound(ApiResponse.UserNotFound);
-			}
-			var result = await _providerRepository.DeleteProvider(ProviderId);
-			if (!result.Succeeded)
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

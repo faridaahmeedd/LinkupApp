@@ -32,7 +32,7 @@ namespace ServicesApp.Repository
 			return _context.Customers.OrderBy(p => p.Id).ToList();
 		}
 
-		public async Task<IdentityResult> UpdateCustomer(Customer customerUpdate)
+		public async Task<bool> UpdateCustomer(Customer customerUpdate)
 		{
 			var existingCustomer = await _userManager.FindByIdAsync(customerUpdate.Id);
 			existingCustomer.FName = customerUpdate.FName;
@@ -46,10 +46,10 @@ namespace ServicesApp.Repository
 			existingCustomer.EmergencyContact = customerUpdate.EmergencyContact;
 			existingCustomer.MobileNumber = customerUpdate.MobileNumber;
 			var result = await _userManager.UpdateAsync(existingCustomer);
-			return result;
+			return result.Succeeded;
 		}
 
-        public async Task<IdentityResult> DeleteCustomer(string id)
+        public async Task<bool> DeleteCustomer(string id)
         {
             var customer = await _userManager.FindByIdAsync(id);
             // Delete requests where status = Requested
@@ -60,7 +60,7 @@ namespace ServicesApp.Repository
                 _context.SaveChanges();
             }
             var result = await _userManager.DeleteAsync(customer);
-            return result;
+            return result.Succeeded;
         }
 
         public bool Save()

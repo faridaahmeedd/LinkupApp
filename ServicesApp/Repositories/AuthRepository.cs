@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using ServicesApp.Interfaces;
 using System.Net.Mime;
+using System.Text.RegularExpressions;
 
 public class AuthRepository : IAuthRepository
 {
@@ -112,7 +113,7 @@ public class AuthRepository : IAuthRepository
 	}
 
 
-	public async Task<(string Token, DateTime Expiration , string Roles)> LoginUser(LoginDto loginDto)
+	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
 	{
 		var appUser = await _userManager.FindByEmailAsync(loginDto.Email);
 		if (appUser != null && await _userManager.CheckPasswordAsync(appUser, loginDto.Password))
@@ -140,11 +141,10 @@ public class AuthRepository : IAuthRepository
 				signingCredentials: signingCredentials
 			);
 			var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-			return (token, expiration, roles.FirstOrDefault());
+			return (token, expiration);
 		}
-		return (null, DateTime.MinValue , null);
+		return (null, DateTime.MinValue);
 	}
-
 
     public async Task<string> ForgetPassword(string mail)
 	{

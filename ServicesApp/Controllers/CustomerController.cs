@@ -24,69 +24,89 @@ namespace ServicesApp.Controllers
         [HttpGet]
 		public IActionResult GetCustomers()
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var customers = _customerRepository.GetCustomers();
+				var mapCustomers = _mapper.Map<List<CustomerDto>>(customers);
+				return Ok(mapCustomers);
 			}
-			var customers = _customerRepository.GetCustomers();
-			var mapCustomers = _mapper.Map<List<CustomerDto>>(customers);
-			return Ok(mapCustomers);
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
 
 		[HttpGet("{CustomerId}", Name = "GetCustomerById")]
 		public IActionResult GetCustomer(string CustomerId) {
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_customerRepository.CustomerExist(CustomerId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var customer = _customerRepository.GetCustomer(CustomerId);
+				var mapCustomer = _mapper.Map<CustomerDto>(customer);
+				return Ok(mapCustomer);
 			}
-			if (!_customerRepository.CustomerExist(CustomerId))
+			catch
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			var customer = _customerRepository.GetCustomer(CustomerId);
-			var mapCustomer = _mapper.Map<CustomerDto>(customer);
-			return Ok(mapCustomer);
 		}
 
 		[HttpPut("Profile/{CustomerId}")]
 		public async Task<IActionResult> UpdateProfile(string CustomerId, [FromBody] CustomerDto customerUpdate)
 		{
-			if (!ModelState.IsValid || customerUpdate == null)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid || customerUpdate == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_customerRepository.CustomerExist(CustomerId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var mapCustomer = _mapper.Map<Customer>(customerUpdate);
+				mapCustomer.Id = CustomerId;
+				await _customerRepository.UpdateCustomer(mapCustomer);
+				return Ok(ApiResponse.SuccessUpdated);
 			}
-			if (!_customerRepository.CustomerExist(CustomerId))
+			catch
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			var mapCustomer = _mapper.Map<Customer>(customerUpdate);
-			mapCustomer.Id = CustomerId;
-			var result = await _customerRepository.UpdateCustomer(mapCustomer);
-			if (! result.Succeeded)
-			{
-				return StatusCode(500,ApiResponse.SomethingWrong);
-			}
-			return Ok(ApiResponse.SuccessUpdated);
 		}
 
 		[HttpDelete("{CustomerId}")]
 		public async Task<IActionResult> DeleteCustomer(string CustomerId)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_customerRepository.CustomerExist(CustomerId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				await _customerRepository.DeleteCustomer(CustomerId);
+				return Ok(ApiResponse.SuccessDeleted);
 			}
-			if (!_customerRepository.CustomerExist(CustomerId))
-			{
-				return NotFound(ApiResponse.UserNotFound);
-			}
-			var result = await _customerRepository.DeleteCustomer(CustomerId);
-			if (!result.Succeeded)
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

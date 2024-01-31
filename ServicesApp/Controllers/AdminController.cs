@@ -19,45 +19,63 @@ namespace ServicesApp.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAdmins()
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var Admins = await _adminRepository.GetAdmins();
+				return Ok(Admins);
 			}
-			var Admins = await _adminRepository.GetAdmins();
-			return Ok(Admins);
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
 		[HttpGet("{AdminId}")]
 		public async Task<IActionResult> GetAdmin(string AdminId)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!await _adminRepository.AdminExist(AdminId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var Admin = await _adminRepository.GetAdmin(AdminId);
+				return Ok(Admin);
 			}
-			if (! await _adminRepository.AdminExist(AdminId))
+			catch
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			var Admin = await _adminRepository.GetAdmin(AdminId);
-			return Ok(Admin);
 		}
 
 		[HttpDelete("{AdminId}")]
 		public async Task<IActionResult> DeleteAdmin(string AdminId)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!await _adminRepository.AdminExist(AdminId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				await _adminRepository.DeleteAdmin(AdminId);
+				return Ok(ApiResponse.SuccessDeleted);
 			}
-			if (!await _adminRepository.AdminExist(AdminId))
-			{
-                return NotFound(ApiResponse.UserNotFound);
-            }
-			if (!await _adminRepository.DeleteAdmin(AdminId))
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

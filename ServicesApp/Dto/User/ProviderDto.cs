@@ -2,7 +2,8 @@
 {
     public class ProviderDto
     {
-        public required string FName { get; set; }
+		public string? Id { get; set; }
+		public required string FName { get; set; }
         public required string LName { get; set; }
         public required string MobileNumber { get; set; }
         public required string City { get; set; }

@@ -12,7 +12,6 @@ using System.Security.Claims;
 using System.Text;
 using ServicesApp.Interfaces;
 using System.Net.Mime;
-using System.Text.RegularExpressions;
 
 public class AuthRepository : IAuthRepository
 {

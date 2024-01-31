@@ -77,7 +77,7 @@ namespace ServicesApp.Controllers
 				}
 				if (!_customerRepository.CustomerExist(CustomerId))
 				{
-					return NotFound();
+					return NotFound(ApiResponse.UserNotFound);
 				}
 				var services = _serviceRepository.GetServicesByCustomer(CustomerId);
 				var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);

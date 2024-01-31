@@ -66,6 +66,7 @@ namespace ServicesApp.Repository
             {
                 existingService.Description = updatedService.Description;
                 existingService.Image = updatedService.Image; //TODO
+                existingService.Location = updatedService.Location;
 
                 _context.SaveChanges();
 

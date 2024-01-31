@@ -77,14 +77,22 @@ public class AuthRepository : IAuthRepository
 			string senderEmail = "linkupp2024@gmail.com";
 			string senderPassword = "mbyo noyk dfbb fhlr";
 			string recipientEmail = userMap.Email;
-			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+
+            LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
+            LinkedImage.ContentId = "Logo";
+            LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
+            string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
+            AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
+            htmlContent, null, "text/html");
+            htmlView.LinkedResources.Add(LinkedImage);
+            MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
 			{
-				Subject = "Welcome to Linkup Service Hub",
-				Body = File.ReadAllText("Mails/RegistrationMail.html"),
+				Subject = "Welcome to Linkup",
 				IsBodyHtml = true,
 			};
+            mailMessage.AlternateViews.Add(htmlView);
 
-			SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
 			{
 				Port = 587,
 				Credentials = new NetworkCredential(senderEmail, senderPassword),
@@ -159,9 +167,8 @@ public class AuthRepository : IAuthRepository
 		LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
 		string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
 		htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
-		htmlContent = htmlContent.Replace("{UserNamePlaceholder}", user.UserName);
 		AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-		  $"<div style='text-align: center;'> <img src='cid:Logo' style=\"width: 100px;\"/> </div>" + htmlContent, null, "text/html");
+	    htmlContent, null, "text/html");
 		htmlView.LinkedResources.Add(LinkedImage);
 
 		MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)

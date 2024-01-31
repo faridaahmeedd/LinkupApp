@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class intial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -237,6 +237,7 @@ namespace ServicesApp.Migrations
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Fees = table.Column<int>(type: "int", nullable: true)
                 },
@@ -323,7 +324,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "43e9c8f0-3a25-4fb8-b580-81589ab0b099", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEDgOvIzRjSV57+9VN2LtZwi2jViMx3iYAm95ZDbfiLKl5JIMCEZ7ShJ8SlCYdMIYfw==", "a22fb270-0e03-4125-a428-f598228d7250", false, "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "73a9b7d3-bcf6-47a0-9c34-478c29b71a7a", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEAUqKmrXejAR6md9ZBUNzyEKZBPl6BxfUd+nznCkug4ShzqhBtmoWpiy+HaccwTfAA==", "2154ae3d-97bb-4642-8131-168a1426ae44", false, "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

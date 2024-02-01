@@ -17,52 +17,65 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetAdmins()
 		{
-			var Admins = await _adminRepository.GetAdmins();
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var Admins = await _adminRepository.GetAdmins();
+				return Ok(Admins);
 			}
-			return Ok(Admins);
-		}
-
-		[HttpGet("{AdminId}")]
-		[ProducesResponseType(200)]
-		public async Task<IActionResult> GetAdmin(string AdminId)
-		{
-			if (! await _adminRepository.AdminExist(AdminId))
-			{
-				return NotFound(ApiResponse.UserNotFound);
-			}
-			var Admin = await _adminRepository.GetAdmin(AdminId);
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			return Ok(Admin);
-		}
-
-		[HttpDelete("{AdminId}")]
-		[ProducesResponseType(200)]
-		public async Task<IActionResult> DeleteAdmin(string AdminId)
-		{
-			if (!await _adminRepository.AdminExist(AdminId))
-			{
-
-                return NotFound(ApiResponse.UserNotFound);
-            }
-            if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-
-			if (!await _adminRepository.DeleteAdmin(AdminId))
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessDeleted);
+		}
+
+		[HttpGet("{AdminId}")]
+		public async Task<IActionResult> GetAdmin(string AdminId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!await _adminRepository.AdminExist(AdminId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var Admin = await _adminRepository.GetAdmin(AdminId);
+				return Ok(Admin);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+
+		[HttpDelete("{AdminId}")]
+		public async Task<IActionResult> DeleteAdmin(string AdminId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!await _adminRepository.AdminExist(AdminId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				await _adminRepository.DeleteAdmin(AdminId);
+				return Ok(ApiResponse.SuccessDeleted);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 	}
 }

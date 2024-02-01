@@ -27,12 +27,12 @@
             statusMsg = "success",
             message = "Successfully Updated."
         };
-		public static readonly object FailedUpdated = new
+		public static readonly object FailedToUpdate = new
 		{
 			statusMsg = "fail",
 			message = "Failed to Update."
 		};
-        public static readonly object UnAutharized = new
+        public static readonly object Unuthorized = new
         {
             statusMsg = "fail",
             message = "Invalid Email or Password."
@@ -118,7 +118,7 @@
             statusMsg = "fail",
             message = "You are Already Offered this Service."
         };
-        public static readonly object PasswordInValid = new
+        public static readonly object InvalidPass = new
         {
             statusMsg = "fail",
             message = "Invalid Password."

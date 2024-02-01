@@ -15,92 +15,141 @@ public class AuthController : ControllerBase
 		_authRepository = authenticationRepository;
 	}
 
-	[HttpPost("Register")]
-	public async Task<IActionResult> Register([FromBody] RegistrationDto registerDto, string role)
+	[HttpPost("Register/{Role}")]
+	public async Task<IActionResult> Register([FromBody] RegistrationDto registerDto, string Role)
 	{
-		if (ModelState.IsValid)
+		try
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			if (!await _authRepository.CheckRole(Role))
+			{
+				return BadRequest(ApiResponse.RoleDoesNotExist);
+			}
 			var appUser = await _authRepository.CheckUser(registerDto.Email);
 			if (appUser != null)
 			{
 				return BadRequest(ApiResponse.UserAlreadyExist);
 			}
-			if (await _authRepository.CheckRole(role))
+			var res = await _authRepository.CreateUser(registerDto, Role);
+			if (res.Succeeded)
 			{
-                var res = await _authRepository.CreateUser(registerDto, role);
-				if(res.Succeeded)
+				appUser = await _authRepository.CheckUser(registerDto.Email);
+				return Ok(new
 				{
-                    appUser = await _authRepository.CheckUser(registerDto.Email);
-                    return Ok(new
-					{
-                        statusMsg = "success",
-                        message = "User Created Successfully.",
-                        userId = appUser.Id
-
-                    }) ;
-                }
-                return BadRequest(ApiResponse.PasswordInValid);
-            }
-			return BadRequest(ApiResponse.RoleDoesNotExist);
+					statusMsg = "success",
+					message = "User Created Successfully.",
+					userId = appUser.Id
+				});
+			}
+			foreach (var error in res.Errors)
+			{
+				if (error.Code.StartsWith("Password"))
+				{
+					return BadRequest(ApiResponse.InvalidPass);
+				}
+			}
+			return BadRequest(ApiResponse.NotValid);
 		}
-		return BadRequest(ApiResponse.NotValid);
+		catch
+		{
+			return StatusCode(500, ApiResponse.SomethingWrong);
+		}
 	}
 
 	[HttpPost("Login")]
-	public async Task<IActionResult> Login(LoginDto loginDto)
+	public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
 	{
-		if (ModelState.IsValid)
+		try
 		{
-			var (token, expiration , role) = await _authRepository.LoginUser(loginDto);
-
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			var (token, expiration) = await _authRepository.LoginUser(loginDto);
 			if (token != null)
 			{
 				return Ok(new
 				{
-                    statusMsg = "success",
-                    message = "Logged in Successfully.",
-                    Token = token,
+					statusMsg = "success",
+					message = "Logged in Successfully.",
+					Token = token,
 					Expiration = expiration,
-					Role = role
 				});
 			}
+			return Unauthorized(ApiResponse.Unuthorized);
 		}
-		return Unauthorized(ApiResponse.UnAutharized);
+		catch
+		{
+			return StatusCode(500, ApiResponse.SomethingWrong);
+		}
 	}
 
-	[HttpPost("ForgetPassword")]
-	public  async Task<IActionResult> ForgetPassword(string mail)
+	[HttpPost("ForgetPassword/{Mail}")]
+	public  async Task<IActionResult> ForgetPassword(string Mail)
 	{
-        var resetCode = await _authRepository.ForgetPassword(mail);
-
-        if (resetCode != string.Empty)
+		try
 		{
-			return Ok(new {
-                code=  resetCode,
-				statusMsg = "success",
-                message = "Reset Code Sent Successfully.",
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			var user = await _authRepository.CheckUser(Mail);
+			if (user == null)
+			{
+				return NotFound(ApiResponse.UserNotFound);
+			}
+			var resetCode = await _authRepository.ForgetPassword(Mail);
 
-            }
-            );
+			if (resetCode != string.Empty)
+			{
+				return Ok(new
+				{
+					code = resetCode,
+					statusMsg = "success",
+					message = "Reset Code Sent Successfully.",
+				});
+			}
+			return BadRequest(ApiResponse.CanNotSentMail);
 		}
-		return BadRequest(ApiResponse.CanNotSentMail);
+		catch
+		{
+			return StatusCode(500, ApiResponse.SomethingWrong);
+		}
 	}
 
     [HttpPut("ResetPassword")]
     public async Task<IActionResult> ResetPassword([FromBody] RegistrationDto registrationDto)
     {
-        if (registrationDto.Password == registrationDto.ConfirmPassword)
-        {
-			Console.Write(registrationDto.Password);
-            
-			var resetPassword = await _authRepository.ResetPassword(registrationDto.Email, registrationDto.Password);
-
-			if (resetPassword)
+		try
+		{
+			if (!ModelState.IsValid)
 			{
-                return Ok(ApiResponse.PassChanged);
+				return BadRequest(ApiResponse.NotValid);
+			}
+			var user = await _authRepository.CheckUser(registrationDto.Email);
+			if (user == null)
+			{
+				return NotFound(ApiResponse.UserNotFound);
+			}
+			if (registrationDto.Password == registrationDto.ConfirmPassword)
+			{
+				Console.Write(registrationDto.Password);
 
-            }
-        }
-        return BadRequest(ApiResponse.CanNotChangePass);
-    }
+				var resetPassword = await _authRepository.ResetPassword(registrationDto.Email, registrationDto.Password);
+
+				if (resetPassword)
+				{
+					return Ok(ApiResponse.PassChanged);
+				}
+			}
+			return BadRequest(ApiResponse.CanNotChangePass);
+		}
+		catch
+		{
+			return StatusCode(500, ApiResponse.SomethingWrong);
+		}
+	}
 }

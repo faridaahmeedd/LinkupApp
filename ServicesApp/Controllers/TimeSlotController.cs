@@ -22,98 +22,114 @@ namespace ServicesApp.Controllers
         }
 
 		[HttpGet("{TimeSlotId}")]
-		[ProducesResponseType(200, Type = typeof(TimeSlotDto))]
 		public IActionResult GetTimeSlot(int TimeSlotId)
 		{
-			if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
+			try
 			{
-				return NotFound(ApiResponse.TimeSlotNotFound);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
+				{
+					return NotFound(ApiResponse.TimeSlotNotFound);
+				}
+				var TimeSlot = _mapper.Map<TimeSlotDto>(_timeSlotRepository.GetTimeSlot(TimeSlotId));
+				return Ok(TimeSlot);
 			}
-			var TimeSlot = _mapper.Map<TimeSlotDto>(_timeSlotRepository.GetTimeSlot(TimeSlotId));
-			if (!ModelState.IsValid)
+			catch
 			{
-				return BadRequest(ApiResponse.NotValid);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(TimeSlot);
 		}
 
 
 		[HttpGet("service/{ServiceId}")]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<TimeSlotDto>))]
 		public IActionResult GetTimeSlotsOfService(int ServiceId)
 		{
-			if (!_requestRepository.ServiceExist(ServiceId))
+			try
 			{
-				return NotFound(ApiResponse.RequestNotFound);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_requestRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponse.RequestNotFound);
+				}
+				var TimeSlot = _mapper.Map<List<TimeSlotDto>>(_timeSlotRepository.GetTimeSlotsOfService(ServiceId));
+				return Ok(TimeSlot);
 			}
-			var TimeSlot = _mapper.Map<List<TimeSlotDto>>(_timeSlotRepository.GetTimeSlotsOfService(ServiceId));
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			return Ok(TimeSlot);
-		}
-
-		[HttpPost]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		public IActionResult AddTimeSlots([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
-		{
-			if (!ModelState.IsValid || timeSlots == null)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			if (timeSlots.Count > 3)
-			{
-				return BadRequest(ApiResponse.TimeSlotsExceededMax);
-			}
-			if (!_requestRepository.ServiceExist(ServiceId))
-			{
-				return NotFound(ApiResponse.RequestNotFound);
-			}
-			List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
-			foreach (var item in timeSlots)
-			{
-				var mapItem = _mapper.Map<TimeSlot>(item);
-				mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
-				mapTimeSlots.Add(mapItem);
-			}
-			if (!_timeSlotRepository.AddTimeSlots(mapTimeSlots))
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessCreated);
 		}
 
-		[HttpPut]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		public IActionResult UpdateTimeSlots([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
+		[HttpPost("{ServiceId}")]
+		public IActionResult AddTimeSlots(int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
-			if (!ModelState.IsValid || timeSlots == null)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid || timeSlots == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (timeSlots.Count > 3)
+				{
+					return BadRequest(ApiResponse.TimeSlotsExceededMax);
+				}
+				if (!_requestRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponse.RequestNotFound);
+				}
+				List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
+				foreach (var item in timeSlots)
+				{
+					var mapItem = _mapper.Map<TimeSlot>(item);
+					mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
+					mapTimeSlots.Add(mapItem);
+				}
+				_timeSlotRepository.AddTimeSlots(mapTimeSlots);
+				return Ok(ApiResponse.SuccessCreated);
 			}
-			if (timeSlots.Count > 3)
-			{
-				return BadRequest(ApiResponse.TimeSlotsExceededMax);
-			}
-			if (!_requestRepository.ServiceExist(ServiceId))
-			{
-				return NotFound(ApiResponse.RequestNotFound);
-			}
-			List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
-			foreach (var item in timeSlots)
-			{
-				var mapItem = _mapper.Map<TimeSlot>(item);
-				mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
-				mapTimeSlots.Add(mapItem);
-			}
-			if (!_timeSlotRepository.UpdateTimeSlots(mapTimeSlots, ServiceId))
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessUpdated);
+		}
+
+		[HttpPut("{ServiceId}")]
+		public IActionResult UpdateTimeSlots(int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
+		{
+			try
+			{
+				if (!ModelState.IsValid || timeSlots == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (timeSlots.Count > 3)
+				{
+					return BadRequest(ApiResponse.TimeSlotsExceededMax);
+				}
+				if (!_requestRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponse.RequestNotFound);
+				}
+				List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
+				foreach (var item in timeSlots)
+				{
+					var mapItem = _mapper.Map<TimeSlot>(item);
+					mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
+					mapTimeSlots.Add(mapItem);
+				}
+				_timeSlotRepository.UpdateTimeSlots(mapTimeSlots, ServiceId);
+				return Ok(ApiResponse.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
 

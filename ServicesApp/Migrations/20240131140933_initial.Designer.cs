@@ -12,7 +12,7 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240126230757_initial")]
+    [Migration("20240131140933_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -260,14 +260,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "43e9c8f0-3a25-4fb8-b580-81589ab0b099",
+                            ConcurrencyStamp = "2fc598a2-1c46-4b42-9e28-f27864326e93",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDgOvIzRjSV57+9VN2LtZwi2jViMx3iYAm95ZDbfiLKl5JIMCEZ7ShJ8SlCYdMIYfw==",
-                            SecurityStamp = "a22fb270-0e03-4125-a428-f598228d7250",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKhHhQZJhd5PlWsUlj9uUnnjTFPMtwf405QlDs3zl6Jj0RGQA0eMGLdz4Y8nzSf9rg==",
+                            SecurityStamp = "d08a4f60-bc1d-41ca-a1da-f6ee4f7fe797",
                             TwoFactorEnabled = false,
                             UserName = "MainAdmin"
                         });
@@ -355,6 +355,10 @@ namespace ServicesApp.Migrations
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()

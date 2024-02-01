@@ -69,35 +69,50 @@ public class AuthRepository : IAuthRepository
 		
         userMap.Email = registerDto.Email;
         userMap.SecurityStamp = Guid.NewGuid().ToString();
-        userMap.UserName = new MailAddress(registerDto.Email).User;
+		userMap.UserName = registerDto.Email;
 		var result = await _userManager.CreateAsync(userMap, registerDto.Password);
-        if (result.Succeeded)
-        {
-            await _userManager.AddToRoleAsync(userMap, role);
-            string senderEmail = "linkupp2024@gmail.com";
-            string senderPassword = "mbyo noyk dfbb fhlr";
-            string recipientEmail = userMap.Email;
+		if (result.Succeeded)
+		{
+			await _userManager.AddToRoleAsync(userMap, role);
+			string senderEmail = "linkupp2024@gmail.com";
+			string senderPassword = "mbyo noyk dfbb fhlr";
+			string recipientEmail = userMap.Email;
+
+            LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
+            LinkedImage.ContentId = "Logo";
+            LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
+            string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
+            AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
+            htmlContent, null, "text/html");
+            htmlView.LinkedResources.Add(LinkedImage);
             MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-            {
-                 Subject = "Welcome to Linkup Service Hub",
-                 Body = File.ReadAllText("Mails/RegistrationMail.html"),
-                 IsBodyHtml = true,
-            };
+			{
+				Subject = "Welcome to Linkup",
+				IsBodyHtml = true,
+			};
+            mailMessage.AlternateViews.Add(htmlView);
 
             SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential(senderEmail, senderPassword),
-                EnableSsl = true
-            };
-
-             smtpClient.Send(mailMessage);
-        }
+			{
+				Port = 587,
+				Credentials = new NetworkCredential(senderEmail, senderPassword),
+				EnableSsl = true
+			};
+			try
+			{
+				smtpClient.Send(mailMessage);
+				Console.WriteLine("Email sent successfully");
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error sending email");
+			}
+		}
         return result;
 	}
 
 
-	public async Task<(string Token, DateTime Expiration , string Roles)> LoginUser(LoginDto loginDto)
+	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
 	{
 		var appUser = await _userManager.FindByEmailAsync(loginDto.Email);
 		if (appUser != null && await _userManager.CheckPasswordAsync(appUser, loginDto.Password))
@@ -125,11 +140,10 @@ public class AuthRepository : IAuthRepository
 				signingCredentials: signingCredentials
 			);
 			var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-			return (token, expiration, roles.FirstOrDefault());
+			return (token, expiration);
 		}
-		return (null, DateTime.MinValue , null);
+		return (null, DateTime.MinValue);
 	}
-
 
     public async Task<string> ForgetPassword(string mail)
 	{
@@ -152,9 +166,8 @@ public class AuthRepository : IAuthRepository
 		LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
 		string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
 		htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
-		htmlContent = htmlContent.Replace("{UserNamePlaceholder}", user.UserName);
 		AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-		  $"<div style='text-align: center;'> <img src='cid:Logo' style=\"width: 100px;\"/> </div>" + htmlContent, null, "text/html");
+	    htmlContent, null, "text/html");
 		htmlView.LinkedResources.Add(LinkedImage);
 
 		MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
@@ -175,6 +188,7 @@ public class AuthRepository : IAuthRepository
         try
         {
             smtpClient.Send(mailMessage);
+			smtpClient.Dispose();
             return resetCode;
         }
         catch (Exception ex)

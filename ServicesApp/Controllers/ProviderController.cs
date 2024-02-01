@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using ServicesApp.APIs;
 using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.APIs;
 
 namespace ServicesApp.Controllers
 {
@@ -22,85 +22,97 @@ namespace ServicesApp.Controllers
 
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(Provider))]
 		public IActionResult GetProviders()
 		{
-			var providers = _providerRepository.GetProviders();
-			var mapProviders = _mapper.Map<List<ProviderDto>>(providers);
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ApiResponse.NotValid);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var providers = _providerRepository.GetProviders();
+				var mapProviders = _mapper.Map<List<ProviderDto>>(providers);
+				return Ok(mapProviders);
 			}
-			return Ok(mapProviders);
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
 
 		[HttpGet("{ProviderId}", Name = "GetProviderById")]
-		[ProducesResponseType(200, Type = typeof(Provider))]
 		public IActionResult GetProvider(string ProviderId)
 		{
-			if (!_providerRepository.ProviderExist(ProviderId))
+			try
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var provider = _providerRepository.GetProvider(ProviderId);
+				var mapProvider = _mapper.Map<ProviderDto>(provider);
+				return Ok(mapProvider);
 			}
-			var provider = _providerRepository.GetProvider(ProviderId);
-			var mapProvider = _mapper.Map<ProviderDto>(provider);
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			return Ok(mapProvider);
-		}
-
-		[HttpPost("Profile")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public async Task<IActionResult> UpdateProfile(ProviderDto ProviderUpdate, string ProviderId)
-		{
-			if (ProviderUpdate == null)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			if (!_providerRepository.ProviderExist(ProviderId))
-			{
-				return NotFound(ApiResponse.UserNotFound);
-			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			var mapProvider = _mapper.Map<Provider>(ProviderUpdate);
-			mapProvider.Id = ProviderId;
-			var result = await _providerRepository.UpdateProvider(mapProvider);
-			if (!result.Succeeded)
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessUpdated);
+		}
+
+		[HttpPut("Profile/{ProviderId}")]
+		public async Task<IActionResult> UpdateProfile(string ProviderId, [FromBody] ProviderDto ProviderUpdate)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (ProviderUpdate == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var mapProvider = _mapper.Map<Provider>(ProviderUpdate);
+				mapProvider.Id = ProviderId;
+				await _providerRepository.UpdateProvider(mapProvider);
+				return Ok(ApiResponse.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
 
 		[HttpDelete("{ProviderId}")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
 		public async Task<IActionResult> DeleteProvider(string ProviderId)
 		{
-			if (!_providerRepository.ProviderExist(ProviderId))
+			try
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				await _providerRepository.DeleteProvider(ProviderId);
+				return Ok(ApiResponse.SuccessDeleted);
 			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ApiResponse.NotValid);
-			}
-			var result = await _providerRepository.DeleteProvider(ProviderId);
-			if (!result.Succeeded)
+			catch
 			{
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(ApiResponse.SuccessDeleted);
 		}
 	}
 }

@@ -10,7 +10,8 @@ namespace ServicesApp.Models
 		public byte[]? Image { get; set; }
 		public  Category? Category { get; set; }
 		public string Status { get; set; } = "Requested" ;
-		public  Customer? Customer { get; set; }
+		public string Location { get; set; }
+        public  Customer? Customer { get; set; }
         public int? Fees { get; set; }
         public ICollection<ServiceOffer>? Offers { get; set; }
 		public required ICollection<TimeSlot> TimeSlots { get; set; }

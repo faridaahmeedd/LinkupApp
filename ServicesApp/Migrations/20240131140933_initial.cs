@@ -237,6 +237,7 @@ namespace ServicesApp.Migrations
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Fees = table.Column<int>(type: "int", nullable: true)
                 },
@@ -323,7 +324,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "43e9c8f0-3a25-4fb8-b580-81589ab0b099", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEDgOvIzRjSV57+9VN2LtZwi2jViMx3iYAm95ZDbfiLKl5JIMCEZ7ShJ8SlCYdMIYfw==", "a22fb270-0e03-4125-a428-f598228d7250", false, "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "2fc598a2-1c46-4b42-9e28-f27864326e93", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEKhHhQZJhd5PlWsUlj9uUnnjTFPMtwf405QlDs3zl6Jj0RGQA0eMGLdz4Y8nzSf9rg==", "d08a4f60-bc1d-41ca-a1da-f6ee4f7fe797", false, "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

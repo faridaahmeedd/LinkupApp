@@ -36,7 +36,12 @@ namespace ServicesApp.Repository
 			return _context.Categories.Any(p => p.Id == id);
 		}
 
-		public bool CreateCategory(Category category)
+        public bool CategoryExist(string name)
+        {
+            return _context.Categories.Any(p => p.Name == name);
+        }
+
+        public bool CreateCategory(Category category)
 		{
 			// Change Tracker (add,update,modify)
 			_context.Add(category);

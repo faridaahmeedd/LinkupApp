@@ -35,6 +35,17 @@ namespace ServicesApp.Repository
 			_context.Add(offer);
 			return Save();
 		}
+		public bool CheckMaxFees(ServiceOffer  serviceOffer)
+		{
+			var request = _context.Requests.Where(r=> r.Id == serviceOffer.Request.Id).FirstOrDefault();//error
+			if(request != null)
+			{
+				if(request.MaxFees >= serviceOffer.Fees ) {
+					return true;
+				}
+			}
+            return false;
+		}
 		public bool AcceptOffer(int id)
 		{
 			//var existingOffer = _context.Offers.Find(id);
@@ -42,9 +53,7 @@ namespace ServicesApp.Repository
             Console.WriteLine(existingOffer);
 			if (existingOffer != null)
 			{
-				existingOffer.Accepted = true;
-				Console.WriteLine($"offer {existingOffer}");
-                Console.WriteLine($"request {existingOffer.Request}");
+				existingOffer.Status = "Accepted";
                 var service = _context.Requests.Find(existingOffer.Request.Id);
 				service.Status = "Pending";
                 _context.SaveChanges();
@@ -52,6 +61,19 @@ namespace ServicesApp.Repository
 			}
 			return false;
 		}
+
+        public bool DeclineOffer(int offerId)
+        {
+            var serviceOffer = _context.Offers.FirstOrDefault(o => o.Id == offerId);
+
+            if (serviceOffer != null)
+            {
+				serviceOffer.Status = "Declined";
+				Save();
+                return true;
+            }
+            return false;
+        }
 
         public bool UpdateOffer(ServiceOffer updatedOffer)
 		{
@@ -70,7 +92,7 @@ namespace ServicesApp.Repository
 		public bool DeleteOffer(int id)
 		{
 			var offer = _context.Offers.Include(c => c.Provider).Where(p => p.Id == id).FirstOrDefault();
-			if (offer.Accepted == true)
+			if (offer.Status == "Accepted")
 			{
 				var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
 

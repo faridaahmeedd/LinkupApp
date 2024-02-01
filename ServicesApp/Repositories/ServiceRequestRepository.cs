@@ -29,8 +29,12 @@ namespace ServicesApp.Repository
 		{
 			return _context.Requests.Where(p => p.Id == id).FirstOrDefault();
 		}
+        public ICollection<ServiceRequest> GetServicesWithFees()
+        {
+            return _context.Requests.Where(p=>  p.MaxFees != 0).ToList();
+        }
 
-		public ICollection<ServiceRequest> GetServicesByCustomer(string id)
+        public ICollection<ServiceRequest> GetServicesByCustomer(string id)
 		{
 			return _context.Requests.Where(p => p.Customer.Id == id).ToList();
 		}
@@ -50,15 +54,15 @@ namespace ServicesApp.Repository
             _context.Add(service);
 			return Save();
 		}
-        public bool CheckServiceMinFees(ServiceRequest service , int categoryId)
-        {
-            var existingCategory = _context.Categories.Find(categoryId);
-            if (service.Fees < existingCategory.MinFees)
-            {
-                return false;
-            }
-            return true;
-        }
+        //public bool CheckServiceMinFees(ServiceRequest service , int categoryId)
+        //{
+        //    var existingCategory = _context.Categories.Find(categoryId);
+        //    if (service.MaxFees < existingCategory.MinFees)
+        //    {
+        //        return false;
+        //    }
+        //    return true;
+        //}
         public bool UpdateService(ServiceRequest updatedService)
         {
             var existingService = _context.Requests.Find(updatedService.Id);
@@ -67,12 +71,8 @@ namespace ServicesApp.Repository
                 existingService.Description = updatedService.Description;
                 existingService.Image = updatedService.Image; //TODO
                 existingService.Location = updatedService.Location;
-
-                _context.SaveChanges();
-
-                return true;
+                return Save();
             }
-
             return false;
         }
 
@@ -81,7 +81,7 @@ namespace ServicesApp.Repository
 			var service = _context.Requests.Include(c => c.Customer).Where(p => p.Id == id).FirstOrDefault();
             if(service.Status == "Pending")
             {
-				var offer = _context.Offers.Include(c => c.Request).Where(p => p.Request.Id == id && p.Accepted == true).FirstOrDefault();
+				var offer = _context.Offers.Include(c => c.Request).Where(p => p.Request.Id == id && p.Status == "Accepted").FirstOrDefault();
                 var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
 
 				DateTime offerTime = timeSlot.Date.ToDateTime(timeSlot.FromTime);
@@ -120,10 +120,9 @@ namespace ServicesApp.Repository
                 request.Status = "Completed";
 				if(request.Offers != null)
 				{
-					request.Offers = request.Offers.Where(item => item.Accepted == true).ToList();
+					request.Offers = request.Offers.Where(item => item.Status == "Accepted").ToList();
 				}
-                _context.SaveChanges();
-                return true;
+                return Save();
             }
             return false;
         }
@@ -141,18 +140,19 @@ namespace ServicesApp.Repository
             }
             return null;
         }
+
         public ServiceOffer AcceptedOffer(int serviceId)
         {
             var serviceRequest = _context.Requests.Include(sr => sr.Offers).FirstOrDefault(sr => sr.Id == serviceId);
 
             if (serviceRequest != null)
             {
-                var acceptedOffer = serviceRequest.Offers.FirstOrDefault(o => o.Accepted);
+                var acceptedOffer = serviceRequest.Offers.FirstOrDefault(o => o.Status == "Accepted");
                 return acceptedOffer;
             }
-
             return null;
         }
+      
 
         public ICollection<ServiceDetailsDto> GetAllServicesDetails()
         {
@@ -169,6 +169,7 @@ namespace ServicesApp.Repository
                     CustomerName = r.Customer.FName,
                     CustomerId = r.Customer.Id,
                     CategoryName = r.Category.Name,
+                    MaxFees = r.MaxFees ,
                     TimeSlots = r.TimeSlots.Select(t => new TimeSlotDto
                     {
                         Id = t.Id,
@@ -186,6 +187,30 @@ namespace ServicesApp.Repository
                 .ToList();
 
             return serviceDetails;
+        }
+        public bool UpdateMaxFees(int serviceId, int maxFees)
+        {
+            var service = _context.Requests.Where(s=> s.Id == serviceId).FirstOrDefault();
+            if(service != null)
+            {
+                service.MaxFees = maxFees;
+                return Save();
+            }
+            return false;
+        }
+        public bool UpdateUnkownCategory(int serviceId, string categoryName)
+        {
+            var service = _context.Requests.Include(c => c.Category).Where(s => s.Id == serviceId).FirstOrDefault();
+            if (service != null)
+            {
+                if (service.Category.Name == "Unknown")
+                {
+                    var category = _context.Categories.Where(c => c.Name == categoryName).FirstOrDefault();
+                    service.Category = category;
+                    return Save();
+                }
+            }
+            return false;
         }
     }
 }

@@ -54,64 +54,70 @@ public class AuthRepository : IAuthRepository
 	public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
 	{
         var userMap = _mapper.Map<AppUser>(registerDto);
+        userMap.Email = registerDto.Email;
+        userMap.SecurityStamp = Guid.NewGuid().ToString();
+        userMap.UserName = registerDto.Email;
+        var result = await _userManager.CreateAsync(userMap, registerDto.Password);
+
         if (role == "Customer")
 		{
 			 userMap = _mapper.Map<Customer>(registerDto);
+
+            if (result.Succeeded)
+			{
+                await _userManager.AddToRoleAsync(userMap, role);
+                string recipientEmail = userMap.Email;
+                SendMail(recipientEmail);
+
+            }
         }
 		else if (role == "Provider")
 		{
 			 userMap = _mapper.Map<Provider>(registerDto);
-		}
+
+            if (result.Succeeded)
+			{
+                await _userManager.AddToRoleAsync(userMap, role);
+                string recipientEmail = userMap.Email;
+                SendMail(recipientEmail);
+
+            }
+        }
 		else if (role == "Admin")
 		{
 			 userMap = _mapper.Map<Admin>(registerDto);
 		}
 		
-        userMap.Email = registerDto.Email;
-        userMap.SecurityStamp = Guid.NewGuid().ToString();
-		userMap.UserName = registerDto.Email;
-		var result = await _userManager.CreateAsync(userMap, registerDto.Password);
-		if (result.Succeeded)
-		{
-			await _userManager.AddToRoleAsync(userMap, role);
-			string senderEmail = "linkupp2024@gmail.com";
-			string senderPassword = "mbyo noyk dfbb fhlr";
-			string recipientEmail = userMap.Email;
-
-            LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-            LinkedImage.ContentId = "Logo";
-            LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-            string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
-            AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-            htmlContent, null, "text/html");
-            htmlView.LinkedResources.Add(LinkedImage);
-            MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-			{
-				Subject = "Welcome to Linkup",
-				IsBodyHtml = true,
-			};
-            mailMessage.AlternateViews.Add(htmlView);
-
-            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-			{
-				Port = 587,
-				Credentials = new NetworkCredential(senderEmail, senderPassword),
-				EnableSsl = true
-			};
-			try
-			{
-				smtpClient.Send(mailMessage);
-				Console.WriteLine("Email sent successfully");
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine("Error sending email");
-			}
-		}
         return result;
 	}
 
+	public void SendMail(string recipientEmail)
+	{
+        string senderEmail = "linkupp2024@gmail.com";
+        string senderPassword = "mbyo noyk dfbb fhlr";
+        LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
+        LinkedImage.ContentId = "Logo";
+        LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
+        string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
+        AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
+        htmlContent, null, "text/html");
+        htmlView.LinkedResources.Add(LinkedImage);
 
+        MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+        {
+            Subject = "Welcome to Linkup",
+            IsBodyHtml = true,
+        };
+        mailMessage.AlternateViews.Add(htmlView);
+
+        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(senderEmail, senderPassword),
+            EnableSsl = true
+        };
+        smtpClient.Send(mailMessage);
+    }
 	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
 	{
 		var appUser = await _userManager.FindByEmailAsync(loginDto.Email);

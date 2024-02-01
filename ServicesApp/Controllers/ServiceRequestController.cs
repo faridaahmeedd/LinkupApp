@@ -42,8 +42,26 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
+        [HttpGet("WithMaxFees")]
+        public IActionResult GetServicesWithFees()
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ApiResponse.NotValid);
+                }
+                var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees() );
+                return Ok(services);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse.SomethingWrong);
+            }
+        }
 
-		[HttpGet("{ServiceId}")]
+
+        [HttpGet("{ServiceId}")]
 		public IActionResult GetService(int ServiceId)
 		{
 			try
@@ -144,10 +162,10 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.CategoryNotFound);
 				}
-				if (!_serviceRepository.CheckServiceMinFees(serviceMap, CategoryId))
-				{
-					return NotFound(ApiResponse.MinFees);
-				}
+				//if (!_serviceRepository.CheckServiceMinFees(serviceMap, CategoryId))
+				//{
+				//	return NotFound(ApiResponse.MinFees);
+				//}
 				serviceMap.Category = _categoryRepository.GetCategory(CategoryId);
 
 				if (!_customerRepository.CustomerExist(CustomerId))
@@ -197,6 +215,7 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
+
 
 		[HttpDelete("{ServiceId}")]
 		public IActionResult DeleteService(int ServiceId)
@@ -279,5 +298,53 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
+
+        [HttpPut("UpdateUnknownCategory/{ServiceId}/{CategoryName}")]
+        public IActionResult UpdateServiceCategory(int ServiceId, string CategoryName)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+					return BadRequest(ApiResponse.NotValid);
+                }
+                if (!_serviceRepository.ServiceExist(ServiceId))
+                {
+                    return NotFound(ApiResponse.RequestNotFound);
+                }
+                if (!_categoryRepository.CategoryExist(CategoryName))
+                {
+                    return NotFound(ApiResponse.CategoryNotFound);
+                }
+                _serviceRepository.UpdateUnkownCategory(ServiceId, CategoryName);
+                return Ok(ApiResponse.SuccessUpdated);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse.SomethingWrong);
+            }
+        }
+
+        [HttpPut("UpdateMaxFees/{ServiceId}/{MaxFees}")]
+        public IActionResult UpdateServiceMaxFees(int ServiceId, int MaxFees)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ApiResponse.NotValid);
+                }
+                if (!_serviceRepository.ServiceExist(ServiceId))
+                {
+                    return NotFound(ApiResponse.RequestNotFound);
+                }
+                _serviceRepository.UpdateMaxFees(ServiceId, MaxFees);
+                return Ok(ApiResponse.SuccessUpdated);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse.SomethingWrong);
+            }
+        }
     }
 }

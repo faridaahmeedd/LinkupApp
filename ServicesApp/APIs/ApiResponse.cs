@@ -103,15 +103,15 @@
             statusMsg = "success",
             message = "Offer Accepted."
         };
+        public static readonly object OfferDeclined = new
+        {
+            statusMsg = "success",
+            message = "Offer Declined."
+        };
         public static readonly object ServiceCompletedSuccess = new
         {
             statusMsg = "success",
             message = "Service Completed Successfully."
-        };
-        public static readonly object MinFees = new
-        {
-            statusMsg = "fail",
-            message = "Fees Can not be less than Category Minimum Fees."
         };
         public static readonly object AlreadyOffered = new
         {
@@ -138,5 +138,10 @@
 			statusMsg = "fail",
 			message = "You can only add up to three time slots."
 		};
-	}
+        public static readonly object FeesExceededMax = new
+        {
+            statusMsg = "fail",
+            message = "Offer Fees exceeded Request max fees"
+        };
+    }
 }

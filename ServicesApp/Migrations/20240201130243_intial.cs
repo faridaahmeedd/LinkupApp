@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class intial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -57,8 +57,7 @@ namespace ServicesApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MinFees = table.Column<int>(type: "int", nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -235,11 +234,11 @@ namespace ServicesApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Fees = table.Column<int>(type: "int", nullable: true)
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MaxFees = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -265,10 +264,10 @@ namespace ServicesApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fees = table.Column<int>(type: "int", nullable: false),
-                    Accepted = table.Column<bool>(type: "bit", nullable: false),
                     TimeSlotId = table.Column<int>(type: "int", nullable: false),
                     Duration = table.Column<TimeOnly>(type: "time", nullable: false),
                     ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RequestId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -324,7 +323,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "2fc598a2-1c46-4b42-9e28-f27864326e93", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEKhHhQZJhd5PlWsUlj9uUnnjTFPMtwf405QlDs3zl6Jj0RGQA0eMGLdz4Y8nzSf9rg==", "d08a4f60-bc1d-41ca-a1da-f6ee4f7fe797", false, "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "50a51d04-64cb-4c64-b1da-813ed6b3d57b", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEGzF8pTf95Yx4hnyb0eICUS5u2RVGVv8WxLmXVM/lyzbT2p2U/VPqrLdRXYNFIodcg==", "9271c373-208b-4b60-a68d-25e14241a34e", false, "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

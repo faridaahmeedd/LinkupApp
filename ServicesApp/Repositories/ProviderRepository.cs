@@ -59,7 +59,7 @@ namespace ServicesApp.Repository
         {
             var provider = await _userManager.FindByIdAsync(id);
             // Delete unaccepted offers
-            var offers = _context.Offers.Include(o => o.Provider).Where(o => o.Provider.Id == id && o.Accepted == false).ToList();
+            var offers = _context.Offers.Include(o => o.Provider).Where(o => o.Provider.Id == id && o.Status != "Accepted").ToList();
             if (offers != null)
             {
                 _context.RemoveRange(offers);

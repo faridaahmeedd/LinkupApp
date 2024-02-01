@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240131140933_initial")]
-    partial class initial
+    [Migration("20240201130243_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -260,14 +260,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2fc598a2-1c46-4b42-9e28-f27864326e93",
+                            ConcurrencyStamp = "50a51d04-64cb-4c64-b1da-813ed6b3d57b",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKhHhQZJhd5PlWsUlj9uUnnjTFPMtwf405QlDs3zl6Jj0RGQA0eMGLdz4Y8nzSf9rg==",
-                            SecurityStamp = "d08a4f60-bc1d-41ca-a1da-f6ee4f7fe797",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGzF8pTf95Yx4hnyb0eICUS5u2RVGVv8WxLmXVM/lyzbT2p2U/VPqrLdRXYNFIodcg==",
+                            SecurityStamp = "9271c373-208b-4b60-a68d-25e14241a34e",
                             TwoFactorEnabled = false,
                             UserName = "MainAdmin"
                         });
@@ -284,9 +284,6 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MinFees")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -305,9 +302,6 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("Accepted")
-                        .HasColumnType("bit");
-
                     b.Property<TimeOnly>("Duration")
                         .HasColumnType("time");
 
@@ -319,6 +313,10 @@ namespace ServicesApp.Migrations
 
                     b.Property<int>("RequestId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TimeSlotId")
                         .HasColumnType("int");
@@ -350,15 +348,14 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Fees")
-                        .HasColumnType("int");
-
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Location")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxFees")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()

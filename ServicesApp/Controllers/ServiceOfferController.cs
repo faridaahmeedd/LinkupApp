@@ -102,7 +102,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.TimeSlotNotFound);
 				}
-				if (_offerRepository.ProviderAlreadyOffered(ProviderId, RequestId)) //->
+				if (_offerRepository.ProviderAlreadyOffered(ProviderId, RequestId)) 
 				{
 					return BadRequest(ApiResponse.AlreadyOffered);
 				}
@@ -110,12 +110,16 @@ namespace ServicesApp.Controllers
 				{
 					return StatusCode(500, ApiResponse.TimeSlotConflict);
 				}
-				if (!_providerRepository.CheckProviderBalance(ProviderId))  //->
+				if (!_providerRepository.CheckProviderBalance(ProviderId))  
 				{
 					return BadRequest(ApiResponse.PayFine);
 				}
+                if (!_offerRepository.CheckMaxFees(offerMap))  
+                {
+                    return BadRequest(ApiResponse.FeesExceededMax);
+                }
 
-				_offerRepository.CreateOffer(offerMap);
+                _offerRepository.CreateOffer(offerMap);
 				return Ok(new
 				{
 					statusMsg = "success",
@@ -254,5 +258,30 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
+
+        [HttpPut("Decline/{OfferId}")]
+        public IActionResult DeclineOffer(int OfferId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ApiResponse.NotValid);
+                }
+                if (!_offerRepository.OfferExist(OfferId))
+                {
+                    return NotFound(ApiResponse.OfferNotFound);
+                }
+                if (!_offerRepository.DeclineOffer(OfferId))
+                {
+                    return StatusCode(500, ApiResponse.FailedToUpdate);
+                }
+                return Ok(ApiResponse.OfferDeclined);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse.SomethingWrong);
+            }
+        }
     }
 }

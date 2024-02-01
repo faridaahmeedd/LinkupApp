@@ -16,6 +16,8 @@ namespace ServicesApp.Interfaces
 		bool Save();
 		ICollection<ServiceOffer> GetOfffersOfProvider(string providerId);
 		bool ProviderAlreadyOffered(string providerId, int requestId);
+		bool DeclineOffer(int offerId);
+		bool CheckMaxFees(ServiceOffer serviceOffer);
 
     }
 }

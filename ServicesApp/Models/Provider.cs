@@ -17,7 +17,9 @@ namespace ServicesApp.Models
 		public String? JobTitle { get; set; }
         public String? Description { get; set; }
 		public int Balance { get; set; }
-		public ICollection<ServiceOffer>? Offers { get; set; }
+        public byte[]? Image { get; set; }
+
+        public ICollection<ServiceOffer>? Offers { get; set; }
 		// SKILLS
 	}
 }

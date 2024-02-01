@@ -18,6 +18,8 @@ namespace ServicesApp.Core.Models
 		public String? Disability { get; set; }
         public String? EmergencyContact { get; set; }
 		public int Balance { get; set; }
-		public ICollection<ServiceRequest>? Services { get; set; }
+        public byte[]? Image { get; set; }
+
+        public ICollection<ServiceRequest>? Services { get; set; }
 	}
 }

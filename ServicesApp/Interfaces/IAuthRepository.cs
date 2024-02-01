@@ -13,5 +13,7 @@ namespace ServicesApp.Interfaces
 		Task<string> ForgetPassword(string mail);
 		string GenerateRandomCode(int length);
 		Task<bool> ResetPassword(string mail, string newPassword);
-	}
+		void SendMail(string recipientEmail);
+
+    }
 }

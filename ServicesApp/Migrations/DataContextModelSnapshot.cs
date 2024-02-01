@@ -257,14 +257,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "50a51d04-64cb-4c64-b1da-813ed6b3d57b",
+                            ConcurrencyStamp = "556db93c-e757-41a6-9f42-89605b473311",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGzF8pTf95Yx4hnyb0eICUS5u2RVGVv8WxLmXVM/lyzbT2p2U/VPqrLdRXYNFIodcg==",
-                            SecurityStamp = "9271c373-208b-4b60-a68d-25e14241a34e",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKd/xLp98VjtSdMw3nb9rDcQGasbMYxClY6f9JaHOKc02ZMNqrauB3SJaaasenGEiQ==",
+                            SecurityStamp = "daeea433-4af7-4a59-8b59-75907d642cea",
                             TwoFactorEnabled = false,
                             UserName = "MainAdmin"
                         });
@@ -425,6 +425,9 @@ namespace ServicesApp.Migrations
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
 
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("LName")
                         .HasColumnType("nvarchar(max)");
 
@@ -461,6 +464,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");

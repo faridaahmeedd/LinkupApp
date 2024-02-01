@@ -69,7 +69,7 @@ namespace ServicesApp.Repository
             if (existingService != null)
             {
                 existingService.Description = updatedService.Description;
-                existingService.Image = updatedService.Image; //TODO
+                existingService.Image = updatedService.Image; 
                 existingService.Location = updatedService.Location;
                 return Save();
             }

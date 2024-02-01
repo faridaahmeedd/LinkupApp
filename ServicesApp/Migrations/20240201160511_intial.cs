@@ -185,7 +185,8 @@ namespace ServicesApp.Migrations
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Disability = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmergencyContact = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Balance = table.Column<int>(type: "int", nullable: false)
+                    Balance = table.Column<int>(type: "int", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -213,7 +214,8 @@ namespace ServicesApp.Migrations
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Balance = table.Column<int>(type: "int", nullable: false)
+                    Balance = table.Column<int>(type: "int", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -323,7 +325,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "50a51d04-64cb-4c64-b1da-813ed6b3d57b", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEGzF8pTf95Yx4hnyb0eICUS5u2RVGVv8WxLmXVM/lyzbT2p2U/VPqrLdRXYNFIodcg==", "9271c373-208b-4b60-a68d-25e14241a34e", false, "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "556db93c-e757-41a6-9f42-89605b473311", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEKd/xLp98VjtSdMw3nb9rDcQGasbMYxClY6f9JaHOKc02ZMNqrauB3SJaaasenGEiQ==", "daeea433-4af7-4a59-8b59-75907d642cea", false, "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

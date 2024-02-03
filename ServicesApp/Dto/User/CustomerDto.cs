@@ -13,7 +13,7 @@
         public required DateOnly BirthDate { get; set; }
         public string? Disability { get; set; }
         public string? EmergencyContact { get; set; }
-        public byte[]? Image { get; set; }
+       // public byte[]? Image { get; set; }
 
     }
 }

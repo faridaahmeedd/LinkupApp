@@ -51,45 +51,56 @@ public class AuthRepository : IAuthRepository
 		return false;
 	}
 
-	public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
-	{
+	
+    public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
+    {
         var userMap = _mapper.Map<AppUser>(registerDto);
+        if (role == "Customer")
+        {
+            userMap = _mapper.Map<Customer>(registerDto);
+        }
+        else if (role == "Provider")
+        {
+            userMap = _mapper.Map<Provider>(registerDto);
+        }
+        else if (role == "Admin")
+        {
+            userMap = _mapper.Map<Admin>(registerDto);
+        }
+
         userMap.Email = registerDto.Email;
         userMap.SecurityStamp = Guid.NewGuid().ToString();
-        userMap.UserName = registerDto.Email;
+        userMap.UserName = new MailAddress(registerDto.Email).User;
         var result = await _userManager.CreateAsync(userMap, registerDto.Password);
+        if (result.Succeeded)
+        {
 
-        if (role == "Customer")
-		{
-			 userMap = _mapper.Map<Customer>(registerDto);
+            await _userManager.AddToRoleAsync(userMap, role);
+            string senderEmail = "linkupp2024@gmail.com";
+            string senderPassword = "mbyo noyk dfbb fhlr";
+            string recipientEmail = userMap.Email;
+            MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+            {
+                Subject = "Welcome to Linkup Service Hub",
+                Body = File.ReadAllText("Mails/RegistrationMail.html"),
+                IsBodyHtml = true,
+            };
 
-            if (result.Succeeded)
-			{
-                await _userManager.AddToRoleAsync(userMap, role);
-                string recipientEmail = userMap.Email;
-                SendMail(recipientEmail);
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(senderEmail, senderPassword),
+                EnableSsl = true
+            };
+            if (role != "Admin")
+            {
+                smtpClient.Send(mailMessage);
 
             }
-        }
-		else if (role == "Provider")
-		{
-			 userMap = _mapper.Map<Provider>(registerDto);
-
-            if (result.Succeeded)
-			{
-                await _userManager.AddToRoleAsync(userMap, role);
-                string recipientEmail = userMap.Email;
-                SendMail(recipientEmail);
-
-            }
-        }
-		else if (role == "Admin")
-		{
-			 userMap = _mapper.Map<Admin>(registerDto);
-		}
-		
+    }
         return result;
-	}
+    }
+    
 
 	public void SendMail(string recipientEmail)
 	{

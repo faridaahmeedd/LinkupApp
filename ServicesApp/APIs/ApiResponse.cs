@@ -57,6 +57,11 @@
 			statusMsg = "fail",
 			message = "User Already Exists."
 		};
+		public static readonly object AdminAlreadyExist = new
+		{
+			statusMsg = "fail",
+			message = "Admin Already Exists."
+		};
 		public static readonly object CategoryAlreadyExist= new
         {
             statusMsg = "fail",

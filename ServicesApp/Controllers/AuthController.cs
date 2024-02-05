@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.APIs;
 using ServicesApp.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -15,8 +16,8 @@ public class AuthController : ControllerBase
 		_authRepository = authenticationRepository;
 	}
 
-	[HttpPost("Register/{Role}")]
-	public async Task<IActionResult> Register([FromBody] RegistrationDto registerDto, string Role)
+	[HttpPost("RegisterUser/{Role}")]
+	public async Task<IActionResult> RegisterUser([FromBody] RegistrationDto registerDto, string Role)
 	{
 		try
 		{
@@ -41,6 +42,47 @@ public class AuthController : ControllerBase
 				{
 					statusMsg = "success",
 					message = "User Created Successfully.",
+					userId = appUser.Id
+				});
+			}
+			foreach (var error in res.Errors)
+			{
+				if (error.Code.StartsWith("Password"))
+				{
+					return BadRequest(ApiResponse.InvalidPass);
+				}
+			}
+			return BadRequest(ApiResponse.NotValid);
+		}
+		catch
+		{
+			return StatusCode(500, ApiResponse.SomethingWrong);
+		}
+	}
+
+	[HttpPost("RegisterAdmin")]
+	// [Authorize(Roles = "MainAdmin")]
+	public async Task<IActionResult> RegisterAdmin([FromBody] RegistrationDto registerDto)
+	{
+		try
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			var appUser = await _authRepository.CheckAdmin(registerDto.Email);
+			if (appUser != null)
+			{
+				return BadRequest(ApiResponse.AdminAlreadyExist);
+			}
+			var res = await _authRepository.CreateAdmin(registerDto);
+			if (res.Succeeded)
+			{
+				appUser = await _authRepository.CheckAdmin(registerDto.Email);
+				return Ok(new
+				{
+					statusMsg = "success",
+					message = "Admin Created Successfully.",
 					userId = appUser.Id
 				});
 			}

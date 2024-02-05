@@ -42,6 +42,20 @@ public class AuthRepository : IAuthRepository
 		return null;
 	}
 
+	public async Task<AppUser?> CheckAdmin(string email)
+	{
+		var appUser = await _userManager.FindByEmailAsync(email);
+		if (appUser != null)
+		{
+			var role = await _userManager.GetRolesAsync(appUser);
+			if(role.Contains("Admin"))
+			{
+				return appUser;
+			}
+		}
+		return null;
+	}
+
 	public async Task<bool> CheckRole(string role)
 	{
 		if (await _roleManager.RoleExistsAsync(role))
@@ -50,7 +64,6 @@ public class AuthRepository : IAuthRepository
 		}
 		return false;
 	}
-
 	
     public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
     {
@@ -63,46 +76,37 @@ public class AuthRepository : IAuthRepository
         {
             userMap = _mapper.Map<Provider>(registerDto);
         }
-        else if (role == "Admin")
+        else
         {
-            userMap = _mapper.Map<Admin>(registerDto);
+            return IdentityResult.Failed();
         }
-
         userMap.Email = registerDto.Email;
         userMap.SecurityStamp = Guid.NewGuid().ToString();
-        userMap.UserName = new MailAddress(registerDto.Email).User;
+        userMap.UserName = registerDto.Email;
         var result = await _userManager.CreateAsync(userMap, registerDto.Password);
         if (result.Succeeded)
         {
-
             await _userManager.AddToRoleAsync(userMap, role);
-            string senderEmail = "linkupp2024@gmail.com";
-            string senderPassword = "mbyo noyk dfbb fhlr";
-            string recipientEmail = userMap.Email;
-            MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-            {
-                Subject = "Welcome to Linkup Service Hub",
-                Body = File.ReadAllText("Mails/RegistrationMail.html"),
-                IsBodyHtml = true,
-            };
-
-            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential(senderEmail, senderPassword),
-                EnableSsl = true
-            };
-            if (role != "Admin")
-            {
-                smtpClient.Send(mailMessage);
-
-            }
-    }
+            SendRegistrtationMail(userMap.Email);
+        }
         return result;
     }
-    
 
-	public void SendMail(string recipientEmail)
+	public async Task<IdentityResult> CreateAdmin(RegistrationDto registerDto)
+	{
+		var userMap = _mapper.Map<Admin>(registerDto);
+		userMap.Email = registerDto.Email;
+		userMap.SecurityStamp = Guid.NewGuid().ToString();
+		userMap.UserName = registerDto.Email;
+		var result = await _userManager.CreateAsync(userMap, registerDto.Password);
+		if (result.Succeeded)
+		{
+			await _userManager.AddToRoleAsync(userMap, "Admin");
+		}
+		return result;
+	}
+
+	public void SendRegistrtationMail(string recipientEmail)
 	{
         string senderEmail = "linkupp2024@gmail.com";
         string senderPassword = "mbyo noyk dfbb fhlr";
@@ -127,8 +131,16 @@ public class AuthRepository : IAuthRepository
             Credentials = new NetworkCredential(senderEmail, senderPassword),
             EnableSsl = true
         };
-        smtpClient.Send(mailMessage);
+		try
+		{
+			smtpClient.Send(mailMessage);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+		}
     }
+
 	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
 	{
 		var appUser = await _userManager.FindByEmailAsync(loginDto.Email);
@@ -140,11 +152,8 @@ public class AuthRepository : IAuthRepository
 				new Claim(ClaimTypes.NameIdentifier, appUser.Id),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 			};
-
 			var roles = await _userManager.GetRolesAsync(appUser);
 			authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-            Console.WriteLine(roles );
-
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
 			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 			var expiration = DateTime.Now.AddMonths(5);
@@ -164,10 +173,6 @@ public class AuthRepository : IAuthRepository
 
     public async Task<string> ForgetPassword(string mail)
 	{
-        string senderEmail = "linkupp2024@gmail.com";
-        string senderPassword = "mbyo noyk dfbb fhlr"; 
-        string recipientEmail = mail;
-
         var user = await _userManager.FindByEmailAsync(mail);
 		if (user == null){
 			return string.Empty;
@@ -178,6 +183,9 @@ public class AuthRepository : IAuthRepository
 		// user.ConfirmationCode = confirmationCode; 
 		// await _userManager.UpdateAsync(user);
 
+		string senderEmail = "linkupp2024@gmail.com";
+		string senderPassword = "mbyo noyk dfbb fhlr";
+		string recipientEmail = mail;
 		LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
 		LinkedImage.ContentId = "Logo";
 		LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
@@ -192,16 +200,13 @@ public class AuthRepository : IAuthRepository
 			Subject = "Linkup Reset Password",
 			IsBodyHtml = true, 
         };
-
 		mailMessage.AlternateViews.Add(htmlView);
-
 		SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
             Credentials = new NetworkCredential(senderEmail, senderPassword),
             EnableSsl = true
         };
-
         try
         {
             smtpClient.Send(mailMessage);
@@ -226,15 +231,12 @@ public class AuthRepository : IAuthRepository
     public async Task<bool> ResetPassword(string mail, string newPassword)
     {
         var user = await _userManager.FindByEmailAsync(mail);
-
         if (user == null)
         {
             return false; 
         }
-
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
-
         if (result.Succeeded)
         {
             await _userManager.UpdateAsync(user);

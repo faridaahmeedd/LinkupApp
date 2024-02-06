@@ -50,8 +50,8 @@ namespace ServicesApp.Repository
 			existingProvider.JobTitle = ProviderUpdate.JobTitle;
 			existingProvider.Description = ProviderUpdate.Description;
 			existingProvider.MobileNumber = ProviderUpdate.MobileNumber;
-		//	existingProvider.Image = ProviderUpdate.Image;
-            var result = await _userManager.UpdateAsync(existingProvider);
+			existingProvider.Image	= ProviderUpdate.Image;
+			var result = await _userManager.UpdateAsync(existingProvider);
 			return result.Succeeded;
 		}
 

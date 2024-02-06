@@ -45,7 +45,7 @@ namespace ServicesApp.Repository
 			existingCustomer.Disability = customerUpdate.Disability;
 			existingCustomer.EmergencyContact = customerUpdate.EmergencyContact;
 			existingCustomer.MobileNumber = customerUpdate.MobileNumber;
-			//existingCustomer.Image = customerUpdate.Image;
+			existingCustomer.Image = customerUpdate.Image;
 			var result = await _userManager.UpdateAsync(existingCustomer);
 			return result.Succeeded;
 		}

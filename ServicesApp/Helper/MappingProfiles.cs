@@ -17,16 +17,6 @@ namespace ServicesApp.Helper
 			CreateMap<ServiceRequestDto, ServiceRequest>();
             CreateMap<ServiceRequest, ServiceDetailsDto>();
             CreateMap<ServiceDetailsDto, ServiceRequest>();
-			CreateMap<ServiceOffer, ServiceOfferDto>()
-				.ForMember(
-					dest => dest.Duration,
-					opt => opt.MapFrom(src => src.Duration.ToString("HH:mm"))
-				);
-			CreateMap<ServiceOfferDto, ServiceOffer>()
-				.ForMember(
-					dest => dest.Duration,
-					opt => opt.MapFrom(src => ConvertToTimeOnly(src.Duration))
-				);
 			CreateMap<Customer, CustomerDto>();
 			CreateMap<CustomerDto, Customer>();
 			CreateMap<RegistrationDto, Customer>();
@@ -37,24 +27,63 @@ namespace ServicesApp.Helper
 			CreateMap<ProviderDto, RegistrationDto>();
 			CreateMap<RegistrationDto, Admin>();
 			CreateMap<Admin, RegistrationDto>();
-			CreateMap<TimeSlot, TimeSlotDto>();
-            CreateMap<TimeSlotDto, TimeSlot>();
             CreateMap<AppUser, RegistrationDto>();
             CreateMap<RegistrationDto, AppUser>();
             CreateMap<Category, CategoryDto>();
             CreateMap<CategoryDto, Category>();
+			CreateMap<ServiceOffer, ServiceOfferDto>()
+				.ForMember(
+					dest => dest.Duration,
+					opt => opt.MapFrom(src => ConvertTimeToString(src.Duration))
+				);
+			CreateMap<ServiceOfferDto, ServiceOffer>()
+				.ForMember(
+					dest => dest.Duration,
+					opt => opt.MapFrom(src => ConvertStringToTime(src.Duration))
+				);
+			CreateMap<TimeSlot, TimeSlotDto>()
+				.ForMember(
+					dest => dest.Date,
+					opt => opt.MapFrom(src => ConvertDateToString(src.Date))
+				)
+				.ForMember(
+					dest => dest.FromTime,
+					opt => opt.MapFrom(src => ConvertTimeToString(src.FromTime))
+				);
+			CreateMap<TimeSlotDto, TimeSlot>()
+				.ForMember(
+					dest => dest.Date,
+					opt => opt.MapFrom(src => ConvertStringToDate(src.Date))
+				)
+				.ForMember(
+					dest => dest.FromTime,
+					opt => opt.MapFrom(src => ConvertStringToTime(src.FromTime))
+				);
 		}
 
 
-
-		private TimeOnly ConvertToTimeOnly(string duration)
+		private TimeOnly ConvertStringToTime(string time)
 		{
 			DateTime result;
-			Console.WriteLine("ConvertToTimeOnly");
-			return DateTime.TryParse(DateOnly.MinValue + " " + duration, out result)
+			return DateTime.TryParse(DateOnly.MinValue + " " + time, out result)
 				? TimeOnly.FromDateTime(result)
 				: TimeOnly.MinValue;
 		}
+		private DateOnly ConvertStringToDate(string date)
+		{
+			DateTime result;
+			return DateTime.TryParse(date + " " + TimeOnly.MinValue, out result)
+				? DateOnly.FromDateTime(result.Date)
+				: DateOnly.MinValue;
+		}
 
+		private string ConvertTimeToString(TimeOnly time)
+		{
+			return time.ToString("HH:mm");
+		}
+		private string ConvertDateToString(DateOnly date)
+		{
+			return date.ToString("yyyy-M-d");
+		}
 	}
 }

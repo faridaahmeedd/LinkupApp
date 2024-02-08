@@ -14,7 +14,5 @@ namespace ServicesApp.Interfaces
 		bool DeleteTimeSlot(int id);
 		bool Save();
 		bool CheckConflict(ServiceOffer offer);
-		TimeSlot ConvertToModel(TimeSlotDto timeSlotDto);
-		TimeSlotDto ConvertToDto(TimeSlot timeSlot);
 	}
 }

@@ -131,32 +131,5 @@ namespace ServicesApp.Repository
 			}
 			return true;
 		}
-
-		public TimeSlot ConvertToModel(TimeSlotDto timeSlotDto)
-		{
-			DateTime parsedDateTime;
-			DateTime.TryParse(timeSlotDto.Date + " " + timeSlotDto.FromTime, out parsedDateTime);
-			DateOnly Date = DateOnly.FromDateTime(parsedDateTime.Date);
-			TimeOnly FromTime = TimeOnly.FromDateTime(parsedDateTime);
-			TimeSlot timeSlot = new()
-			{
-				Id = timeSlotDto.Id,
-				Date = Date,
-				FromTime = FromTime,
-				ServiceRequest = null,
-			};
-			return timeSlot;
-		}
-
-		public TimeSlotDto ConvertToDto(TimeSlot timeSlot)
-		{
-			TimeSlotDto timeSlotDto = new()
-			{
-				Id = timeSlot.Id,
-				Date = timeSlot.Date.ToString("yyyy-M-d"),
-				FromTime = timeSlot.FromTime.ToString("HH:mm")
-			};
-			return timeSlotDto;
-		}
 	}
 }

@@ -3,6 +3,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 using ServicesApp.Interfaces;
 using ServicesApp.APIs;
+using AutoMapper;
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -11,12 +12,14 @@ namespace ServicesApp.Controllers
     {
         private readonly ITimeSlotsRepository _timeSlotRepository;
 		private readonly IServiceRequestRepository _requestRepository;
+		private readonly IMapper _mapper;
 
-        public TimeSlotController(ITimeSlotsRepository timeSlotRepository , IServiceRequestRepository requestRepository)
+		public TimeSlotController(ITimeSlotsRepository timeSlotRepository , IServiceRequestRepository requestRepository, IMapper mapper)
         {
             _timeSlotRepository = timeSlotRepository;
 			_requestRepository = requestRepository;
-        }
+			_mapper = mapper;
+		}
 
 		[HttpGet("{TimeSlotId}")]
 		public IActionResult GetTimeSlot(int TimeSlotId)
@@ -31,8 +34,8 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.TimeSlotNotFound);
 				}
-				TimeSlotDto timeSlotDto = _timeSlotRepository.ConvertToDto(_timeSlotRepository.GetTimeSlot(TimeSlotId));
-				return Ok(timeSlotDto);
+				var TimeSlot = _mapper.Map<TimeSlotDto>(_timeSlotRepository.GetTimeSlot(TimeSlotId));
+				return Ok(TimeSlot);
 			}
 			catch
 			{
@@ -54,14 +57,8 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.RequestNotFound);
 				}
-				var timeSlots = _timeSlotRepository.GetTimeSlotsOfService(ServiceId);
-				List<TimeSlotDto> mapTimeSlots = new List<TimeSlotDto>();
-				foreach (var item in timeSlots)
-				{
-					TimeSlotDto mapItem = _timeSlotRepository.ConvertToDto(item);
-					mapTimeSlots.Add(mapItem);
-				}
-				return Ok(mapTimeSlots);
+				var TimeSlot = _mapper.Map<List<TimeSlotDto>>(_timeSlotRepository.GetTimeSlotsOfService(ServiceId));
+				return Ok(TimeSlot);
 			}
 			catch
 			{
@@ -89,7 +86,7 @@ namespace ServicesApp.Controllers
 				List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
 				foreach (var item in timeSlots)
 				{
-					TimeSlot mapItem = _timeSlotRepository.ConvertToModel(item);
+					var mapItem = _mapper.Map<TimeSlot>(item);
 					mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
 					mapTimeSlots.Add(mapItem);
 				}
@@ -122,7 +119,7 @@ namespace ServicesApp.Controllers
 				List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
 				foreach (var item in timeSlots)
 				{
-					TimeSlot mapItem = _timeSlotRepository.ConvertToModel(item);
+					var mapItem = _mapper.Map<TimeSlot>(item);
 					mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
 					mapTimeSlots.Add(mapItem);
 				}

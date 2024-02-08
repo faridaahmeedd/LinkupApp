@@ -5,6 +5,6 @@
         public int Id { get; set; }
         public required string Description { get; set; }
         public string Location { get; set; }
-        public byte[]? Image { get; set; }
+        //public byte[]? Image { get; set; }
     }
 }

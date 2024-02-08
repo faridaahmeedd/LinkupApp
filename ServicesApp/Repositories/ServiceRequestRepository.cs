@@ -179,7 +179,7 @@ namespace ServicesApp.Repository
                     Offers = r.Offers.Select(t => new ServiceOfferDto
                     {
                         Fees = t.Fees,
-                        Duration = t.Duration,
+                        Duration = t.Duration.ToString(),
                         TimeSlotId = t.TimeSlotId
                     }).ToList()
 

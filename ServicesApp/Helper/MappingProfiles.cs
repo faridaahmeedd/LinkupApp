@@ -5,6 +5,7 @@ using ServicesApp.Dto.Category;
 using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Users;
 using ServicesApp.Models;
+using System.Globalization;
 
 namespace ServicesApp.Helper
 {
@@ -16,8 +17,16 @@ namespace ServicesApp.Helper
 			CreateMap<ServiceRequestDto, ServiceRequest>();
             CreateMap<ServiceRequest, ServiceDetailsDto>();
             CreateMap<ServiceDetailsDto, ServiceRequest>();
-            CreateMap<ServiceOffer, ServiceOfferDto>();
-			CreateMap<ServiceOfferDto, ServiceOffer>();
+			CreateMap<ServiceOffer, ServiceOfferDto>()
+				.ForMember(
+					dest => dest.Duration,
+					opt => opt.MapFrom(src => src.Duration.ToString("HH:mm"))
+				);
+			CreateMap<ServiceOfferDto, ServiceOffer>()
+				.ForMember(
+					dest => dest.Duration,
+					opt => opt.MapFrom(src => ConvertToTimeOnly(src.Duration))
+				);
 			CreateMap<Customer, CustomerDto>();
 			CreateMap<CustomerDto, Customer>();
 			CreateMap<RegistrationDto, Customer>();
@@ -34,7 +43,18 @@ namespace ServicesApp.Helper
             CreateMap<RegistrationDto, AppUser>();
             CreateMap<Category, CategoryDto>();
             CreateMap<CategoryDto, Category>();
+		}
 
-        }
-    }
+
+
+		private TimeOnly ConvertToTimeOnly(string duration)
+		{
+			DateTime result;
+			Console.WriteLine("ConvertToTimeOnly");
+			return DateTime.TryParse(DateOnly.MinValue + " " + duration, out result)
+				? TimeOnly.FromDateTime(result)
+				: TimeOnly.MinValue;
+		}
+
+	}
 }

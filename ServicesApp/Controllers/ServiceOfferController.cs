@@ -4,6 +4,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.APIs;
+using Azure.Core;
 
 namespace ServicesApp.Controllers
 {
@@ -87,14 +88,12 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.RequestNotFound);
 				}
-
 				if (!_requestRepository.TimeSlotsExistInService(RequestId, serviceOfferDto.TimeSlotId))
 				{
 					return NotFound(ApiResponse.TimeSlotNotFound);
-
 				}
-				var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 
+				var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 				offerMap.Provider = _providerRepository.GetProvider(ProviderId);
 				offerMap.Request = _requestRepository.GetService(RequestId);
 
@@ -147,6 +146,11 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.OfferNotFound);
 				}
+				var offer = _offerRepository.GetOffer(OfferId);
+				if (!_requestRepository.TimeSlotsExistInService(offer.Request.Id, serviceOfferDto.TimeSlotId))
+				{
+					return NotFound(ApiResponse.TimeSlotNotFound);
+				}
 				var serviceMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 				serviceMap.Id = OfferId;
 
@@ -172,10 +176,11 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.OfferNotFound);
 				}
-				if(!_offerRepository.AcceptOffer(OfferId) && !_timeSlotsRepository.UpdateToTime(OfferId))
+				if(!_offerRepository.AcceptOffer(OfferId))
 				{
 					return StatusCode(500, ApiResponse.FailedToUpdate);
 				}
+				_timeSlotsRepository.UpdateToTime(OfferId);
 				return Ok(ApiResponse.OfferAccepted);
 			}
 			catch

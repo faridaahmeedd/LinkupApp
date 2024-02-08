@@ -2,7 +2,6 @@
 using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 using ServicesApp.Interfaces;
-using AutoMapper;
 using ServicesApp.APIs;
 namespace ServicesApp.Controllers
 {
@@ -12,13 +11,11 @@ namespace ServicesApp.Controllers
     {
         private readonly ITimeSlotsRepository _timeSlotRepository;
 		private readonly IServiceRequestRepository _requestRepository;
-		private readonly IMapper _mapper;
 
-        public TimeSlotController(ITimeSlotsRepository timeSlotRepository , IServiceRequestRepository requestRepository, IMapper mapper)
+        public TimeSlotController(ITimeSlotsRepository timeSlotRepository , IServiceRequestRepository requestRepository)
         {
             _timeSlotRepository = timeSlotRepository;
 			_requestRepository = requestRepository;
-            _mapper = mapper;
         }
 
 		[HttpGet("{TimeSlotId}")]

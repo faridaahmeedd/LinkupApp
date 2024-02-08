@@ -1,7 +1,9 @@
-﻿using ServicesApp.Data;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using ServicesApp.Data;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ServicesApp.Repository
 {
@@ -129,6 +131,33 @@ namespace ServicesApp.Repository
 				}
 			}
 			return true;
+		}
+
+		public TimeSlot ConvertToModel(TimeSlotDto timeSlotDto)
+		{
+			DateTime parsedDateTime;
+			DateTime.TryParse(timeSlotDto.Date + " " + timeSlotDto.FromTime, out parsedDateTime);
+			DateOnly Date = DateOnly.FromDateTime(parsedDateTime.Date);
+			TimeOnly FromTime = TimeOnly.FromDateTime(parsedDateTime);
+			TimeSlot timeSlot = new()
+			{
+				Id = timeSlotDto.Id,
+				Date = Date,
+				FromTime = FromTime,
+				ServiceRequest = null,
+			};
+			return timeSlot;
+		}
+
+		public TimeSlotDto ConvertToDto(TimeSlot timeSlot)
+		{
+			TimeSlotDto timeSlotDto = new()
+			{
+				Id = timeSlot.Id,
+				Date = timeSlot.Date.ToString("yyyy-M-d"),
+				FromTime = timeSlot.FromTime.ToString("HH:mm")
+			};
+			return timeSlotDto;
 		}
 	}
 }

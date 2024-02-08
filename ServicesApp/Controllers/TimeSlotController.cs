@@ -34,8 +34,8 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.TimeSlotNotFound);
 				}
-				var TimeSlot = _mapper.Map<TimeSlotDto>(_timeSlotRepository.GetTimeSlot(TimeSlotId));
-				return Ok(TimeSlot);
+				TimeSlotDto timeSlotDto = _timeSlotRepository.ConvertToDto(_timeSlotRepository.GetTimeSlot(TimeSlotId));
+				return Ok(timeSlotDto);
 			}
 			catch
 			{
@@ -57,8 +57,14 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.RequestNotFound);
 				}
-				var TimeSlot = _mapper.Map<List<TimeSlotDto>>(_timeSlotRepository.GetTimeSlotsOfService(ServiceId));
-				return Ok(TimeSlot);
+				var timeSlots = _timeSlotRepository.GetTimeSlotsOfService(ServiceId);
+				List<TimeSlotDto> mapTimeSlots = new List<TimeSlotDto>();
+				foreach (var item in timeSlots)
+				{
+					TimeSlotDto mapItem = _timeSlotRepository.ConvertToDto(item);
+					mapTimeSlots.Add(mapItem);
+				}
+				return Ok(mapTimeSlots);
 			}
 			catch
 			{
@@ -86,7 +92,7 @@ namespace ServicesApp.Controllers
 				List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
 				foreach (var item in timeSlots)
 				{
-					var mapItem = _mapper.Map<TimeSlot>(item);
+					TimeSlot mapItem = _timeSlotRepository.ConvertToModel(item);
 					mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
 					mapTimeSlots.Add(mapItem);
 				}
@@ -119,7 +125,7 @@ namespace ServicesApp.Controllers
 				List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
 				foreach (var item in timeSlots)
 				{
-					var mapItem = _mapper.Map<TimeSlot>(item);
+					TimeSlot mapItem = _timeSlotRepository.ConvertToModel(item);
 					mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
 					mapTimeSlots.Add(mapItem);
 				}

@@ -169,12 +169,12 @@ namespace ServicesApp.Repository
                     CustomerName = r.Customer.FName,
                     CustomerId = r.Customer.Id,
                     CategoryName = r.Category.Name,
-                    MaxFees = r.MaxFees ,
+                    MaxFees = r.MaxFees,
                     TimeSlots = r.TimeSlots.Select(t => new TimeSlotDto
                     {
                         Id = t.Id,
-                        Date = t.Date,
-                        FromTime = t.FromTime
+                        Date = t.Date.ToString(),
+                        FromTime = t.FromTime.ToString()
                     }).ToList(),
                     Offers = r.Offers.Select(t => new ServiceOfferDto
                     {

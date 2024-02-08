@@ -18,6 +18,5 @@ namespace ServicesApp.Interfaces
 		bool ProviderAlreadyOffered(string providerId, int requestId);
 		bool DeclineOffer(int offerId);
 		bool CheckMaxFees(ServiceOffer serviceOffer);
-
     }
 }

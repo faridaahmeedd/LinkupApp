@@ -7,7 +7,7 @@ namespace ServicesApp.Models
         public int Id { get; set; }
         public required DateOnly Date { get; set; }
         public required TimeOnly FromTime { get; set; }
-        public required TimeOnly ToTime { get; set; }
+        public TimeOnly ToTime { get; set; }
 		public required ServiceRequest ServiceRequest { get; set; }
     }
 }

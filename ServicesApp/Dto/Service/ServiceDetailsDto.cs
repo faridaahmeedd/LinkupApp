@@ -1,7 +1,4 @@
-﻿using ServicesApp.Core.Models;
-using ServicesApp.Models;
-
-namespace ServicesApp.Dto.Service
+﻿namespace ServicesApp.Dto.Service
 {
     public class ServiceDetailsDto
     {

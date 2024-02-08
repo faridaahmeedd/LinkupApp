@@ -2,7 +2,6 @@
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using System;
 
 namespace ServicesApp.Repository
 {
@@ -22,7 +21,7 @@ namespace ServicesApp.Repository
 
 		public ServiceOffer GetOffer(int id)
 		{
-			return _context.Offers.Where(p => p.Id == id).FirstOrDefault();
+			return _context.Offers.Include(o => o.Request).Where(p => p.Id == id).FirstOrDefault();
 		}
 
 		public bool OfferExist(int id)
@@ -46,11 +45,10 @@ namespace ServicesApp.Repository
 			}
             return false;
 		}
+
 		public bool AcceptOffer(int id)
 		{
-			//var existingOffer = _context.Offers.Find(id);
             var existingOffer = _context.Offers.Include(o => o.Request).FirstOrDefault(o => o.Id == id);
-            Console.WriteLine(existingOffer);
 			if (existingOffer != null)
 			{
 				existingOffer.Status = "Accepted";
@@ -69,8 +67,7 @@ namespace ServicesApp.Repository
             if (serviceOffer != null)
             {
 				serviceOffer.Status = "Declined";
-				Save();
-                return true;
+                return Save();
             }
             return false;
         }
@@ -78,20 +75,23 @@ namespace ServicesApp.Repository
         public bool UpdateOffer(ServiceOffer updatedOffer)
 		{
 			var existingOffer = _context.Offers.Find(updatedOffer.Id);
-			Console.WriteLine(existingOffer);
 			if (existingOffer != null)
 			{
+				if (existingOffer.Fees != updatedOffer.Fees)
+				{
+					existingOffer.Status = "Pending";
+				}
 				existingOffer.Fees = updatedOffer.Fees;
 				existingOffer.TimeSlotId = updatedOffer.TimeSlotId;
-
-				_context.SaveChanges();
-				return true;
+				existingOffer.Duration = updatedOffer.Duration;
+				return Save();
 			}
 			return false;
 		}
+
 		public bool DeleteOffer(int id)
 		{
-			var offer = _context.Offers.Include(c => c.Provider).Where(p => p.Id == id).FirstOrDefault();
+			var offer = _context.Offers.Include(c => c.Provider).Include(c => c.Request).Where(p => p.Id == id).FirstOrDefault();
 			if (offer.Status == "Accepted")
 			{
 				var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
@@ -105,8 +105,10 @@ namespace ServicesApp.Repository
 				{
 					offer.Provider.Balance += (offer.Fees * 10) / 100;
 				}
+				offer.Request.Status = "Requested";
+				timeSlot.ToTime = TimeOnly.MinValue;
 			}
-			_context.Remove(offer!);
+			_context.Remove(offer);
 			return Save();
 		}
 

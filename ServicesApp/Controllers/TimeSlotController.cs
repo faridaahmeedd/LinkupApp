@@ -2,8 +2,8 @@
 using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 using ServicesApp.Interfaces;
-using AutoMapper;
 using ServicesApp.APIs;
+using AutoMapper;
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -14,12 +14,12 @@ namespace ServicesApp.Controllers
 		private readonly IServiceRequestRepository _requestRepository;
 		private readonly IMapper _mapper;
 
-        public TimeSlotController(ITimeSlotsRepository timeSlotRepository , IServiceRequestRepository requestRepository, IMapper mapper)
+		public TimeSlotController(ITimeSlotsRepository timeSlotRepository , IServiceRequestRepository requestRepository, IMapper mapper)
         {
             _timeSlotRepository = timeSlotRepository;
 			_requestRepository = requestRepository;
-            _mapper = mapper;
-        }
+			_mapper = mapper;
+		}
 
 		[HttpGet("{TimeSlotId}")]
 		public IActionResult GetTimeSlot(int TimeSlotId)

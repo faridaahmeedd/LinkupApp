@@ -91,9 +91,10 @@ namespace ServicesApp.Repository
 			toTime = toTime.AddMinutes(offer.Duration.Minute);
 			if (existingTimeSlot != null)
 		    {
-			  existingTimeSlot.ToTime = toTime;
-		    }
-		  return Save();
+			    existingTimeSlot.ToTime = toTime;
+				return Save();
+			}
+			return false;
 		}
 
 		public bool Save()

@@ -83,7 +83,6 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-
 		[HttpGet("CustomerRequests/{CustomerId}")]
 		public IActionResult GetServicesByCustomer(string CustomerId)
 		{
@@ -207,7 +206,10 @@ namespace ServicesApp.Controllers
 				var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
 				serviceMap.Id = ServiceId;
 
-				_serviceRepository.UpdateService(serviceMap);
+				if (!_serviceRepository.UpdateService(serviceMap))
+				{
+					return BadRequest(ApiResponse.FailedToUpdate);
+				}
 				return Ok(ApiResponse.SuccessUpdated);
 			}
 			catch

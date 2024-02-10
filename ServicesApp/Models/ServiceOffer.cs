@@ -8,7 +8,7 @@
 		public required int TimeSlotId { get; set; }
 		public required TimeOnly Duration { get; set; }
 		public  Provider? Provider { get; set; }
-		public string Status { get; set; } = "Pending";// declined Accepted
+		public string Status { get; set; } = "Offered";// declined Accepted
         public required ServiceRequest Request { get; set; }
 	}
 }

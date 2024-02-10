@@ -1,13 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ServicesApp.Core.Models;
 using ServicesApp.Data;
-using ServicesApp.Dto;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using System;
-using System.ComponentModel;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ServicesApp.Repository
 {
@@ -68,10 +63,13 @@ namespace ServicesApp.Repository
             var existingService = _context.Requests.Find(updatedService.Id);
             if (existingService != null)
             {
-                existingService.Description = updatedService.Description;
-                existingService.Image = updatedService.Image; 
-                existingService.Location = updatedService.Location;
-                return Save();
+                if(existingService.Status == "Requested")
+                {
+					existingService.Description = updatedService.Description;
+					existingService.Image = updatedService.Image;
+					existingService.Location = updatedService.Location;
+					return Save();
+				}
             }
             return false;
         }

@@ -53,7 +53,7 @@ namespace ServicesApp.Repository
 			{
 				existingOffer.Status = "Accepted";
                 var service = _context.Requests.Find(existingOffer.Request.Id);
-				service.Status = "Pending";
+				service.Status = "Offered";
                 _context.SaveChanges();
 				return true;
 			}
@@ -75,16 +75,19 @@ namespace ServicesApp.Repository
         public bool UpdateOffer(ServiceOffer updatedOffer)
 		{
 			var existingOffer = _context.Offers.Find(updatedOffer.Id);
-			if (existingOffer != null)
+			if (existingOffer != null )
 			{
-				if (existingOffer.Fees != updatedOffer.Fees)
+				if(existingOffer.Status != "Accepted")
 				{
-					existingOffer.Status = "Pending";
+					if (existingOffer.Fees != updatedOffer.Fees)
+					{
+						existingOffer.Status = "Offered";
+					}
+					existingOffer.Fees = updatedOffer.Fees;
+					existingOffer.TimeSlotId = updatedOffer.TimeSlotId;
+					existingOffer.Duration = updatedOffer.Duration;
+					return Save();
 				}
-				existingOffer.Fees = updatedOffer.Fees;
-				existingOffer.TimeSlotId = updatedOffer.TimeSlotId;
-				existingOffer.Duration = updatedOffer.Duration;
-				return Save();
 			}
 			return false;
 		}
@@ -111,13 +114,6 @@ namespace ServicesApp.Repository
 			_context.Remove(offer);
 			return Save();
 		}
-
-		//public bool DeleteOffer(int id)
-		//{
-		//	var offer = _context.Offers.Where(p => p.Id == id).FirstOrDefault();
-		//	_context.Remove(offer!);
-		//	return Save();
-		//}
 
 		public bool Save()
 		{
@@ -146,9 +142,7 @@ namespace ServicesApp.Repository
 
         public bool ProviderAlreadyOffered(string providerId , int requestId)
         {
-			var providerOffers = GetOfffersOfProvider( providerId);
-
-           
+			var providerOffers = GetOfffersOfProvider(providerId);
             if (providerOffers != null)
 			{
 				foreach (var offer in providerOffers)

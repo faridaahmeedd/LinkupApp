@@ -68,10 +68,13 @@ namespace ServicesApp.Repository
             var existingService = _context.Requests.Find(updatedService.Id);
             if (existingService != null)
             {
-                existingService.Description = updatedService.Description;
-                existingService.Image = updatedService.Image; 
-                existingService.Location = updatedService.Location;
-                return Save();
+                if(existingService.Status == "Requested")
+                {
+					existingService.Description = updatedService.Description;
+					existingService.Image = updatedService.Image;
+					existingService.Location = updatedService.Location;
+					return Save();
+				}
             }
             return false;
         }

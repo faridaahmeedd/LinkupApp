@@ -151,10 +151,13 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.TimeSlotNotFound);
 				}
-				var serviceMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
-				serviceMap.Id = OfferId;
+				var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
+				offerMap.Id = OfferId;
 
-				_offerRepository.UpdateOffer(serviceMap);
+				if (!_offerRepository.UpdateOffer(offerMap))
+				{
+					return BadRequest(ApiResponse.FailedToUpdate);
+				}
 				return Ok(ApiResponse.SuccessUpdated);
 			}
 			catch

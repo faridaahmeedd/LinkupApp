@@ -83,7 +83,6 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-
 		[HttpGet("CustomerRequests/{CustomerId}")]
 		public IActionResult GetServicesByCustomer(string CustomerId)
 		{

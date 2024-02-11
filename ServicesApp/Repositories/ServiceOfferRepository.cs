@@ -34,12 +34,14 @@ namespace ServicesApp.Repository
 			_context.Add(offer);
 			return Save();
 		}
-		public bool CheckMaxFees(ServiceOffer  serviceOffer)
+
+		public bool CheckFeesRange(ServiceOffer serviceOffer)
 		{
-			var request = _context.Requests.Where(r=> r.Id == serviceOffer.Request.Id).FirstOrDefault();//error
-			if(request != null)
+			var request = _context.Requests.Include(r => r.Subcategory).Where(r=> r.Id == serviceOffer.Request.Id).FirstOrDefault();
+			if (request != null)
 			{
-				if(request.MaxFees >= serviceOffer.Fees ) {
+				var subCategory = _context.Subcategories.Find(request.Subcategory.Id);
+				if (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees) {
 					return true;
 				}
 			}

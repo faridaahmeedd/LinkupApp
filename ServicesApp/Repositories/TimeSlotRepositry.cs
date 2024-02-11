@@ -97,12 +97,6 @@ namespace ServicesApp.Repository
 			return false;
 		}
 
-		public bool Save()
-		{
-			var saved = _context.SaveChanges();
-			return saved > 0 ? true : false;
-		}
-
 		public bool CheckConflict(ServiceOffer offer)
 		{
 			var pendingOffers = _serviceOfferRepository.GetUnCompletedOffers(offer.Provider.Id);
@@ -130,6 +124,12 @@ namespace ServicesApp.Repository
 				}
 			}
 			return true;
+		}
+
+		public bool Save()
+		{
+			var saved = _context.SaveChanges();
+			return saved > 0 ? true : false;
 		}
 	}
 }

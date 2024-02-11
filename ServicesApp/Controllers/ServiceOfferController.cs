@@ -4,7 +4,6 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.APIs;
-using Azure.Core;
 
 namespace ServicesApp.Controllers
 {
@@ -113,9 +112,9 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.PayFine);
 				}
-                if (!_offerRepository.CheckMaxFees(offerMap))  
+                if (!_offerRepository.CheckFeesRange(offerMap))
                 {
-                    return BadRequest(ApiResponse.FeesExceededMax);
+                    return BadRequest(ApiResponse.FeesOutsideRange);
                 }
 
                 _offerRepository.CreateOffer(offerMap);
@@ -124,7 +123,6 @@ namespace ServicesApp.Controllers
 					statusMsg = "success",
 					message = "Offer Created Successfully.",
 					OfferId = offerMap.Id
-
 				});
 			}
 			catch

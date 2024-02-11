@@ -16,12 +16,13 @@ namespace ServicesApp.Data
 
         }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<ServiceRequest> Requests { get; set; }
+		public DbSet<Subcategory> Subcategories { get; set; }
+		public DbSet<ServiceRequest> Requests { get; set; }
         public DbSet<ServiceOffer> Offers { get; set; }
         public DbSet<TimeSlot> TimeSlots { get; set; }
         public DbSet<Customer> Customers { get; set; }
-        //public DbSet<Admin> Admins { get; set; }
         public DbSet<Provider> Providers { get; set; }
+		//public DbSet<Admin> Admins { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -40,9 +41,9 @@ namespace ServicesApp.Data
                 .WithOne(o => o.Provider)
                 .OnDelete(DeleteBehavior.SetNull);
             modelBuilder
-                .Entity<Category>()
+                .Entity<Subcategory>()
                 .HasMany(p => p.Services)
-                .WithOne(o => o.Category)
+                .WithOne(o => o.Subcategory)
                 .OnDelete(DeleteBehavior.SetNull);
             base.OnModelCreating(modelBuilder);
 		    SeedRoles(modelBuilder);

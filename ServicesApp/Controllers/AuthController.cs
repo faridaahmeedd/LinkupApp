@@ -121,7 +121,7 @@ public class AuthController : ControllerBase
 					Expiration = expiration,
 				});
 			}
-			return Unauthorized(ApiResponse.Unuthorized);
+			return Unauthorized(ApiResponse.Unauthorized);
 		}
 		catch
 		{

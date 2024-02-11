@@ -3,9 +3,9 @@ using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Dto.Category;
 using ServicesApp.Dto.Service;
+using ServicesApp.Dto.Subcategory;
 using ServicesApp.Dto.Users;
 using ServicesApp.Models;
-using System.Globalization;
 
 namespace ServicesApp.Helper
 {
@@ -31,6 +31,8 @@ namespace ServicesApp.Helper
             CreateMap<RegistrationDto, AppUser>();
             CreateMap<Category, CategoryDto>();
             CreateMap<CategoryDto, Category>();
+			CreateMap<Subcategory, SubcategoryDto>();
+			CreateMap<SubcategoryDto, Subcategory>();
 			CreateMap<ServiceOffer, ServiceOfferDto>()
 				.ForMember(
 					dest => dest.Duration,

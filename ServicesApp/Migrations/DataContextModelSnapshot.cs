@@ -257,14 +257,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "556db93c-e757-41a6-9f42-89605b473311",
+                            ConcurrencyStamp = "5d9c4dc1-9ea5-4f41-b1d6-857f9d2b420a",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKd/xLp98VjtSdMw3nb9rDcQGasbMYxClY6f9JaHOKc02ZMNqrauB3SJaaasenGEiQ==",
-                            SecurityStamp = "daeea433-4af7-4a59-8b59-75907d642cea",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH2WVw40/l6V8VlKWz1nIq5h3OXhBXj/fivYWTi1Srjqdb2sW0qUf/pDl9jKw0v+WQ==",
+                            SecurityStamp = "ef1ec0f1-d2a1-47df-a8f1-d7561f346db7",
                             TwoFactorEnabled = false,
                             UserName = "MainAdmin"
                         });
@@ -335,9 +335,6 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CustomerId")
                         .HasColumnType("nvarchar(450)");
 
@@ -351,10 +348,44 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SubcategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("SubcategoryId");
+
+                    b.ToTable("Requests");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Subcategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("MaxFees")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
+                    b.Property<int>("MinFees")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -362,9 +393,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("Requests");
+                    b.ToTable("Subcategories");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.TimeSlot", b =>
@@ -551,19 +580,30 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
                 {
-                    b.HasOne("ServicesApp.Models.Category", "Category")
-                        .WithMany("Services")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
                         .WithMany("Services")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Category");
+                    b.HasOne("ServicesApp.Models.Subcategory", "Subcategory")
+                        .WithMany("Services")
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Customer");
+
+                    b.Navigation("Subcategory");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Subcategory", b =>
+                {
+                    b.HasOne("ServicesApp.Models.Category", "Category")
+                        .WithMany("Subcategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.TimeSlot", b =>
@@ -597,7 +637,7 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.Category", b =>
                 {
-                    b.Navigation("Services");
+                    b.Navigation("Subcategories");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
@@ -605,6 +645,11 @@ namespace ServicesApp.Migrations
                     b.Navigation("Offers");
 
                     b.Navigation("TimeSlots");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Subcategory", b =>
+                {
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("ServicesApp.Core.Models.Customer", b =>

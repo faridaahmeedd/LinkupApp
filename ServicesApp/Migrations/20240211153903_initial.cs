@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -229,6 +229,29 @@ namespace ServicesApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Subcategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MinFees = table.Column<int>(type: "int", nullable: false),
+                    MaxFees = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subcategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subcategories_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Requests",
                 columns: table => new
                 {
@@ -238,23 +261,22 @@ namespace ServicesApp.Migrations
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MaxFees = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    SubcategoryId = table.Column<int>(type: "int", nullable: true),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Requests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Requests_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
                         name: "FK_Requests_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Requests_Subcategories_SubcategoryId",
+                        column: x => x.SubcategoryId,
+                        principalTable: "Subcategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
@@ -325,7 +347,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "556db93c-e757-41a6-9f42-89605b473311", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEKd/xLp98VjtSdMw3nb9rDcQGasbMYxClY6f9JaHOKc02ZMNqrauB3SJaaasenGEiQ==", "daeea433-4af7-4a59-8b59-75907d642cea", false, "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "5d9c4dc1-9ea5-4f41-b1d6-857f9d2b420a", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEH2WVw40/l6V8VlKWz1nIq5h3OXhBXj/fivYWTi1Srjqdb2sW0qUf/pDl9jKw0v+WQ==", "ef1ec0f1-d2a1-47df-a8f1-d7561f346db7", false, "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -382,14 +404,19 @@ namespace ServicesApp.Migrations
                 column: "RequestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Requests_CategoryId",
-                table: "Requests",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Requests_CustomerId",
                 table: "Requests",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Requests_SubcategoryId",
+                table: "Requests",
+                column: "SubcategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subcategories_CategoryId",
+                table: "Subcategories",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TimeSlots_ServiceRequestId",
@@ -431,13 +458,16 @@ namespace ServicesApp.Migrations
                 name: "Requests");
 
             migrationBuilder.DropTable(
-                name: "Categories");
-
-            migrationBuilder.DropTable(
                 name: "Customer");
 
             migrationBuilder.DropTable(
+                name: "Subcategories");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
         }
     }
 }

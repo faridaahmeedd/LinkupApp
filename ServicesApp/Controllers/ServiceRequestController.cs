@@ -11,16 +11,16 @@ namespace ServicesApp.Controllers
 	public class ServiceRequestController : ControllerBase
 	{
 		private readonly IServiceRequestRepository _serviceRepository;
-		private readonly ICategoryRepository _categoryRepository;
+		private readonly ISubcategoryRepository _subcategoryRepository;
 		private readonly ICustomerRepository _customerRepository;
 		private readonly IMapper _mapper;
 
-		public ServiceRequestController(IServiceRequestRepository ServiceRepository,
-			ICategoryRepository CategoryRepository, ICustomerRepository customerRepository,
+		public ServiceRequestController(IServiceRequestRepository serviceRepository,
+			ISubcategoryRepository subcategoryRepository, ICustomerRepository customerRepository,
 			IMapper mapper)
 		{
-			_serviceRepository = ServiceRepository;
-			_categoryRepository = CategoryRepository;
+			_serviceRepository = serviceRepository;
+			_subcategoryRepository = subcategoryRepository;
 			_customerRepository = customerRepository;
             _mapper = mapper;
 		}
@@ -42,26 +42,67 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
-        [HttpGet("WithMaxFees")]
-        public IActionResult GetServicesWithFees()
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ApiResponse.NotValid);
-                }
-                var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees() );
-                return Ok(services);
-            }
-            catch
-            {
-                return StatusCode(500, ApiResponse.SomethingWrong);
-            }
-        }
+
+		//[HttpGet("WithMaxFees")]
+		//public IActionResult GetServicesWithFees()
+		//{
+		//    try
+		//    {
+		//        if (!ModelState.IsValid)
+		//        {
+		//            return BadRequest(ApiResponse.NotValid);
+		//        }
+		//        var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees() );
+		//        return Ok(services);
+		//    }
+		//    catch
+		//    {
+		//        return StatusCode(500, ApiResponse.SomethingWrong);
+		//    }
+		//}
+
+		//[HttpGet("WithMaxFees/{CustomerId}")]
+		//public IActionResult GetServicesWithFees(string CustomerId)
+		//{
+		//	try
+		//	{
+		//		if (!ModelState.IsValid)
+		//		{
+		//			return BadRequest(ApiResponse.NotValid);
+		//		}
+		//		var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees(CustomerId));
+		//		return Ok(services);
+		//	}
+		//	catch
+		//	{
+		//		return StatusCode(500, ApiResponse.SomethingWrong);
+		//	}
+		//}
+
+		//[HttpPut("UpdateMaxFees/{ServiceId}/{MaxFees}")]
+		//public IActionResult UpdateServiceMaxFees(int ServiceId, int MaxFees)
+		//{
+		//	try
+		//	{
+		//		if (!ModelState.IsValid)
+		//		{
+		//			return BadRequest(ApiResponse.NotValid);
+		//		}
+		//		if (!_serviceRepository.ServiceExist(ServiceId))
+		//		{
+		//			return NotFound(ApiResponse.RequestNotFound);
+		//		}
+		//		_serviceRepository.UpdateMaxFees(ServiceId, MaxFees);
+		//		return Ok(ApiResponse.SuccessUpdated);
+		//	}
+		//	catch
+		//	{
+		//		return StatusCode(500, ApiResponse.SomethingWrong);
+		//	}
+		//}
 
 
-        [HttpGet("{ServiceId}")]
+		[HttpGet("{ServiceId}")]
 		public IActionResult GetService(int ServiceId)
 		{
 			try
@@ -146,8 +187,8 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-        [HttpPost("{CustomerId}/{CategoryId}")]
-		public IActionResult CreateService(string CustomerId, int CategoryId, [FromBody] ServiceRequestDto serviceRequestDto)
+        [HttpPost("{CustomerId}/{SubcategoryId}")]
+		public IActionResult CreateService(string CustomerId, int SubcategoryId, [FromBody] ServiceRequestDto serviceRequestDto)
 		{
 			try
 			{
@@ -157,15 +198,11 @@ namespace ServicesApp.Controllers
 				}
 				var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
 
-				if (!_categoryRepository.CategoryExist(CategoryId))
+				if (!_subcategoryRepository.SubcategoryExist(SubcategoryId))
 				{
-					return NotFound(ApiResponse.CategoryNotFound);
+					return NotFound(ApiResponse.SubcategoryNotFound);
 				}
-				//if (!_serviceRepository.CheckServiceMinFees(serviceMap, CategoryId))
-				//{
-				//	return NotFound(ApiResponse.MinFees);
-				//}
-				serviceMap.Category = _categoryRepository.GetCategory(CategoryId);
+				serviceMap.Subcategory = _subcategoryRepository.GetSubcategory(SubcategoryId);
 
 				if (!_customerRepository.CustomerExist(CustomerId))
 				{
@@ -301,8 +338,8 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-        [HttpPut("UpdateUnknownCategory/{ServiceId}/{CategoryName}")]
-        public IActionResult UpdateServiceCategory(int ServiceId, string CategoryName)
+        [HttpPut("UpdateUnknownSubcategory/{ServiceId}/{SubcategoryName}")]
+        public IActionResult UpdateServiceSubcategory(int ServiceId, string SubcategoryName)
         {
             try
             {
@@ -314,33 +351,14 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponse.RequestNotFound);
                 }
-                if (!_categoryRepository.CategoryExist(CategoryName))
+                if (!_subcategoryRepository.SubcategoryExist(SubcategoryName))
                 {
-                    return NotFound(ApiResponse.CategoryNotFound);
+                    return NotFound(ApiResponse.SubcategoryNotFound);
                 }
-                _serviceRepository.UpdateUnkownCategory(ServiceId, CategoryName);
-                return Ok(ApiResponse.SuccessUpdated);
-            }
-            catch
-            {
-                return StatusCode(500, ApiResponse.SomethingWrong);
-            }
-        }
-
-        [HttpPut("UpdateMaxFees/{ServiceId}/{MaxFees}")]
-        public IActionResult UpdateServiceMaxFees(int ServiceId, int MaxFees)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ApiResponse.NotValid);
-                }
-                if (!_serviceRepository.ServiceExist(ServiceId))
-                {
-                    return NotFound(ApiResponse.RequestNotFound);
-                }
-                _serviceRepository.UpdateMaxFees(ServiceId, MaxFees);
+				if (!_serviceRepository.UpdateUnknownSubcategory(ServiceId, SubcategoryName))
+				{
+					return BadRequest(ApiResponse.NotAuthorized);
+				}
                 return Ok(ApiResponse.SuccessUpdated);
             }
             catch

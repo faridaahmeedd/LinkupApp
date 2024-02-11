@@ -64,13 +64,6 @@ namespace ServicesApp.Repository
             return result.Succeeded;
         }
 
-        public bool Save()
-		{
-			//sql code is generated here
-			var saved = _context.SaveChanges();
-			return saved > 0 ? true : false;
-		}
-
 		public bool CheckCustomerBalance(string id)
 		{
 			var existingCustomer = _context.Customers.Where(p => p.Id == id).FirstOrDefault();
@@ -78,8 +71,14 @@ namespace ServicesApp.Repository
 			{
 				return false;
 			}
-
             return true;
+		}
+
+		public bool Save()
+		{
+			//sql code is generated here
+			var saved = _context.SaveChanges();
+			return saved > 0 ? true : false;
 		}
 	}
 }

@@ -32,7 +32,7 @@
 			statusMsg = "fail",
 			message = "Failed to Update."
 		};
-        public static readonly object Unuthorized = new
+        public static readonly object Unauthorized = new
         {
             statusMsg = "fail",
             message = "Invalid Email or Password."
@@ -67,7 +67,11 @@
             statusMsg = "fail",
             message = "Category Already Exists."
         };
-
+		public static readonly object SubcategoryAlreadyExist = new
+		{
+			statusMsg = "fail",
+			message = "SubCategory Already Exists."
+		};
 		public static readonly object RoleDoesNotExist = new
 		{
 			statusMsg = "fail",
@@ -82,6 +86,11 @@
 		{
 			statusMsg = "fail",
 			message = "Category Not Found."
+		};
+		public static readonly object SubcategoryNotFound = new
+		{
+			statusMsg = "fail",
+			message = "SubCategory Not Found."
 		};
 		public static readonly object OfferNotFound = new
         {
@@ -143,10 +152,15 @@
 			statusMsg = "fail",
 			message = "You can only add up to three time slots."
 		};
-        public static readonly object FeesExceededMax = new
+        public static readonly object FeesOutsideRange = new
         {
             statusMsg = "fail",
-            message = "Offer Fees exceeded Request max fees"
+            message = "Offered fees is outside the specified range."
         };
-    }
+		public static readonly object NotAuthorized = new
+		{
+			statusMsg = "fail",
+			message = "Not authorized to do this action."
+		};
+	}
 }

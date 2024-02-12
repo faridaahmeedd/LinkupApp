@@ -42,7 +42,7 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-		[HttpGet("Category/{CategoryId}")]
+		[HttpGet("OfCategory/{CategoryId}")]
 		public IActionResult GetSubcategories(int CategoryId)
 		{
 			try

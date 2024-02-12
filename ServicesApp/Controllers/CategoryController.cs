@@ -7,6 +7,7 @@ using ServicesApp.Dto.Category;
 using ServicesApp.Core.Models;
 using AutoMapper;
 using ServicesApp.APIs;
+using ServicesApp.Dto.Subcategory;
 
 namespace ServicesApp.Controllers
 {
@@ -33,7 +34,8 @@ namespace ServicesApp.Controllers
 					return BadRequest(ApiResponse.NotValid);
 				}
 				var categories = _categoryRepository.GetCategories();
-				return Ok(categories);
+				var mapCategories = _mapper.Map<List<CategoryDto>>(categories);
+				return Ok(mapCategories);
 			}
 			catch
 			{
@@ -55,7 +57,8 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.CategoryNotFound);
 				}
 				var category = _categoryRepository.GetCategory(CategoryId);
-				return Ok(category);
+				var mapCategory = _mapper.Map<CategoryDto>(category);
+				return Ok(mapCategory);
 			}
 			catch
 			{
@@ -77,7 +80,8 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.CategoryNotFound);
 				}
-				return Ok(category);
+				var mapCategory = _mapper.Map<CategoryDto>(category);
+				return Ok(mapCategory);
 			}
 			catch
 			{

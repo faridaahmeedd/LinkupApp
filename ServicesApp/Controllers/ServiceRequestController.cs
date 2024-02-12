@@ -278,8 +278,8 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-        [HttpGet("ServiceOffers/{serviceId}")]
-        public IActionResult GetOffersOfService(int serviceId)
+        [HttpGet("ServiceUndeclinedOffers/{serviceId}")]
+        public IActionResult GetUndeclinedOffersOfService(int serviceId)
         {
 			try
 			{
@@ -291,7 +291,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.RequestNotFound);
 				}
-				var offers = _serviceRepository.GetOffersOfService(serviceId);
+				var offers = _serviceRepository.GetUndeclinedOffersOfService(serviceId);
 				var offersMap = _mapper.Map<List<ServiceOfferDto>>(offers);
 				return Ok(offersMap);
 			}

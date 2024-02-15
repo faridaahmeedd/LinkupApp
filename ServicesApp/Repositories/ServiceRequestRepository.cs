@@ -193,11 +193,12 @@ namespace ServicesApp.Repository
 		public ICollection<GetServiceRequestDto> ServiceDetailsForCustomer(string CustomerId)
 		{
 			Console.WriteLine("testt");
-			Console.WriteLine(AcceptedOffer(11).Id);
+			
 			var requests = _context.Requests
 				.Include(o => o.Customer)
-				.Include(o => o.Offers)
-				.ThenInclude(offer => offer.Provider)
+                .Include(o => o.Subcategory)
+                .Include(o => o.Offers)
+                .ThenInclude(offer => offer.Provider)
 				.Where(p => p.Customer.Id == CustomerId)
 				.Select(o => new GetServiceRequestDto
 				{
@@ -206,6 +207,7 @@ namespace ServicesApp.Repository
 					Description = o.Description,
 					Status = o.Status,
 					Image = o.Image,
+					SubCategoryName = o.Subcategory.Name,
 					ProviderName = o.Offers.FirstOrDefault().Provider.FName + " " + o.Offers.FirstOrDefault().Provider.LName,
 					ProviderMobileNumber = o.Offers.FirstOrDefault().Provider.MobileNumber ?? " "
 				})

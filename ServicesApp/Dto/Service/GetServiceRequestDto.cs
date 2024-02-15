@@ -9,5 +9,6 @@
 		public string ProviderName { get; set; }
 		public string ProviderMobileNumber { get; set; }
 		public byte[]? Image { get; set; }
-	}
+        public string SubCategoryName { get; set; }
+    }
 }

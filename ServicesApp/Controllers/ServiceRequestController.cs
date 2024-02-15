@@ -4,6 +4,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.APIs;
+using ServicesApp.Core.Models;
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -366,5 +367,27 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-    }
+
+		[HttpGet("ForCustomer/{CustomerId}")]
+		public IActionResult RequestsForCustomer(string CustomerId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_customerRepository.CustomerExist(CustomerId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var requests = _serviceRepository.ServiceDetailsForCustomer(CustomerId);
+				return Ok(requests);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+	}
 }

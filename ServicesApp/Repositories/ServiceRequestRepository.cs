@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using ServicesApp.Data;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
@@ -24,27 +25,6 @@ namespace ServicesApp.Repository
 		{
 			return _context.Requests.Where(p => p.Id == id).FirstOrDefault();
 		}
-
-        //public ICollection<ServiceRequest> GetServicesWithFees()
-        //{
-        //    return _context.Requests.Where(p => p.MaxFees != 0).ToList();
-        //}
-
-        //public ICollection<ServiceRequest> GetServicesWithFees(string customerId)
-        //{
-        //	return _context.Requests.Where(p => p.Customer.Id == customerId && p.MaxFees != 0).ToList();
-        //}
-
-        //public bool UpdateMaxFees(int serviceId, int maxFees)
-        //{
-        //	var service = _context.Requests.Where(s => s.Id == serviceId).FirstOrDefault();
-        //	if (service != null)
-        //	{
-        //		service.MaxFees = maxFees;
-        //		return Save();
-        //	}
-        //	return false;
-        //}
 
         public ICollection<ServiceRequest> GetServicesByCustomer(string customerId)
 		{
@@ -143,12 +123,12 @@ namespace ServicesApp.Repository
 
         public ServiceOffer AcceptedOffer(int serviceId)
         {
-            var serviceRequest = _context.Requests.Include(sr => sr.Offers).FirstOrDefault(sr => sr.Id == serviceId);
+            var serviceRequest = _context.Requests.FirstOrDefault(sr => sr.Id == serviceId);
 
             if (serviceRequest != null)
             {
-                var acceptedOffer = serviceRequest.Offers.FirstOrDefault(o => o.Status == "Accepted");
-                return acceptedOffer;
+                var acceptedOffer = _context.Offers.Include(o => o.Provider).FirstOrDefault(o => o.Request.Id == serviceId && o.Status == "Accepted");
+				return acceptedOffer;
             }
             return null;
         }
@@ -158,7 +138,7 @@ namespace ServicesApp.Repository
             var serviceDetails = _context.Requests
                 .Include(r => r.Subcategory)
                 .Include(r => r.Customer)
-                 .Include(r => r.Offers)
+                .Include(r => r.Offers)
                 .Include(r => r.TimeSlots)
                 .Select(r => new ServiceDetailsDto
                 {
@@ -209,5 +189,51 @@ namespace ServicesApp.Repository
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;
 		}
+
+		public ICollection<GetServiceRequestDto> ServiceDetailsForCustomer(string CustomerId)
+		{
+			Console.WriteLine("testt");
+			Console.WriteLine(AcceptedOffer(11).Id);
+			var requests = _context.Requests
+				.Include(o => o.Customer)
+				.Include(o => o.Offers)
+				.ThenInclude(offer => offer.Provider)
+				.Where(p => p.Customer.Id == CustomerId)
+				.Select(o => new GetServiceRequestDto
+				{
+					Id = o.Id,
+					Location = o.Location,
+					Description = o.Description,
+					Status = o.Status,
+					Image = o.Image,
+					ProviderName = o.Offers.FirstOrDefault().Provider.FName + " " + o.Offers.FirstOrDefault().Provider.LName,
+					ProviderMobileNumber = o.Offers.FirstOrDefault().Provider.MobileNumber ?? " "
+				})
+				.ToList();
+
+			Console.WriteLine(requests[0].Id);
+			return requests;
+		}
+
+		//public ICollection<ServiceRequest> GetServicesWithFees()
+		//{
+		//    return _context.Requests.Where(p => p.MaxFees != 0).ToList();
+		//}
+
+		//public ICollection<ServiceRequest> GetServicesWithFees(string customerId)
+		//{
+		//	return _context.Requests.Where(p => p.Customer.Id == customerId && p.MaxFees != 0).ToList();
+		//}
+
+		//public bool UpdateMaxFees(int serviceId, int maxFees)
+		//{
+		//	var service = _context.Requests.Where(s => s.Id == serviceId).FirstOrDefault();
+		//	if (service != null)
+		//	{
+		//		service.MaxFees = maxFees;
+		//		return Save();
+		//	}
+		//	return false;
+		//}
 	}
 }

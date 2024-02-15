@@ -21,6 +21,7 @@ namespace ServicesApp.Interfaces
 		bool CompleteService(int id);
 		ICollection<ServiceDetailsDto> GetAllServicesDetails();
 		bool UpdateUnknownSubcategory(int serviceId, string subcategoryName);
+		ICollection<GetServiceRequestDto> ServiceDetailsForCustomer(string CustomerId);
 		//bool CheckServiceMinFees(ServiceRequest service, int categoryId);
 		//bool UpdateMaxFees(int serviceId, int maxFees);
 		//ICollection<ServiceRequest> GetServicesWithFees();

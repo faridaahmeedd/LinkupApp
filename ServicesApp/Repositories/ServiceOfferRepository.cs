@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using ServicesApp.Data;
+using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 
@@ -55,7 +57,7 @@ namespace ServicesApp.Repository
 			{
 				existingOffer.Status = "Accepted";
                 var service = _context.Requests.Find(existingOffer.Request.Id);
-				service.Status = "Offered";
+				service.Status = "Pending";
                 _context.SaveChanges();
 				return true;
 			}
@@ -157,5 +159,24 @@ namespace ServicesApp.Repository
 			}
             return false;
         }
-    }
+
+		public ICollection<GetServiceOfferDto> ServiceDetailsForProvider(string ProviderId)
+		{
+			var offers = _context.Offers
+				.Include(o => o.Request.Customer)
+				.Where(p => p.Provider.Id == ProviderId)
+				.Select(o => new GetServiceOfferDto
+				{
+					Id = o.Id,
+					Duration = o.Duration.ToString("HH:mm"),
+					Fees = o.Fees,
+					TimeSlotId = o.TimeSlotId,
+					Status = o.Status,
+					CustomerName = o.Request.Customer.FName + " " + o.Request.Customer.LName,
+					CustomerMobileNumber = o.Request.Customer.MobileNumber
+				})
+				.ToList();
+			return offers;
+		}
+	}
 }

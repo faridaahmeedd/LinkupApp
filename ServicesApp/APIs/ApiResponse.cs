@@ -130,7 +130,7 @@
         public static readonly object AlreadyOffered = new
         {
             statusMsg = "fail",
-            message = "You are Already Offered this Service."
+            message = "You have already offered on this request."
         };
         public static readonly object InvalidPass = new
         {

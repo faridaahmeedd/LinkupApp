@@ -61,8 +61,8 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.OfferNotFound);
 				}
-				var Service = _mapper.Map<ServiceOfferDto>(_offerRepository.GetOffer(OfferId));
-				return Ok(Service);
+				var offer = _mapper.Map<ServiceOfferDto>(_offerRepository.GetOffer(OfferId));
+				return Ok(offer);
 			}
 			catch
 			{
@@ -213,8 +213,8 @@ namespace ServicesApp.Controllers
 		}
 
 
-        [HttpGet("ProviderOffers/{providerId}")]
-        public IActionResult GetOffersOfProvider(string providerId)
+        [HttpGet("ProviderOffers/{ProviderId}")]
+        public IActionResult GetOffersOfProvider(string ProviderId)
         {
 			try
 			{
@@ -222,11 +222,11 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				if (!_providerRepository.ProviderExist(providerId))
+				if (!_providerRepository.ProviderExist(ProviderId))
 				{
 					return NotFound(ApiResponse.UserNotFound);
 				}
-				var Offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(providerId));
+				var Offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
 				return Ok(Offers);
 			}
 			catch
@@ -236,8 +236,8 @@ namespace ServicesApp.Controllers
         }
 
 
-        [HttpGet("ProviderCanOffer/{providerId}/{requestId}")]
-        public IActionResult ProviderCanOffer(string providerId, int requestId)
+        [HttpGet("ProviderCanOffer/{ProviderId}/{RequestId}")]
+        public IActionResult ProviderCanOffer(string ProviderId, int RequestId)
         {
 			try
 			{
@@ -245,15 +245,15 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				if (!_providerRepository.ProviderExist(providerId))
+				if (!_providerRepository.ProviderExist(ProviderId))
 				{
 					return NotFound(ApiResponse.UserNotFound);
 				}
-				if (!_requestRepository.ServiceExist(requestId))
+				if (!_requestRepository.ServiceExist(RequestId))
 				{
 					return NotFound(ApiResponse.RequestNotFound);
 				}
-				if (_offerRepository.ProviderAlreadyOffered(providerId, requestId))
+				if (_offerRepository.ProviderAlreadyOffered(ProviderId, RequestId))
 				{
 					return BadRequest(ApiResponse.AlreadyOffered);
 				}
@@ -289,5 +289,27 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-    }
+
+		[HttpGet("ForProvider/{ProviderId}")]
+		public IActionResult OffersDetailsForProvider(string ProviderId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var offer = _offerRepository.ServiceDetailsForProvider(ProviderId);
+				return Ok(offer);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+	}
 }

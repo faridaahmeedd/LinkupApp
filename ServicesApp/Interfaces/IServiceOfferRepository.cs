@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
@@ -17,6 +18,7 @@ namespace ServicesApp.Interfaces
 		ICollection<ServiceOffer> GetOfffersOfProvider(string providerId);
 		bool ProviderAlreadyOffered(string providerId, int requestId);
 		bool CheckFeesRange(ServiceOffer serviceOffer);
+		ICollection<GetServiceOfferDto> ServiceDetailsForProvider(string ProviderId);
 		bool Save();
 	}
 }

@@ -79,7 +79,7 @@ namespace ServicesApp.Repository
         public bool UpdateOffer(ServiceOffer updatedOffer)
 		{
 			var existingOffer = _context.Offers.Find(updatedOffer.Id);
-			if (existingOffer != null )
+			if (existingOffer != null)
 			{
 				if(existingOffer.Status != "Accepted")
 				{

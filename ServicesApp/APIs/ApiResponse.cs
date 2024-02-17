@@ -155,7 +155,7 @@
         public static readonly object FeesOutsideRange = new
         {
             statusMsg = "fail",
-            message = "Offered fees is outside the specified range."
+            message = "Offered fees is outside the category's specified range."
         };
 		public static readonly object NotAuthorized = new
 		{

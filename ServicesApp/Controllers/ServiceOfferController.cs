@@ -116,7 +116,6 @@ namespace ServicesApp.Controllers
                 {
                     return BadRequest(ApiResponse.FeesOutsideRange);
                 }
-
                 _offerRepository.CreateOffer(offerMap);
 				return Ok(new
 				{
@@ -151,7 +150,11 @@ namespace ServicesApp.Controllers
 				}
 				var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 				offerMap.Id = OfferId;
-
+				offerMap.Request = _offerRepository.GetOffer(OfferId).Request;
+				if (!_offerRepository.CheckFeesRange(offerMap))
+				{
+					return BadRequest(ApiResponse.FeesOutsideRange);
+				}
 				if (!_offerRepository.UpdateOffer(offerMap))
 				{
 					return BadRequest(ApiResponse.FailedToUpdate);

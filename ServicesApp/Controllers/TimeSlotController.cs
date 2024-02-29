@@ -2,9 +2,8 @@
 using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 using ServicesApp.Interfaces;
+using ServicesApp.APIs;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -15,130 +14,145 @@ namespace ServicesApp.Controllers
 		private readonly IServiceRequestRepository _requestRepository;
 		private readonly IMapper _mapper;
 
-        public TimeSlotController(ITimeSlotsRepository timeSlotRepository , IServiceRequestRepository requestRepository, IMapper mapper)
+		public TimeSlotController(ITimeSlotsRepository timeSlotRepository , IServiceRequestRepository requestRepository, IMapper mapper)
         {
             _timeSlotRepository = timeSlotRepository;
 			_requestRepository = requestRepository;
-            _mapper = mapper;
-        }
+			_mapper = mapper;
+		}
 
 		[HttpGet("{TimeSlotId}")]
-		[ProducesResponseType(200, Type = typeof(TimeSlotDto))]
 		public IActionResult GetTimeSlot(int TimeSlotId)
 		{
-			if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
+			try
 			{
-				return NotFound();
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
+				{
+					return NotFound(ApiResponse.TimeSlotNotFound);
+				}
+				var TimeSlot = _mapper.Map<TimeSlotDto>(_timeSlotRepository.GetTimeSlot(TimeSlotId));
+				return Ok(TimeSlot);
 			}
-			var TimeSlot = _mapper.Map<TimeSlotDto>(_timeSlotRepository.GetTimeSlot(TimeSlotId));
-			if (!ModelState.IsValid)
+			catch
 			{
-				return BadRequest(ModelState);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(TimeSlot);
 		}
 
 
 		[HttpGet("service/{ServiceId}")]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<TimeSlotDto>))]
 		public IActionResult GetTimeSlotsOfService(int ServiceId)
 		{
-			if (!_requestRepository.ServiceExist(ServiceId))
+			try
 			{
-				return NotFound();
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_requestRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponse.RequestNotFound);
+				}
+				var TimeSlot = _mapper.Map<List<TimeSlotDto>>(_timeSlotRepository.GetTimeSlotsOfService(ServiceId));
+				return Ok(TimeSlot);
 			}
-			var TimeSlot = _mapper.Map<List<TimeSlotDto>>(_timeSlotRepository.GetTimeSlotsOfService(ServiceId));
-			if (!ModelState.IsValid)
+			catch
 			{
-				return BadRequest(ModelState);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(TimeSlot);
 		}
 
-		[HttpPost]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		public IActionResult AddTimeSlot([FromQuery] int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
+		[HttpPost("{ServiceId}")]
+		public IActionResult AddTimeSlots(int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
-			if (timeSlots == null)
+			try
 			{
-				return BadRequest(ModelState);
+				if (!ModelState.IsValid || timeSlots == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (timeSlots.Count > 3)
+				{
+					return BadRequest(ApiResponse.TimeSlotsExceededMax);
+				}
+				if (!_requestRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponse.RequestNotFound);
+				}
+				List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
+				foreach (var item in timeSlots)
+				{
+					var mapItem = _mapper.Map<TimeSlot>(item);
+					mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
+					mapTimeSlots.Add(mapItem);
+				}
+				_timeSlotRepository.AddTimeSlots(mapTimeSlots);
+				return Ok(ApiResponse.SuccessCreated);
 			}
-
-			if (!ModelState.IsValid)
+			catch
 			{
-				return BadRequest(ModelState);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			if (!_requestRepository.ServiceExist(ServiceId))
-			{
-				ModelState.AddModelError("", "Service doesn't exist");
-				return StatusCode(422, ModelState);
-			}
-			List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
-			foreach (var item in timeSlots)
-			{
-				var mapItem = _mapper.Map<TimeSlot>(item);
-				mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
-				mapTimeSlots.Add(mapItem);
-			}
-			if (!_timeSlotRepository.AddTimeSlot(mapTimeSlots))
-			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
-			}
-			return Created();
 		}
 
-
-		[HttpDelete("{TimeSlotId}")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult DeleteTimeSlot(int TimeSlotId)
+		[HttpPut("{ServiceId}")]
+		public IActionResult UpdateTimeSlots(int ServiceId, [FromBody] ICollection<TimeSlotDto> timeSlots)
 		{
-			if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
+			try
 			{
-				return NotFound();
+				if (!ModelState.IsValid || timeSlots == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (timeSlots.Count > 3)
+				{
+					return BadRequest(ApiResponse.TimeSlotsExceededMax);
+				}
+				if (!_requestRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponse.RequestNotFound);
+				}
+				List<TimeSlot> mapTimeSlots = new List<TimeSlot>();
+				foreach (var item in timeSlots)
+				{
+					var mapItem = _mapper.Map<TimeSlot>(item);
+					mapItem.ServiceRequest = _requestRepository.GetService(ServiceId);
+					mapTimeSlots.Add(mapItem);
+				}
+				_timeSlotRepository.UpdateTimeSlots(mapTimeSlots, ServiceId);
+				return Ok(ApiResponse.SuccessUpdated);
 			}
-			if (!ModelState.IsValid)
+			catch
 			{
-				return BadRequest(ModelState);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-
-			if (!_timeSlotRepository.DeleteTimeSlot(TimeSlotId))
-			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
-			}
-			return Ok("Successfully deleted");
 		}
 
 
-
-		//[HttpPut("update")]
+		//[HttpDelete("{TimeSlotId}")]
 		//[ProducesResponseType(204)]
 		//[ProducesResponseType(400)]
 		//[ProducesResponseType(404)]
-		//public IActionResult UpdateTimeSlot([FromBody] TimeSlotDto updatedTimeSlotDto , [FromQuery] int TimeSlotId)
+		//public IActionResult DeleteTimeSlot(int TimeSlotId)
 		//{
-		//    if (updatedTimeSlotDto == null)
-		//    {
-		//        return BadRequest("Invalid data");
-		//    }
+		//	if (!_timeSlotRepository.TimeSlotExist(TimeSlotId))
+		//	{
+		//		return NotFound(ApiResponse.TimeSlotNotFound);
+		//	}
+		//	if (!ModelState.IsValid)
+		//	{
+		//		return BadRequest(ApiResponse.NotValid);
+		//	}
 
-		//    // Assuming you have a mapper to map DTO to the entity
-		//    var updatedTimeSlot = _mapper.Map<TimeSlot>(updatedTimeSlotDto);
-		//    updatedTimeSlot.id = TimeSlotId; 
-		//    var success = _timeSlotRepository.UpdateTimeSlot(updatedTimeSlot);
-
-		//    if (success)
-		//    {
-		//        return NoContent(); // 204 - Success with no content
-		//    }
-		//    else
-		//    {
-		//        return NotFound(); // 404 - Not Found
-		//    }
+		//	if (!_timeSlotRepository.DeleteTimeSlot(TimeSlotId))
+		//	{
+		//		return StatusCode(500, ApiResponse.SomethingWrong);
+		//	}
+		//	return Ok(ApiResponse.SuccessDeleted);
 		//}
 	}
 }

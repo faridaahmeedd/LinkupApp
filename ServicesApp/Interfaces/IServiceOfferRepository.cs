@@ -1,18 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ServicesApp.Dto.Service;
 using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
 {
 	public interface IServiceOfferRepository
 	{
-		public ICollection<ServiceOffer> GetOffers();
-		public ServiceOffer GetOffer(int id);
-		public bool OfferExist(int id);
-		public bool CreateOffer(ServiceOffer offer);
-		public bool UpdateOffer(ServiceOffer updatedOffer);
-		public bool DeleteOffer(int id);
-		public bool AcceptOffer(int id);
-
-		public bool Save();
+		ICollection<ServiceOffer> GetOffers();
+		ServiceOffer GetOffer(int id);
+		bool OfferExist(int id);
+		bool CreateOffer(ServiceOffer offer);
+		bool UpdateOffer(ServiceOffer updatedOffer);
+		bool DeleteOffer(int id);
+		bool AcceptOffer(int id);
+		bool DeclineOffer(int offerId);
+		ICollection<ServiceOffer> GetUnCompletedOffers(string providerId);
+		ICollection<ServiceOffer> GetOfffersOfProvider(string providerId);
+		bool ProviderAlreadyOffered(string providerId, int requestId);
+		bool CheckFeesRange(ServiceOffer serviceOffer);
+		ICollection<GetServiceOfferDto> ServiceDetailsForProvider(string ProviderId);
+		bool Save();
 	}
 }

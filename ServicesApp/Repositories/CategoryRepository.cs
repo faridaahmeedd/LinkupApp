@@ -25,14 +25,20 @@ namespace ServicesApp.Repository
 
 		public Category GetCategory(string name)
 		{
-			return _context.Categories.Where(p => p.Name == name).FirstOrDefault();
+			return _context.Categories.Where(p => p.Name.Trim().ToUpper() == name.ToUpper()).FirstOrDefault();
 		}
+
 		public bool CategoryExist(int id)
 		{
 			return _context.Categories.Any(p => p.Id == id);
 		}
 
-		public bool CreateCategory(Category category)
+        public bool CategoryExist(string name)
+        {
+            return _context.Categories.Any(p => p.Name == name);
+        }
+
+        public bool CreateCategory(Category category)
 		{
 			// Change Tracker (add,update,modify)
 			_context.Add(category);
@@ -48,10 +54,10 @@ namespace ServicesApp.Repository
 
 		public bool DeleteCategory(int id)
 		{
-			var category = _context.Categories.Where(p => p.Id == id).FirstOrDefault();
-			_context.Remove(category!);
+            var category = _context.Categories.Where(p => p.Id == id).FirstOrDefault();
+            _context.Remove(category);
 			return Save();
-		}
+        }
 
 		public bool Save()
 		{

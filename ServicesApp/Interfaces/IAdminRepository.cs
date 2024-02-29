@@ -1,13 +1,12 @@
-﻿using ServicesApp.Core.Models;
-using ServicesApp.Models;
+﻿using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
 {
 	public interface IAdminRepository
 	{
-		ICollection<Admin> GetAdmins();
-		Admin GetAdmin(string id);
-		// Admin GetAdmin(string email, string password);
-		bool AdminExist(string id);
+		Task<bool> AdminExist(string id);
+		Task<AppUser> GetAdmin(string id);
+		Task<ICollection<AppUser>> GetAdmins();
+		Task<bool> DeleteAdmin(string id);
 	}
 }

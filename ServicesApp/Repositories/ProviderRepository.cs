@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -35,14 +36,8 @@ namespace ServicesApp.Repository
 			return _context.Offers.Where(p => p.Provider.Id == id).ToList();
 		}
 
-		public bool CreateProvider(Provider Provider)
-		{
-			// Change Tracker (add,update,modify)
-			_context.Add(Provider);
-			return Save();
-		}
 
-		public async Task<IdentityResult> UpdateProvider(Provider ProviderUpdate)
+		public async Task<bool> UpdateProvider(Provider ProviderUpdate)
 		{
 			var existingProvider = await _userManager.FindByIdAsync(ProviderUpdate.Id);
 			existingProvider.FName = ProviderUpdate.FName;
@@ -55,23 +50,40 @@ namespace ServicesApp.Repository
 			existingProvider.JobTitle = ProviderUpdate.JobTitle;
 			existingProvider.Description = ProviderUpdate.Description;
 			existingProvider.MobileNumber = ProviderUpdate.MobileNumber;
-
-            var result = await _userManager.UpdateAsync(existingProvider);
-			return result;
+			existingProvider.Image	= ProviderUpdate.Image;
+			var result = await _userManager.UpdateAsync(existingProvider);
+			return result.Succeeded;
 		}
 
-		public async Task<IdentityResult> DeleteProvider(string id)
-		{
-			var Provider = await _userManager.FindByIdAsync(id);
-			var result = await _userManager.DeleteAsync(Provider);
-			return result;
-		}
-
-		public bool Save()
+        public async Task<bool> DeleteProvider(string id)
+        {
+            var provider = await _userManager.FindByIdAsync(id);
+            // Delete unaccepted offers
+            var offers = _context.Offers.Include(o => o.Provider).Where(o => o.Provider.Id == id && o.Status != "Accepted").ToList();
+            if (offers != null)
+            {
+                _context.RemoveRange(offers);
+                _context.SaveChanges();
+            }
+            var result = await _userManager.DeleteAsync(provider);
+            return result.Succeeded;
+        }
+		
+        public bool Save()
 		{
 			//sql code is generated here
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;
 		}
-	}
+
+        public bool CheckProviderBalance(string id)
+        {
+            var existingProvider = _context.Providers.Where(p => p.Id == id).FirstOrDefault();
+            if (existingProvider.Balance > 0)
+            {
+                return false;
+            }
+            return true;
+        }
+    }
 }

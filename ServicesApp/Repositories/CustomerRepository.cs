@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
@@ -31,19 +32,7 @@ namespace ServicesApp.Repository
 			return _context.Customers.OrderBy(p => p.Id).ToList();
 		}
 
-		public ICollection<ServiceRequest> GetServicesByCustomer(string id)
-		{
-			return _context.Requests.Where(p => p.Customer.Id == id).ToList();
-		}
-
-		public bool CreateCustomer(Customer customer)
-		{
-			// Change Tracker (add,update,modify)
-			_context.Add(customer);
-			return Save();
-		}
-
-		public async Task<IdentityResult> UpdateCustomer(Customer customerUpdate)
+		public async Task<bool> UpdateCustomer(Customer customerUpdate)
 		{
 			var existingCustomer = await _userManager.FindByIdAsync(customerUpdate.Id);
 			existingCustomer.FName = customerUpdate.FName;
@@ -56,15 +45,33 @@ namespace ServicesApp.Repository
 			existingCustomer.Disability = customerUpdate.Disability;
 			existingCustomer.EmergencyContact = customerUpdate.EmergencyContact;
 			existingCustomer.MobileNumber = customerUpdate.MobileNumber;
+			existingCustomer.Image = customerUpdate.Image;
 			var result = await _userManager.UpdateAsync(existingCustomer);
-			return result;
+			return result.Succeeded;
 		}
 
-		public async Task<IdentityResult> DeleteCustomer(string id)
+        public async Task<bool> DeleteCustomer(string id)
+        {
+            var customer = await _userManager.FindByIdAsync(id);
+            // Delete requests where status = Requested
+            var requests = _context.Requests.Include(r => r.Customer).Where(r => r.Customer.Id == id && r.Status == "Requested").ToList();
+            if (requests != null)
+            {
+                _context.RemoveRange(requests);
+                _context.SaveChanges();
+            }
+            var result = await _userManager.DeleteAsync(customer);
+            return result.Succeeded;
+        }
+
+		public bool CheckCustomerBalance(string id)
 		{
-			var customer = await _userManager.FindByIdAsync(id);
-			var result = await _userManager.DeleteAsync(customer);
-			return result;
+			var existingCustomer = _context.Customers.Where(p => p.Id == id).FirstOrDefault();
+			if(existingCustomer.Balance >0)
+			{
+				return false;
+			}
+            return true;
 		}
 
 		public bool Save()

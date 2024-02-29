@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Interfaces;
-using ServicesApp.Models;
+using System.Web.Helpers;
+using ServicesApp.APIs;
 
 namespace ServicesApp.Controllers
 {
@@ -10,53 +11,71 @@ namespace ServicesApp.Controllers
 	{
 		private readonly IAdminRepository _adminRepository;
 
-		public AdminController(IAdminRepository adminRepository)
+		public AdminController(IAdminRepository adminRepository )
 		{
 			_adminRepository = adminRepository;
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(Admin))]
-		public IActionResult GetAdmins()
+		public async Task<IActionResult> GetAdmins()
 		{
-			var Admins = _adminRepository.GetAdmins();
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ModelState);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var Admins = await _adminRepository.GetAdmins();
+				return Ok(Admins);
 			}
-			return Ok(Admins);
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
 		[HttpGet("{AdminId}")]
-		[ProducesResponseType(200, Type = typeof(Admin))]
-		public IActionResult GetAdmin(string AdminId)
+		public async Task<IActionResult> GetAdmin(string AdminId)
 		{
-			if (!_adminRepository.AdminExist(AdminId))
+			try
 			{
-				return NotFound();
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!await _adminRepository.AdminExist(AdminId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var Admin = await _adminRepository.GetAdmin(AdminId);
+				return Ok(Admin);
 			}
-			var Admin = _adminRepository.GetAdmin(AdminId);
-			if (!ModelState.IsValid)
+			catch
 			{
-				return BadRequest(ModelState);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(Admin);
 		}
 
-		//[HttpGet("Login")]
-		//[ProducesResponseType(200, Type = typeof(Admin))]
-		//public IActionResult Login([FromQuery] string email, [FromQuery] string password)
-		//{
-		//	var Admin = _adminRepository.GetAdmin(email, password);
-		//	if (Admin == null)
-		//	{
-		//		return NotFound();
-		//	}
-		//	if (!ModelState.IsValid)
-		//	{
-		//		return BadRequest(ModelState);
-		//	}
-		//	return Ok(Admin);
-		//}
+		[HttpDelete("{AdminId}")]
+		public async Task<IActionResult> DeleteAdmin(string AdminId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!await _adminRepository.AdminExist(AdminId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				await _adminRepository.DeleteAdmin(AdminId);
+				return Ok(ApiResponse.SuccessDeleted);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
 	}
 }

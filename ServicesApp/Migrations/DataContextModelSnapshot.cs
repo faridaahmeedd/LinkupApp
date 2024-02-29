@@ -51,24 +51,31 @@ namespace ServicesApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "956cd045-b346-4359-98e8-0ff4a65590df",
+                            Id = "6e83945a-31f7-4a85-9679-e5e12895df12",
                             ConcurrencyStamp = "1",
                             Name = "Customer",
                             NormalizedName = "Customer"
                         },
                         new
                         {
-                            Id = "e9860e5d-74ac-4a3a-b383-4198b94ae385",
+                            Id = "43626702-ab6b-4481-89f0-769da1a485c2",
                             ConcurrencyStamp = "2",
                             Name = "Provider",
                             NormalizedName = "Provider"
                         },
                         new
                         {
-                            Id = "7e3d7e17-106e-40ae-8b9d-b2e6f3fa7d02",
+                            Id = "fee70a81-e665-4566-afc0-5d0c84e3f4fe",
                             ConcurrencyStamp = "3",
                             Name = "Admin",
                             NormalizedName = "Admin"
+                        },
+                        new
+                        {
+                            Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958",
+                            ConcurrencyStamp = "4",
+                            Name = "MainAdmin",
+                            NormalizedName = "MainAdmin"
                         });
                 });
 
@@ -157,6 +164,13 @@ namespace ServicesApp.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "8e445865-a24d-4543-a6c6-9443d048cdb9",
+                            RoleId = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -176,24 +190,6 @@ namespace ServicesApp.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("ServicesApp.Models.Admin", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.AppUser", b =>
@@ -255,6 +251,23 @@ namespace ServicesApp.Migrations
                     b.ToTable("AspNetUsers", (string)null);
 
                     b.UseTptMappingStrategy();
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "5d9c4dc1-9ea5-4f41-b1d6-857f9d2b420a",
+                            Email = "MainAdmin@gmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = true,
+                            NormalizedEmail = "MAINADMIN@GMAIL.COM",
+                            NormalizedUserName = "MAINADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH2WVw40/l6V8VlKWz1nIq5h3OXhBXj/fivYWTi1Srjqdb2sW0qUf/pDl9jKw0v+WQ==",
+                            SecurityStamp = "ef1ec0f1-d2a1-47df-a8f1-d7561f346db7",
+                            TwoFactorEnabled = false,
+                            UserName = "MainAdmin"
+                        });
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Category", b =>
@@ -268,9 +281,6 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MinFees")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -289,8 +299,8 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("Accepted")
-                        .HasColumnType("bit");
+                    b.Property<TimeOnly>("Duration")
+                        .HasColumnType("time");
 
                     b.Property<int>("Fees")
                         .HasColumnType("int");
@@ -300,6 +310,10 @@ namespace ServicesApp.Migrations
 
                     b.Property<int>("RequestId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TimeSlotId")
                         .HasColumnType("int");
@@ -321,9 +335,6 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CustomerId")
                         .HasColumnType("nvarchar(450)");
 
@@ -334,7 +345,47 @@ namespace ServicesApp.Migrations
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SubcategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("SubcategoryId");
+
+                    b.ToTable("Requests");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Subcategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxFees")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinFees")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -342,9 +393,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("Requests");
+                    b.ToTable("Subcategories");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.TimeSlot", b =>
@@ -381,6 +430,9 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Balance")
+                        .HasColumnType("int");
+
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
@@ -402,6 +454,9 @@ namespace ServicesApp.Migrations
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
 
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("LName")
                         .HasColumnType("nvarchar(max)");
 
@@ -417,6 +472,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Balance")
+                        .HasColumnType("int");
 
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
@@ -435,6 +493,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
@@ -503,7 +564,8 @@ namespace ServicesApp.Migrations
                 {
                     b.HasOne("ServicesApp.Models.Provider", "Provider")
                         .WithMany("Offers")
-                        .HasForeignKey("ProviderId");
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Offers")
@@ -518,19 +580,30 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
                 {
+                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
+                        .WithMany("Services")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ServicesApp.Models.Subcategory", "Subcategory")
+                        .WithMany("Services")
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Subcategory");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Subcategory", b =>
+                {
                     b.HasOne("ServicesApp.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Subcategories")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
-                        .WithMany("Services")
-                        .HasForeignKey("CustomerId");
-
                     b.Navigation("Category");
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.TimeSlot", b =>
@@ -562,11 +635,21 @@ namespace ServicesApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ServicesApp.Models.Category", b =>
+                {
+                    b.Navigation("Subcategories");
+                });
+
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
                 {
                     b.Navigation("Offers");
 
                     b.Navigation("TimeSlots");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Subcategory", b =>
+                {
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("ServicesApp.Core.Models.Customer", b =>

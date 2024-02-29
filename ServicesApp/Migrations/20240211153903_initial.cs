@@ -8,24 +8,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Admins",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Admins", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -70,8 +57,7 @@ namespace ServicesApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MinFees = table.Column<int>(type: "int", nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -198,7 +184,9 @@ namespace ServicesApp.Migrations
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Disability = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmergencyContact = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    EmergencyContact = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Balance = table.Column<int>(type: "int", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -225,7 +213,9 @@ namespace ServicesApp.Migrations
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Balance = table.Column<int>(type: "int", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -239,6 +229,29 @@ namespace ServicesApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Subcategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MinFees = table.Column<int>(type: "int", nullable: false),
+                    MaxFees = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subcategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subcategories_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Requests",
                 columns: table => new
                 {
@@ -246,24 +259,26 @@ namespace ServicesApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SubcategoryId = table.Column<int>(type: "int", nullable: true),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Requests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Requests_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Requests_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Requests_Subcategories_SubcategoryId",
+                        column: x => x.SubcategoryId,
+                        principalTable: "Subcategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -273,9 +288,10 @@ namespace ServicesApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fees = table.Column<int>(type: "int", nullable: false),
-                    Accepted = table.Column<bool>(type: "bit", nullable: false),
                     TimeSlotId = table.Column<int>(type: "int", nullable: false),
+                    Duration = table.Column<TimeOnly>(type: "time", nullable: false),
                     ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RequestId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -285,7 +301,8 @@ namespace ServicesApp.Migrations
                         name: "FK_Offers_Provider_ProviderId",
                         column: x => x.ProviderId,
                         principalTable: "Provider",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Offers_Requests_RequestId",
                         column: x => x.RequestId,
@@ -321,10 +338,21 @@ namespace ServicesApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "144cfe0a-d056-4844-99b3-0cd5de43ec7e", "1", "Customer", "Customer" },
-                    { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "2", "Provider", "Provider" },
-                    { "831f1147-aa54-4038-ac59-aafc37bbb7f2", "3", "Admin", "Admin" }
+                    { "43626702-ab6b-4481-89f0-769da1a485c2", "2", "Provider", "Provider" },
+                    { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "4", "MainAdmin", "MainAdmin" },
+                    { "6e83945a-31f7-4a85-9679-e5e12895df12", "1", "Customer", "Customer" },
+                    { "fee70a81-e665-4566-afc0-5d0c84e3f4fe", "3", "Admin", "Admin" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "5d9c4dc1-9ea5-4f41-b1d6-857f9d2b420a", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEH2WVw40/l6V8VlKWz1nIq5h3OXhBXj/fivYWTi1Srjqdb2sW0qUf/pDl9jKw0v+WQ==", "ef1ec0f1-d2a1-47df-a8f1-d7561f346db7", false, "MainAdmin" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[] { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "8e445865-a24d-4543-a6c6-9443d048cdb9" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -376,14 +404,19 @@ namespace ServicesApp.Migrations
                 column: "RequestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Requests_CategoryId",
-                table: "Requests",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Requests_CustomerId",
                 table: "Requests",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Requests_SubcategoryId",
+                table: "Requests",
+                column: "SubcategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subcategories_CategoryId",
+                table: "Subcategories",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TimeSlots_ServiceRequestId",
@@ -394,9 +427,6 @@ namespace ServicesApp.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Admins");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -428,13 +458,16 @@ namespace ServicesApp.Migrations
                 name: "Requests");
 
             migrationBuilder.DropTable(
-                name: "Categories");
-
-            migrationBuilder.DropTable(
                 name: "Customer");
 
             migrationBuilder.DropTable(
+                name: "Subcategories");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
         }
     }
 }

@@ -1,16 +1,18 @@
-﻿using ServicesApp.Models;
+﻿using ServicesApp.Dto.Service;
+using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
 {
     public interface ITimeSlotsRepository
     {
-		//ICollection<TimeSlot> GetTimeSlotsOfService();
 		bool TimeSlotExist(int id);
 		TimeSlot GetTimeSlot(int id);
 		ICollection<TimeSlot> GetTimeSlotsOfService(int ServiceId);
-		bool AddTimeSlot(List<TimeSlot> timeSlots);
-		//bool UpdateTimeSlot(TimeSlot timeSlot);
+		bool AddTimeSlots(List<TimeSlot> timeSlots);
+		bool UpdateTimeSlots(List<TimeSlot> newTimeSlots, int serviceId);
+		bool UpdateToTime(int OfferId);
 		bool DeleteTimeSlot(int id);
 		bool Save();
+		bool CheckConflict(ServiceOffer offer);
 	}
 }

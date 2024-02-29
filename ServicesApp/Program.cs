@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,11 +22,12 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
 builder.Services.AddScoped<IServiceRequestRepository, ServiceRequestRepository>();
 builder.Services.AddScoped<IServiceOfferRepository, ServiceOfferRepository>();
 builder.Services.AddScoped<ITimeSlotsRepository , TimeSlotRepositry>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
-builder.Services.AddScoped<AuthRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,10 +35,14 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(
 	builder.Configuration.GetConnectionString("DefaultConnection")
 ));
 
-builder.Services.AddIdentity<AppUser, IdentityRole>(options =>{
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
 	options.User.RequireUniqueEmail = true;
 	options.User.AllowedUserNameCharacters = null;
-}).AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
+})
+.AddEntityFrameworkStores<DataContext>()
+.AddDefaultTokenProviders();
+
 
 builder.Services.AddIdentityCore<Customer>()
 	.AddRoles<IdentityRole>()
@@ -67,6 +73,14 @@ builder.Services.AddAuthentication(options =>{
 		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
 	};
 });
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder => {
+        builder.AllowAnyOrigin();
+        builder.AllowAnyMethod();
+        builder.AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -77,6 +91,10 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
+
+app.UseStaticFiles();
+app.UseRouting();
+app.UseCors();
 
 app.UseHttpsRedirection();
 

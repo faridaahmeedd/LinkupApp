@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Repository;
+using ServicesApp.APIs;
 
 namespace ServicesApp.Controllers
 {
@@ -15,166 +14,305 @@ namespace ServicesApp.Controllers
 		private readonly IServiceOfferRepository _offerRepository;
 		private readonly IServiceRequestRepository _requestRepository;
 		private readonly IProviderRepository _providerRepository;
+		private readonly ITimeSlotsRepository _timeSlotsRepository;
 		private readonly IMapper _mapper;
 
 		public ServiceOfferController(IServiceRequestRepository RequestRepository, 
 			IServiceOfferRepository OfferRepository,
 			IProviderRepository ProviderRepository,
+			ITimeSlotsRepository TimeSlotsRepository,
 			IMapper mapper)
 		{
 			_offerRepository = OfferRepository;
 			_requestRepository = RequestRepository;
 			_providerRepository = ProviderRepository;
+			_timeSlotsRepository = TimeSlotsRepository;
 			_mapper = mapper;
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200, Type = typeof(IEnumerable<ServiceOfferDto>))]
 		public IActionResult GetOffers()
 		{
-			var offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOffers());
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ModelState);
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				var offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOffers());
+				return Ok(offers);
 			}
-			return Ok(offers);
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
 		}
 
-		[HttpGet("{ServiceId}")]
-		[ProducesResponseType(200, Type = typeof(ServiceOfferDto))]
+		[HttpGet("{OfferId}")]
 		public IActionResult GetOffer(int OfferId)
 		{
-			if (!_offerRepository.OfferExist(OfferId))
+			try
 			{
-				return NotFound();
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_offerRepository.OfferExist(OfferId))
+				{
+					return NotFound(ApiResponse.OfferNotFound);
+				}
+				var offer = _mapper.Map<ServiceOfferDto>(_offerRepository.GetOffer(OfferId));
+				return Ok(offer);
 			}
-			var Service = _mapper.Map<ServiceOfferDto>(_offerRepository.GetOffer(OfferId));
-			if (!ModelState.IsValid)
+			catch
 			{
-				return BadRequest(ModelState);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Ok(Service);
 		}
 
-		[HttpPost]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		public IActionResult CreateOffer([FromBody] ServiceOfferDto serviceOfferDto)
+		[HttpPost("{ProviderId}/{RequestId}")]
+		public IActionResult CreateOffer(string ProviderId, int RequestId, [FromBody] ServiceOfferDto serviceOfferDto)
 		{
-			if (serviceOfferDto == null)
+			try
 			{
-				return BadRequest(ModelState);
-			}
+				if (!ModelState.IsValid || serviceOfferDto == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				if (!_requestRepository.ServiceExist(RequestId))
+				{
+					return NotFound(ApiResponse.RequestNotFound);
+				}
+				if (!_requestRepository.TimeSlotsExistInService(RequestId, serviceOfferDto.TimeSlotId))
+				{
+					return NotFound(ApiResponse.TimeSlotNotFound);
+				}
 
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-			if (!_providerRepository.ProviderExist(serviceOfferDto.ProviderId))
-			{
-				ModelState.AddModelError("", "Provider doesn't exist");
-				return StatusCode(422, ModelState);
-			}
-			if (!_requestRepository.ServiceExist(serviceOfferDto.RequestId))
-			{
-				ModelState.AddModelError("", "Service request doesn't exist");
-				return StatusCode(422, ModelState);
-			}
+				var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
+				offerMap.Provider = _providerRepository.GetProvider(ProviderId);
+				offerMap.Request = _requestRepository.GetService(RequestId);
 
-			if (!_requestRepository.TimeSlotsExistInService(serviceOfferDto.RequestId, serviceOfferDto.TimeSlotId))
-			{
-				ModelState.AddModelError("", "Time slot is not available for this request");
-				return StatusCode(422, ModelState);
+				if (_timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId) == null)
+				{
+					return NotFound(ApiResponse.TimeSlotNotFound);
+				}
+				if (_offerRepository.ProviderAlreadyOffered(ProviderId, RequestId)) 
+				{
+					return BadRequest(ApiResponse.AlreadyOffered);
+				}
+				if (!_timeSlotsRepository.CheckConflict(offerMap))
+				{
+					return StatusCode(500, ApiResponse.TimeSlotConflict);
+				}
+				if (!_providerRepository.CheckProviderBalance(ProviderId))  
+				{
+					return BadRequest(ApiResponse.PayFine);
+				}
+                if (!_offerRepository.CheckFeesRange(offerMap))
+                {
+                    return BadRequest(ApiResponse.FeesOutsideRange);
+                }
+                _offerRepository.CreateOffer(offerMap);
+				return Ok(new
+				{
+					statusMsg = "success",
+					message = "Offer Created Successfully.",
+					OfferId = offerMap.Id
+				});
 			}
-
-			var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
-
-			offerMap.Provider = _providerRepository.GetProvider(serviceOfferDto.ProviderId);
-			offerMap.Request = _requestRepository.GetService(serviceOfferDto.RequestId);
-
-			if (!_offerRepository.CreateOffer(offerMap))
+			catch
 			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			return Created($"/api/Service/{offerMap.Id}", offerMap);
 		}
 
-		[HttpPut()]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult UpdateOffer([FromQuery] int OfferId, [FromBody] ServiceOfferDto serviceOfferDto)
+		[HttpPut("{OfferId}")]
+		public IActionResult UpdateOffer(int OfferId, [FromBody] ServiceOfferDto serviceOfferDto)
 		{
-			if (serviceOfferDto == null)
+			try
 			{
-				return BadRequest(ModelState);
+				if (!ModelState.IsValid || serviceOfferDto == null)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_offerRepository.OfferExist(OfferId))
+				{
+					return NotFound(ApiResponse.OfferNotFound);
+				}
+				var offer = _offerRepository.GetOffer(OfferId);
+				if (!_requestRepository.TimeSlotsExistInService(offer.Request.Id, serviceOfferDto.TimeSlotId))
+				{
+					return NotFound(ApiResponse.TimeSlotNotFound);
+				}
+				var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
+				offerMap.Id = OfferId;
+				offerMap.Request = _offerRepository.GetOffer(OfferId).Request;
+				if (!_offerRepository.CheckFeesRange(offerMap))
+				{
+					return BadRequest(ApiResponse.FeesOutsideRange);
+				}
+				if (!_offerRepository.UpdateOffer(offerMap))
+				{
+					return BadRequest(ApiResponse.FailedToUpdate);
+				}
+				return Ok(ApiResponse.SuccessUpdated);
 			}
-			if (!_offerRepository.OfferExist(OfferId))
+			catch
 			{
-				return NotFound();
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-			var serviceMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
-			serviceMap.Id = OfferId;
-
-			if (!_offerRepository.UpdateOffer(serviceMap))
-			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
-			}
-			return Ok("Successfully updated");
 		}
 
-		[HttpPut("Accept")]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(400)]
-		[ProducesResponseType(404)]
-		public IActionResult AcceptOffer([FromQuery] int OfferId)
+		[HttpPut("Accept/{OfferId}")]
+		public IActionResult AcceptOffer(int OfferId)
 		{
-		
-			if (!_offerRepository.OfferExist(OfferId))
+			try
 			{
-				return NotFound();
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_offerRepository.OfferExist(OfferId))
+				{
+					return NotFound(ApiResponse.OfferNotFound);
+				}
+				if(!_offerRepository.AcceptOffer(OfferId))
+				{
+					return StatusCode(500, ApiResponse.FailedToUpdate);
+				}
+				_timeSlotsRepository.UpdateToTime(OfferId);
+				return Ok(ApiResponse.OfferAccepted);
 			}
-			if (!ModelState.IsValid)
+			catch
 			{
-				return BadRequest(ModelState);
+				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
-			if (!_offerRepository.AcceptOffer(OfferId))
-			{
-				ModelState.AddModelError("", "Something went wrong.");
-				return StatusCode(500, ModelState);
-			}
-			return Ok("Offer Accepted");
 		}
-      
 
-        // change status pending
-        //[HttpDelete()]
-        //[ProducesResponseType(204)]
-        //[ProducesResponseType(400)]
-        //[ProducesResponseType(404)]
-        //public IActionResult DeleteOffer(int OfferId)
-        //{
-        //	if (!_offerRepository.OfferExist(OfferId))
-        //	{
-        //		return NotFound();
-        //	}
-        //	if (!ModelState.IsValid)
-        //	{
-        //		return BadRequest(ModelState);
-        //	}
+	    [HttpDelete("{OfferId}")]
+		public IActionResult DeleteOffer(int OfferId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_offerRepository.OfferExist(OfferId))
+				{
+					return NotFound(ApiResponse.OfferNotFound);
+				}
+				_offerRepository.DeleteOffer(OfferId);
+				return Ok(ApiResponse.SuccessDeleted);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
 
-        //	if (!_offerRepository.DeleteOffer(OfferId))
-        //	{
-        //		ModelState.AddModelError("", "Something went wrong.");
-        //		return StatusCode(500, ModelState);
-        //	}
-        //	return Ok("Successfully deleted");
-        //}
-    }
+
+        [HttpGet("ProviderOffers/{ProviderId}")]
+        public IActionResult GetOffersOfProvider(string ProviderId)
+        {
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var Offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
+				return Ok(Offers);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+        }
+
+
+        [HttpGet("ProviderCanOffer/{ProviderId}/{RequestId}")]
+        public IActionResult ProviderCanOffer(string ProviderId, int RequestId)
+        {
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				if (!_requestRepository.ServiceExist(RequestId))
+				{
+					return NotFound(ApiResponse.RequestNotFound);
+				}
+				if (_offerRepository.ProviderAlreadyOffered(ProviderId, RequestId))
+				{
+					return BadRequest(ApiResponse.AlreadyOffered);
+				}
+				return Ok(ApiResponse.ProviderCanOffer);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+
+        [HttpPut("Decline/{OfferId}")]
+        public IActionResult DeclineOffer(int OfferId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ApiResponse.NotValid);
+                }
+                if (!_offerRepository.OfferExist(OfferId))
+                {
+                    return NotFound(ApiResponse.OfferNotFound);
+                }
+                if (!_offerRepository.DeclineOffer(OfferId))
+                {
+                    return StatusCode(500, ApiResponse.FailedToUpdate);
+                }
+                return Ok(ApiResponse.OfferDeclined);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse.SomethingWrong);
+            }
+        }
+
+		[HttpGet("ForProvider/{ProviderId}")]
+		public IActionResult OffersDetailsForProvider(string ProviderId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var offer = _offerRepository.ServiceDetailsForProvider(ProviderId);
+				return Ok(offer);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+	}
 }

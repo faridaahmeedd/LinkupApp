@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ServicesApp.Core.Models;
 using ServicesApp.Data;
@@ -81,6 +82,7 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader();
     });
 });
+
 
 var app = builder.Build();
 

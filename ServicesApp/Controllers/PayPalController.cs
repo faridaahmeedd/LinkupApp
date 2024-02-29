@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -57,7 +58,7 @@ public class PayPalController : ControllerBase
 		Console.WriteLine(accessToken);
 		var createPaymentJson = new
 		{
-			intent = "authorize",
+			intent = "sale",
 			payer = new
 			{
 				payment_method = "paypal"
@@ -77,9 +78,9 @@ public class PayPalController : ControllerBase
 						{
 							new
 							{
-								name = "item",
+								name = "Service",
 								sku = "item",
-								price = "1.00",
+								price = "30.00",
 								currency = "USD",
 								quantity = 1
 							}
@@ -88,19 +89,16 @@ public class PayPalController : ControllerBase
 					amount = new
 					{
 						currency = "USD",
-						total = "1.00"
+						total = "30.00"
 					},
 					description = "This is the payment description."
 				}
 			}
 		};
 
-
-
 		_httpClient.DefaultRequestHeaders.Remove("Authorization"); // Clear any existing authorization header
 		_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
 		Console.WriteLine($"Request Headers: {string.Join(", ", _httpClient.DefaultRequestHeaders)}");
-
 
 		Console.WriteLine($"Create Payment JSON: {JsonConvert.SerializeObject(createPaymentJson)}");
 
@@ -126,13 +124,13 @@ public class PayPalController : ControllerBase
 	}
 
 	[HttpPost("execute")]
-	public async Task<IActionResult> ExecutePayment([FromQuery] string paymentId, [FromQuery] string token, [FromQuery] string PayerID)
+	public async Task<IActionResult> ExecutePayment([FromQuery] string paymentId, [FromQuery] string token, [FromQuery] string payerID)
 	{
 		try
 		{
 			var executePaymentJson = new
 			{
-				payer_id = PayerID,
+				payer_id = payerID,
 				transactions = new[]
 				{
 					new
@@ -140,13 +138,16 @@ public class PayPalController : ControllerBase
 						amount = new
 						{
 							currency = "USD",
-							total = "1.00"
+							total = "30.00"
 						}
 					}
 				}
 			};
 
 			var executePaymentResponse = await SendPayPalRequest($"/v1/payments/payment/{paymentId}/execute?token={token}", executePaymentJson);
+			Console.WriteLine(executePaymentResponse);
+			Console.WriteLine("stateeeee: ");
+			Console.WriteLine(executePaymentResponse.state);
 
 			// Check if the payment execution is successful
 			if (executePaymentResponse.state == "approved")
@@ -156,13 +157,11 @@ public class PayPalController : ControllerBase
 			}
 			else
 			{
-				// Handle unsuccessful payment execution
 				return BadRequest($"Payment execution failed. Payment state: {executePaymentResponse.state}");
 			}
 		}
 		catch (Exception ex)
 		{
-			// Handle exceptions
 			return BadRequest($"Error executing payment: {ex.Message}");
 		}
 	}
@@ -170,10 +169,19 @@ public class PayPalController : ControllerBase
 	private async Task<dynamic> SendPayPalRequest(string endpoint, object requestData)
 	{
 		var requestJson = JsonConvert.SerializeObject(requestData);
-		var response = await _httpClient.PostAsync($"{PayPalApiBaseUrl}{endpoint}", new StringContent(requestJson, Encoding.UTF8, "application/json"));
-		Console.WriteLine($"responsee: {response}");
 		Console.WriteLine($"Request JSON: {requestJson}");
 
+		var fullUrl = new Uri(new Uri(PayPalApiBaseUrl), endpoint);
+
+		// Set authorization header
+		var accessToken = await GetAccessToken();
+		_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+		var response = await _httpClient.PostAsync(fullUrl, new StringContent(requestJson, Encoding.UTF8, "application/json"));
+
+		Console.WriteLine($"responsee: {response}");
+		Console.WriteLine($"Full URL: {fullUrl}");
+		Console.WriteLine($"Request Headers: {string.Join(", ", _httpClient.DefaultRequestHeaders)}");
 
 		if (response.IsSuccessStatusCode)
 		{

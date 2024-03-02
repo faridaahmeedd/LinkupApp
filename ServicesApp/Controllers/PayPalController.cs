@@ -1,196 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using ServicesApp.APIs;
+using ServicesApp.Interfaces;
 
 [ApiController]
 [Route("api/paypal")]
 public class PayPalController : ControllerBase
 {
-	private const string PayPalApiBaseUrl = "https://api.sandbox.paypal.com"; // Change to live URL for production
+	private readonly IPayPalRepository _payPalRepsoitory;
+	private readonly IServiceRequestRepository _serviceRepository;
 
-	private readonly HttpClient _httpClient;
-	private readonly IConfiguration _configuration;
-
-
-	public PayPalController(IConfiguration configuration)
+	public PayPalController(IPayPalRepository payPalRepsoitory, IServiceRequestRepository serviceRepository)
 	{
-		_httpClient = new HttpClient();
-		_configuration = configuration;
+		_payPalRepsoitory = payPalRepsoitory;
+		_serviceRepository = serviceRepository;
 	}
 
-	private async Task<string> GetAccessToken()
-	{
-		var clientId = _configuration["PayPal:ClientId"];
-		var clientSecret = _configuration["PayPal:ClientSecret"];
-
-		var tokenRequest = new List<KeyValuePair<string, string>>
-	{
-		new KeyValuePair<string, string>("grant_type", "client_credentials")
-	};
-
-		var base64Auth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{clientId}:{clientSecret}"));
-		_httpClient.DefaultRequestHeaders.Clear();
-		_httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-		_httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {base64Auth}");
-
-		var response = await _httpClient.PostAsync("https://api.sandbox.paypal.com/v1/oauth2/token", new FormUrlEncodedContent(tokenRequest));
-		Console.WriteLine(response.ToString());
-		var responseContent = await response.Content.ReadAsStringAsync();
-
-		if (response.IsSuccessStatusCode)
-		{
-			var tokenData = JsonConvert.DeserializeObject<dynamic>(responseContent);
-			return tokenData.access_token;
-		}
-
-		throw new Exception($"Failed to retrieve PayPal access token. Response: {responseContent}");
-	}
-
-	[HttpPost("create-payment")]
-	public async Task<IActionResult> CreatePayment()
-	{
-		var accessToken = await GetAccessToken();
-		Console.WriteLine(accessToken);
-		var createPaymentJson = new
-		{
-			intent = "sale",
-			payer = new
-			{
-				payment_method = "paypal"
-			},
-			redirect_urls = new
-			{
-				return_url = "http://return.url",
-				cancel_url = "http://localhost:7111/api/paypal/execute/"
-			},
-			transactions = new[]
-			{
-				new
-				{
-					item_list = new
-					{
-						items = new[]
-						{
-							new
-							{
-								name = "Service",
-								sku = "item",
-								price = "30.00",
-								currency = "USD",
-								quantity = 1
-							}
-						}
-					},
-					amount = new
-					{
-						currency = "USD",
-						total = "30.00"
-					},
-					description = "This is the payment description."
-				}
-			}
-		};
-
-		_httpClient.DefaultRequestHeaders.Remove("Authorization"); // Clear any existing authorization header
-		_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-		Console.WriteLine($"Request Headers: {string.Join(", ", _httpClient.DefaultRequestHeaders)}");
-
-		Console.WriteLine($"Create Payment JSON: {JsonConvert.SerializeObject(createPaymentJson)}");
-
-		var createPaymentResponse = await SendPayPalRequest("/v1/payments/payment", createPaymentJson);
-
-		Console.WriteLine($"Create Payment Response: {JsonConvert.SerializeObject(createPaymentResponse)}");
-
-		var approvalLink = GetApprovalLink(createPaymentResponse.links);
-		return Ok(approvalLink);
-		//return Ok(JsonConvert.SerializeObject(createPaymentResponse));
-	}
-
-	private string GetApprovalLink(dynamic links)
-	{
-		foreach (var link in links)
-		{
-			if (link.rel == "approval_url")
-			{
-				return link.href;
-			}
-		}
-		throw new Exception("Approval link not found in the PayPal API response.");
-	}
-
-	[HttpPost("execute")]
-	public async Task<IActionResult> ExecutePayment([FromQuery] string paymentId, [FromQuery] string token, [FromQuery] string payerID)
+	[HttpPost("create-payment/{ServiceId}")]
+	public async Task<IActionResult> CreatePayment(int ServiceId)
 	{
 		try
 		{
-			var executePaymentJson = new
+			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
-				payer_id = payerID,
-				transactions = new[]
-				{
-					new
-					{
-						amount = new
-						{
-							currency = "USD",
-							total = "30.00"
-						}
-					}
-				}
-			};
+				return NotFound(ApiResponse.RequestNotFound);
+			}
+			if(_serviceRepository.GetAcceptedOffer(ServiceId) == null)
+			{
+				return NotFound(ApiResponse.OfferNotFound);
+			}
+			var approvalLink = await _payPalRepsoitory.CreatePayment(ServiceId);
+			if(approvalLink != null)
+			{
+				return Ok(approvalLink);
+			}
+			return BadRequest(ApiResponse.PaymentError);
+		}
+		catch
+		{
+			return StatusCode(500, ApiResponse.SomethingWrong);
+		}
+	}
 
-			var executePaymentResponse = await SendPayPalRequest($"/v1/payments/payment/{paymentId}/execute?token={token}", executePaymentJson);
-			Console.WriteLine(executePaymentResponse);
-			Console.WriteLine("stateeeee: ");
-			Console.WriteLine(executePaymentResponse.state);
-
-			// Check if the payment execution is successful
-			if (executePaymentResponse.state == "approved")
+	[HttpPost("execute-payment/{PaymentId}/{Token}/{PayerId}")]
+	public async Task<IActionResult> ExecutePayment(string PaymentId, string Token, string PayerId)
+	{
+		try
+		{
+			var responseState = await _payPalRepsoitory.ExecutePayment(PaymentId, Token, PayerId);
+			if (responseState == "approved")
 			{
 				// Redirect to your success page
 				return Ok("http://localhost:7111/api/paypal/success-url");
 			}
 			else
 			{
-				return BadRequest($"Payment execution failed. Payment state: {executePaymentResponse.state}");
+				return BadRequest(ApiResponse.PaymentError);
 			}
 		}
-		catch (Exception ex)
+		catch
 		{
-			return BadRequest($"Error executing payment: {ex.Message}");
+			return StatusCode(500, ApiResponse.SomethingWrong);
 		}
-	}
-
-	private async Task<dynamic> SendPayPalRequest(string endpoint, object requestData)
-	{
-		var requestJson = JsonConvert.SerializeObject(requestData);
-		Console.WriteLine($"Request JSON: {requestJson}");
-
-		var fullUrl = new Uri(new Uri(PayPalApiBaseUrl), endpoint);
-
-		// Set authorization header
-		var accessToken = await GetAccessToken();
-		_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-		var response = await _httpClient.PostAsync(fullUrl, new StringContent(requestJson, Encoding.UTF8, "application/json"));
-
-		Console.WriteLine($"responsee: {response}");
-		Console.WriteLine($"Full URL: {fullUrl}");
-		Console.WriteLine($"Request Headers: {string.Join(", ", _httpClient.DefaultRequestHeaders)}");
-
-		if (response.IsSuccessStatusCode)
-		{
-			var responseBody = await response.Content.ReadAsStringAsync();
-			return JsonConvert.DeserializeObject<dynamic>(responseBody);
-		}
-
-		// Handle error response
-		var errorResponse = await response.Content.ReadAsStringAsync();
-		throw new Exception($"PayPal API request failed. Status code: {response.StatusCode}. Response: {errorResponse}");
 	}
 }

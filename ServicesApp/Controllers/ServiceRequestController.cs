@@ -44,65 +44,6 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-		//[HttpGet("WithMaxFees")]
-		//public IActionResult GetServicesWithFees()
-		//{
-		//    try
-		//    {
-		//        if (!ModelState.IsValid)
-		//        {
-		//            return BadRequest(ApiResponse.NotValid);
-		//        }
-		//        var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees() );
-		//        return Ok(services);
-		//    }
-		//    catch
-		//    {
-		//        return StatusCode(500, ApiResponse.SomethingWrong);
-		//    }
-		//}
-
-		//[HttpGet("WithMaxFees/{CustomerId}")]
-		//public IActionResult GetServicesWithFees(string CustomerId)
-		//{
-		//	try
-		//	{
-		//		if (!ModelState.IsValid)
-		//		{
-		//			return BadRequest(ApiResponse.NotValid);
-		//		}
-		//		var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees(CustomerId));
-		//		return Ok(services);
-		//	}
-		//	catch
-		//	{
-		//		return StatusCode(500, ApiResponse.SomethingWrong);
-		//	}
-		//}
-
-		//[HttpPut("UpdateMaxFees/{ServiceId}/{MaxFees}")]
-		//public IActionResult UpdateServiceMaxFees(int ServiceId, int MaxFees)
-		//{
-		//	try
-		//	{
-		//		if (!ModelState.IsValid)
-		//		{
-		//			return BadRequest(ApiResponse.NotValid);
-		//		}
-		//		if (!_serviceRepository.ServiceExist(ServiceId))
-		//		{
-		//			return NotFound(ApiResponse.RequestNotFound);
-		//		}
-		//		_serviceRepository.UpdateMaxFees(ServiceId, MaxFees);
-		//		return Ok(ApiResponse.SuccessUpdated);
-		//	}
-		//	catch
-		//	{
-		//		return StatusCode(500, ApiResponse.SomethingWrong);
-		//	}
-		//}
-
-
 		[HttpGet("{ServiceId}")]
 		public IActionResult GetService(int ServiceId)
 		{
@@ -307,7 +248,7 @@ namespace ServicesApp.Controllers
         {
 			try
 			{
-				var acceptedOffer = _serviceRepository.AcceptedOffer(serviceId);
+				var acceptedOffer = _serviceRepository.GetAcceptedOffer(serviceId);
 				if (acceptedOffer != null)
 				{
 					var offerMap = _mapper.Map<ServiceOfferDto>(acceptedOffer);
@@ -389,5 +330,63 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
+
+		//[HttpGet("WithMaxFees")]
+		//public IActionResult GetServicesWithFees()
+		//{
+		//    try
+		//    {
+		//        if (!ModelState.IsValid)
+		//        {
+		//            return BadRequest(ApiResponse.NotValid);
+		//        }
+		//        var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees() );
+		//        return Ok(services);
+		//    }
+		//    catch
+		//    {
+		//        return StatusCode(500, ApiResponse.SomethingWrong);
+		//    }
+		//}
+
+		//[HttpGet("WithMaxFees/{CustomerId}")]
+		//public IActionResult GetServicesWithFees(string CustomerId)
+		//{
+		//	try
+		//	{
+		//		if (!ModelState.IsValid)
+		//		{
+		//			return BadRequest(ApiResponse.NotValid);
+		//		}
+		//		var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees(CustomerId));
+		//		return Ok(services);
+		//	}
+		//	catch
+		//	{
+		//		return StatusCode(500, ApiResponse.SomethingWrong);
+		//	}
+		//}
+
+		//[HttpPut("UpdateMaxFees/{ServiceId}/{MaxFees}")]
+		//public IActionResult UpdateServiceMaxFees(int ServiceId, int MaxFees)
+		//{
+		//	try
+		//	{
+		//		if (!ModelState.IsValid)
+		//		{
+		//			return BadRequest(ApiResponse.NotValid);
+		//		}
+		//		if (!_serviceRepository.ServiceExist(ServiceId))
+		//		{
+		//			return NotFound(ApiResponse.RequestNotFound);
+		//		}
+		//		_serviceRepository.UpdateMaxFees(ServiceId, MaxFees);
+		//		return Ok(ApiResponse.SuccessUpdated);
+		//	}
+		//	catch
+		//	{
+		//		return StatusCode(500, ApiResponse.SomethingWrong);
+		//	}
+		//}
 	}
 }

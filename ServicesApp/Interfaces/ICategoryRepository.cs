@@ -1,5 +1,4 @@
-﻿using ServicesApp.Dto.Category;
-using ServicesApp.Models;
+﻿using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces
 {

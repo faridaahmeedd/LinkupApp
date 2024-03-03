@@ -13,7 +13,7 @@ namespace ServicesApp.Repository
 
 		public ServiceOfferRepository(DataContext context)
 		{
-			this._context = context;
+			_context = context;
 		}
 
 		public ICollection<ServiceOffer> GetOffers()

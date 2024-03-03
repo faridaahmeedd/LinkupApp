@@ -10,7 +10,7 @@
         public static readonly object SomethingWrong = new
         {
             statusMsg = "fail",
-            message = "Something went Wrong."
+            message = "Something Went Wrong."
         };
 		public static readonly object SuccessCreated = new
 		{
@@ -105,7 +105,7 @@
         public static readonly object TimeSlotNotFound = new
         {
             statusMsg = "fail",
-            message = "Time Slot is not Found."
+            message = "Time Slot Not Found."
         };
         public static readonly object TimeSlotConflict = new
         {
@@ -115,13 +115,13 @@
         public static readonly object OfferAccepted = new
         {
             statusMsg = "success",
-            message = "Offer Accepted."
-        };
+            message = "Offer Accepted Successfully."
+		};
         public static readonly object OfferDeclined = new
         {
             statusMsg = "success",
-            message = "Offer Declined."
-        };
+            message = "Offer Declined Successfully."
+		};
         public static readonly object ServiceCompletedSuccess = new
         {
             statusMsg = "success",
@@ -161,6 +161,11 @@
 		{
 			statusMsg = "fail",
 			message = "Not authorized to do this action."
+		};
+		public static readonly object PaymentError = new
+		{
+			statusMsg = "fail",
+			message = "Error occured while paying for the service."
 		};
 	}
 }

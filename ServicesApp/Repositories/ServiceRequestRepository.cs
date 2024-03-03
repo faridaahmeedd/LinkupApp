@@ -13,7 +13,7 @@ namespace ServicesApp.Repository
 
 		public ServiceRequestRepository(DataContext context)
 		{
-			this._context = context;
+			_context = context;
 		}
 
 		public ICollection<ServiceRequest> GetServices()
@@ -23,7 +23,7 @@ namespace ServicesApp.Repository
 
 		public ServiceRequest GetService(int id)
 		{
-			return _context.Requests.Where(p => p.Id == id).FirstOrDefault();
+			return _context.Requests.Include(p => p.Subcategory).Where(p => p.Id == id).FirstOrDefault();
 		}
 
         public ICollection<ServiceRequest> GetServicesByCustomer(string customerId)
@@ -121,7 +121,7 @@ namespace ServicesApp.Repository
             return null;
         }
 
-        public ServiceOffer AcceptedOffer(int serviceId)
+        public ServiceOffer GetAcceptedOffer(int serviceId)
         {
             var serviceRequest = _context.Requests.FirstOrDefault(sr => sr.Id == serviceId);
 

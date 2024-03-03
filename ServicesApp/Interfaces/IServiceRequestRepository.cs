@@ -16,7 +16,7 @@ namespace ServicesApp.Interfaces
 		bool DeleteService(int id);
 		bool Save();
         ICollection<ServiceOffer> GetUndeclinedOffersOfService(int id);
-		ServiceOffer AcceptedOffer(int serviceId);
+		ServiceOffer GetAcceptedOffer(int serviceId);
         bool TimeSlotsExistInService(int ServiceId, int timeSlotId);
 		bool CompleteService(int id);
 		ICollection<ServiceDetailsDto> GetAllServicesDetails();

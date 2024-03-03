@@ -257,14 +257,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5d9c4dc1-9ea5-4f41-b1d6-857f9d2b420a",
+                            ConcurrencyStamp = "7445925e-9903-4e8e-a6d6-11f4d7b225e6",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEH2WVw40/l6V8VlKWz1nIq5h3OXhBXj/fivYWTi1Srjqdb2sW0qUf/pDl9jKw0v+WQ==",
-                            SecurityStamp = "ef1ec0f1-d2a1-47df-a8f1-d7561f346db7",
+                            PasswordHash = "AQAAAAIAAYagAAAAEE+85MzoF3P21MCKe7mW0PcIJifLrtu+Mp9t37VzoCn2xVG0L0g6am/evN6DjvlNTw==",
+                            SecurityStamp = "490421c8-5e86-4015-af91-b71b8582e7d6",
                             TwoFactorEnabled = false,
                             UserName = "MainAdmin"
                         });
@@ -289,6 +289,39 @@ namespace ServicesApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("Rate")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewerRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProviderId");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>
@@ -560,6 +593,21 @@ namespace ServicesApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ServicesApp.Models.Review", b =>
+                {
+                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
+                        .WithMany("Reviews")
+                        .HasForeignKey("CustomerId");
+
+                    b.HasOne("ServicesApp.Models.Provider", "Provider")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ProviderId");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Provider");
+                });
+
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>
                 {
                     b.HasOne("ServicesApp.Models.Provider", "Provider")
@@ -654,12 +702,16 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Core.Models.Customer", b =>
                 {
+                    b.Navigation("Reviews");
+
                     b.Navigation("Services");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Provider", b =>
                 {
                     b.Navigation("Offers");
+
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

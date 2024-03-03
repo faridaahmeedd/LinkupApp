@@ -22,12 +22,12 @@ namespace ServicesApp.Repositories
 
 		public ICollection<Review> GetReviewsOfCustomer(string customerId)
 		{
-			return _context.Reviews.Include(p => p.Customer).Where(p => p.ReviewerId == p.Customer.Id).OrderBy(p => p.Id).ToList();
+			return _context.Reviews.Include(p => p.Customer).Where(p => p.ReviewerRole =="Customer").OrderBy(p => p.Id).ToList();
 		}
 
 		public ICollection<Review> GetReviewsOfProvider(string providerId)
 		{
-			return _context.Reviews.Include(p => p.Provider).Where(p => p.ReviewerId == p.Provider.Id).OrderBy(p => p.Id).ToList();
+			return _context.Reviews.Include(p => p.Provider).Where(p => p.ReviewerRole == "Provider").OrderBy(p => p.Id).ToList();
 		}
 
 		public Review GetReview(int id)

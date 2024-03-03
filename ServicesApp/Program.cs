@@ -28,6 +28,7 @@ builder.Services.AddScoped<IServiceOfferRepository, ServiceOfferRepository>();
 builder.Services.AddScoped<ITimeSlotsRepository , TimeSlotRepositry>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IPayPalRepository, PayPalRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

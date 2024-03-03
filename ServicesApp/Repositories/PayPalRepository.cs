@@ -157,7 +157,6 @@ namespace ServicesApp.Repositories
 			{
 				payer_id = payerID,
 			};
-
 			var executePaymentResponse = await SendPayPalRequest($"/v1/payments/payment/{paymentId}/execute?token={token}", executePaymentJson);
 			Console.WriteLine(executePaymentResponse);
 			Console.WriteLine(executePaymentResponse.state);

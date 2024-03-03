@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class intial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -252,6 +252,33 @@ namespace ServicesApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Rate = table.Column<int>(type: "int", nullable: true),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReviewerRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Reviews_Provider_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "Provider",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Requests",
                 columns: table => new
                 {
@@ -347,7 +374,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "5d9c4dc1-9ea5-4f41-b1d6-857f9d2b420a", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEH2WVw40/l6V8VlKWz1nIq5h3OXhBXj/fivYWTi1Srjqdb2sW0qUf/pDl9jKw0v+WQ==", "ef1ec0f1-d2a1-47df-a8f1-d7561f346db7", false, "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "7445925e-9903-4e8e-a6d6-11f4d7b225e6", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEE+85MzoF3P21MCKe7mW0PcIJifLrtu+Mp9t37VzoCn2xVG0L0g6am/evN6DjvlNTw==", "490421c8-5e86-4015-af91-b71b8582e7d6", false, "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -414,6 +441,16 @@ namespace ServicesApp.Migrations
                 column: "SubcategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reviews_CustomerId",
+                table: "Reviews",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ProviderId",
+                table: "Reviews",
+                column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Subcategories_CategoryId",
                 table: "Subcategories",
                 column: "CategoryId");
@@ -444,6 +481,9 @@ namespace ServicesApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "Offers");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "TimeSlots");

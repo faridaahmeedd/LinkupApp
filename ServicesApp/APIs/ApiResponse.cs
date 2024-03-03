@@ -167,5 +167,15 @@
 			statusMsg = "fail",
 			message = "Error occured while paying for the service."
 		};
-	}
+        public static readonly object ReviewNotFound = new
+        {
+            statusMsg = "fail",
+            message = "Review not Found."
+        };
+        public static readonly object ReviewAlreadyExist = new
+        {
+            statusMsg = "fail",
+            message = "Review already Exist."
+        };
+    }
 }

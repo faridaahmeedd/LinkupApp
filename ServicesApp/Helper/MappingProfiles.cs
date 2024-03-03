@@ -2,6 +2,7 @@
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Dto.Category;
+using ServicesApp.Dto.Review;
 using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Subcategory;
 using ServicesApp.Dto.Users;
@@ -33,7 +34,11 @@ namespace ServicesApp.Helper
             CreateMap<CategoryDto, Category>();
 			CreateMap<Subcategory, SubcategoryDto>();
 			CreateMap<SubcategoryDto, Subcategory>();
-			CreateMap<ServiceOffer, ServiceOfferDto>()
+            CreateMap<GetReviewDto, Review>();
+            CreateMap<Review, GetReviewDto>();
+            CreateMap<PostReviewDto, Review>();
+            CreateMap<Review, PostReviewDto>();
+            CreateMap<ServiceOffer, ServiceOfferDto>()
 				.ForMember(
 					dest => dest.Duration,
 					opt => opt.MapFrom(src => ConvertTimeToString(src.Duration))

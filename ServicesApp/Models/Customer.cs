@@ -21,5 +21,6 @@ namespace ServicesApp.Core.Models
         public byte[]? Image { get; set; }
 
         public ICollection<ServiceRequest>? Services { get; set; }
+		public ICollection<Review> Reviews { get; set; }
 	}
 }

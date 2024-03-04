@@ -257,14 +257,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7445925e-9903-4e8e-a6d6-11f4d7b225e6",
+                            ConcurrencyStamp = "579f1b48-4be1-4cc5-8973-bc5b36398236",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE+85MzoF3P21MCKe7mW0PcIJifLrtu+Mp9t37VzoCn2xVG0L0g6am/evN6DjvlNTw==",
-                            SecurityStamp = "490421c8-5e86-4015-af91-b71b8582e7d6",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGVmM17ZpNpSUTI6A+CB5qcQA8BZYCiofPz/TP/C3LgFxk/OQg1+6GPGu32Pq/YXYg==",
+                            SecurityStamp = "480d40d3-a210-4e08-83ff-5187e71281da",
                             TwoFactorEnabled = false,
                             UserName = "MainAdmin"
                         });
@@ -291,6 +291,41 @@ namespace ServicesApp.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("ServicesApp.Models.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ReporterName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReporterRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProviderId");
+
+                    b.ToTable("Reports");
+                });
+
             modelBuilder.Entity("ServicesApp.Models.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -310,6 +345,10 @@ namespace ServicesApp.Migrations
 
                     b.Property<int?>("Rate")
                         .HasColumnType("int");
+
+                    b.Property<string>("ReviewerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReviewerRole")
                         .IsRequired()
@@ -591,6 +630,21 @@ namespace ServicesApp.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Report", b =>
+                {
+                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId");
+
+                    b.HasOne("ServicesApp.Models.Provider", "Provider")
+                        .WithMany()
+                        .HasForeignKey("ProviderId");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Review", b =>

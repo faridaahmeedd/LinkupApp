@@ -23,6 +23,7 @@ namespace ServicesApp.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Provider> Providers { get; set; }
 		public DbSet<Review> Reviews { get; set; }
+		public DbSet<Report> Reports { get; set; }
 		//public DbSet<Admin> Admins { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

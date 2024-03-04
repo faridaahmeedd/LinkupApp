@@ -2,7 +2,7 @@
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Dto.Category;
-using ServicesApp.Dto.Review;
+using ServicesApp.Dto.Reviews_Reports;
 using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Subcategory;
 using ServicesApp.Dto.Users;
@@ -38,6 +38,10 @@ namespace ServicesApp.Helper
             CreateMap<Review, GetReviewDto>();
             CreateMap<PostReviewDto, Review>();
             CreateMap<Review, PostReviewDto>();
+			CreateMap<GetReportDto, Report>();
+            CreateMap<Report, GetReportDto>();
+            CreateMap<PostReportDto, Report>();
+            CreateMap<Report, PostReportDto>();
             CreateMap<ServiceOffer, ServiceOfferDto>()
 				.ForMember(
 					dest => dest.Duration,

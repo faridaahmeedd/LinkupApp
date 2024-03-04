@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Repository;
-using ServicesApp.Dto.Review;
+using ServicesApp.Dto.Reviews_Reports;
 using ServicesApp.Core.Models;
 using AutoMapper;
 using ServicesApp.APIs;
@@ -20,9 +20,9 @@ namespace ServicesApp.Controllers
         private readonly ICustomerRepository _customerRepository;
         private readonly IProviderRepository _providerRepository;
 
-        public ReviewController(IReviewRepository ReviewRepository , IMapper mapper, IProviderRepository providerRepository, ICustomerRepository customerRepository)
+        public ReviewController(IReviewRepository IReviewRepository, IMapper mapper, IProviderRepository providerRepository, ICustomerRepository customerRepository)
         {
-            _ReviewRepository = ReviewRepository;
+            _ReviewRepository = IReviewRepository;
 			_customerRepository = customerRepository;
 			_providerRepository = providerRepository;
 			_mapper = mapper;
@@ -157,6 +157,8 @@ namespace ServicesApp.Controllers
                 mapReview.Customer = _customerRepository.GetCustomer(customerId);
                 mapReview.Provider = _providerRepository.GetProvider(providerId);
 
+                mapReview.ReviewerName = mapReview.Provider.FName;
+
                 mapReview.ReviewerRole = "Provider";
                 _ReviewRepository.CreateReview(mapReview);
 				return Ok(new
@@ -196,6 +198,8 @@ namespace ServicesApp.Controllers
                 }
                 mapReview.Customer = _customerRepository.GetCustomer(customerId);
                 mapReview.Provider = _providerRepository.GetProvider(providerId);
+
+                mapReview.ReviewerName = mapReview.Customer.FName;
 
                 mapReview.ReviewerRole = "Customer";
 

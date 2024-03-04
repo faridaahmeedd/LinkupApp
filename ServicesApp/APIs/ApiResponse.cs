@@ -172,10 +172,16 @@
             statusMsg = "fail",
             message = "Review not Found."
         };
-        public static readonly object ReviewAlreadyExist = new
+        public static readonly object ReportNotFound = new
         {
             statusMsg = "fail",
-            message = "Review already Exist."
+            message = "Review not Found."
         };
+        //public static readonly object ReviewAlreadyExist = new
+        //{
+        //    statusMsg = "fail",
+        //    message = "Review already Exist."
+        //};
+        
     }
 }

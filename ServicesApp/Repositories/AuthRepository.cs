@@ -42,6 +42,16 @@ public class AuthRepository : IAuthRepository
 		return null;
 	}
 
+	public async Task<AppUser?> CheckUserById(string id)
+	{
+		var appUser = await _userManager.FindByIdAsync(id);
+		if (appUser != null)
+		{
+			return appUser;
+		}
+		return null;
+	}
+
 	public async Task<AppUser?> CheckAdmin(string email)
 	{
 		var appUser = await _userManager.FindByEmailAsync(email);
@@ -144,7 +154,7 @@ public class AuthRepository : IAuthRepository
 	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
 	{
 		var appUser = await _userManager.FindByEmailAsync(loginDto.Email);
-		if (appUser != null && await _userManager.CheckPasswordAsync(appUser, loginDto.Password))
+		if (appUser != null && appUser.Active && await _userManager.CheckPasswordAsync(appUser, loginDto.Password))
 		{
 			var authClaims = new List<Claim>
 			{
@@ -179,9 +189,6 @@ public class AuthRepository : IAuthRepository
 		}
 
 		var resetCode = GenerateRandomCode();
-		// Save the confirmation code in your database or a secure storage
-		// user.ConfirmationCode = confirmationCode; 
-		// await _userManager.UpdateAsync(user);
 
 		string senderEmail = "linkupp2024@gmail.com";
 		string senderPassword = "mbyo noyk dfbb fhlr";
@@ -244,4 +251,26 @@ public class AuthRepository : IAuthRepository
         }
 		return false;
     }
+
+	public async Task<bool> DeactivateUser(string userId)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
+		if (user != null)
+		{
+			var role = await _userManager.GetRolesAsync(user);
+			if (! role.Contains("MainAdmin"))
+			{
+				user.Active = false;
+				var result = await _userManager.UpdateAsync(user);
+
+				if (result.Succeeded)
+				{
+					return true;
+				}
+			}
+		}
+		//SEND MAIL
+		return false;
+	}
+
 }

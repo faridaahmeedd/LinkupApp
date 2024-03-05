@@ -10,6 +10,5 @@ namespace ServicesApp.Models
         public required string ReporterRole { get; set; }
         public required Provider Provider { get; set; }
         public required Customer Customer { get; set; }
-
     }
 }

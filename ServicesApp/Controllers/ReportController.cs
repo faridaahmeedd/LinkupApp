@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Repository;
 using ServicesApp.Dto.Reviews_Reports;
-using ServicesApp.Core.Models;
 using AutoMapper;
 using ServicesApp.APIs;
-using Microsoft.AspNetCore.Identity;
-using ServicesApp.Repositories;
 
 namespace ServicesApp.Controllers
 {
@@ -49,7 +44,7 @@ namespace ServicesApp.Controllers
             }
         }
 
-        [HttpGet("{ReportId:int}", Name = "GetReportById")]
+        [HttpGet("{ReportId}")]
         public IActionResult GetReport(int ReportId)
         {
             try
@@ -71,8 +66,9 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-        [HttpGet("GetCustomerReports/{customerId}")]
-        public IActionResult GetCustomerReports(string customerId)
+
+        [HttpGet("CustomerReports/{CustomerId}")]
+        public IActionResult GetCustomerReports(string CustomerId)
         {
             try
             {
@@ -80,21 +76,18 @@ namespace ServicesApp.Controllers
                 {
                     return BadRequest(ApiResponse.NotValid);
                 }
-                if (!_customerRepository.CustomerExist(customerId))
+                if (!_customerRepository.CustomerExist(CustomerId))
                 {
                     return NotFound(ApiResponse.ReportNotFound);
                 }
-                var Report = _ReportRepository.GetReportsOfCustomer(customerId);
+                var Report = _ReportRepository.GetReportsOfCustomer(CustomerId);
                 var mappedReports = Report.Select(report =>
                 {
                     var reportDto = _mapper.Map<GetReportDto>(report);
-
-                    // Set the ReporterName based on the customer's name
                     reportDto.ReporterName = report.Customer.FName;
 
                     return reportDto;
                 }).ToList();
-                // var mapReview = _mapper.Map<List<GetReviewDto>>(Review);
                 return Ok(mappedReports);
             }
             catch
@@ -102,8 +95,9 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-        [HttpGet("GetProviderReports/{providerId}")]
-        public IActionResult GetProviderReports(string providerId)
+
+        [HttpGet("ProviderReports/{ProviderId}")]
+        public IActionResult GetProviderReports(string ProviderId)
         {
             try
             {
@@ -111,23 +105,19 @@ namespace ServicesApp.Controllers
                 {
                     return BadRequest(ApiResponse.NotValid);
                 }
-                if (!_providerRepository.ProviderExist(providerId))
+                if (!_providerRepository.ProviderExist(ProviderId))
                 {
                     return NotFound(ApiResponse.ReportNotFound);
                 }
-                var Report = _ReportRepository.GetReportsOfProvider(providerId);
+                var Report = _ReportRepository.GetReportsOfProvider(ProviderId);
                 var mappedReports = Report.Select(report =>
                 {
                     var reportDto = _mapper.Map<GetReportDto>(report);
-
-                    // Set the ReviewerName based on the customer's name
                     reportDto.ReporterName = report.Provider.FName;
 
                     return reportDto;
                 }).ToList();
-                // var mapReview = _mapper.Map<List<GetReviewDto>>(Review);
                 return Ok(mappedReports);
-
             }
             catch
             {
@@ -135,9 +125,8 @@ namespace ServicesApp.Controllers
             }
         }
 
-        [HttpPost("ReportCustomer")]
-        public IActionResult CreateCustomerReport([FromBody] PostReportDto ReportCreate, string customerId, string providerId)
-
+        [HttpPost("ReportCustomer/{CustomerId}/{ProviderId}")]
+        public IActionResult CreateCustomerReport([FromBody] PostReportDto ReportCreate, string CustomerId, string ProviderId)
         {
             try
             {
@@ -147,19 +136,18 @@ namespace ServicesApp.Controllers
                 }
 
                 var mapReport = _mapper.Map<Report>(ReportCreate);
-                if (!_customerRepository.CustomerExist(customerId))
+                if (!_customerRepository.CustomerExist(CustomerId))
                 {
                     return NotFound(ApiResponse.UserNotFound);
                 }
-                if (!_providerRepository.ProviderExist(providerId))
+                if (!_providerRepository.ProviderExist(ProviderId))
                 {
                     return NotFound(ApiResponse.UserNotFound);
                 }
-                mapReport.Customer = _customerRepository.GetCustomer(customerId);
-                mapReport.Provider = _providerRepository.GetProvider(providerId);
+                mapReport.Customer = _customerRepository.GetCustomer(CustomerId);
+                mapReport.Provider = _providerRepository.GetProvider(ProviderId);
 
                 mapReport.ReporterName = mapReport.Provider.FName;
-
                 mapReport.ReporterRole = "Provider";
 
                 _ReportRepository.CreateReport(mapReport);
@@ -176,10 +164,8 @@ namespace ServicesApp.Controllers
             }
         }
 
-
-
-        [HttpPost("reportProvider")]
-        public IActionResult CreateProviderReport([FromBody] PostReportDto ReportCreate, string customerId, string providerId)
+        [HttpPost("ReportProvider/{CustomerId}/{ProviderId}")]
+		public IActionResult CreateProviderReport([FromBody] PostReportDto ReportCreate, string CustomerId, string ProviderId)
 
         {
             try
@@ -190,16 +176,16 @@ namespace ServicesApp.Controllers
                 }
 
                 var mapReport = _mapper.Map<Report>(ReportCreate);
-                if (!_customerRepository.CustomerExist(customerId))
+                if (!_customerRepository.CustomerExist(CustomerId))
                 {
                     return NotFound(ApiResponse.UserNotFound);
                 }
-                if (!_providerRepository.ProviderExist(providerId))
+                if (!_providerRepository.ProviderExist(ProviderId))
                 {
                     return NotFound(ApiResponse.UserNotFound);
                 }
-                mapReport.Customer = _customerRepository.GetCustomer(customerId);
-                mapReport.Provider = _providerRepository.GetProvider(providerId);
+                mapReport.Customer = _customerRepository.GetCustomer(CustomerId);
+                mapReport.Provider = _providerRepository.GetProvider(ProviderId);
 
                 mapReport.ReporterName = mapReport.Customer.FName;
 
@@ -218,9 +204,5 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-
-
-
     }
 }
-

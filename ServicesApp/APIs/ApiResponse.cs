@@ -47,7 +47,12 @@
             statusMsg = "success",
             message = "Password Changed Successfully."
         };
-        public static readonly object CanNotChangePass = new
+		public static readonly object UserDeactivated = new
+		{
+			statusMsg = "success",
+			message = "User Deactivated Successfully."
+		};
+		public static readonly object CanNotChangePass = new
         {
             statusMsg = "fail",
             message = "Can not Change Password."
@@ -177,11 +182,5 @@
             statusMsg = "fail",
             message = "Review not Found."
         };
-        //public static readonly object ReviewAlreadyExist = new
-        //{
-        //    statusMsg = "fail",
-        //    message = "Review already Exist."
-        //};
-        
     }
 }

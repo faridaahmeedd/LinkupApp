@@ -30,9 +30,20 @@ namespace ServicesApp.Data
 		{
 
             base.OnModelCreating(modelBuilder);
-			modelBuilder.Entity<AppUser>().Ignore(c => c.PhoneNumber)
-											   .Ignore(c => c.PhoneNumberConfirmed);
-            modelBuilder
+
+			modelBuilder.Entity<AppUser>()
+				.Ignore(c => c.PhoneNumber)
+				.Ignore(c => c.PhoneNumberConfirmed)
+				.Ignore(c => c.TwoFactorEnabled)
+				.Ignore(c => c.LockoutEnd)
+				.Ignore(c => c.LockoutEnabled)
+				.Ignore(c => c.AccessFailedCount);
+			modelBuilder.Entity<AppUser>()
+				.Property<bool>("Active")
+				.IsRequired()
+				.HasDefaultValue(true);
+
+			modelBuilder
                 .Entity<Customer>()
                 .HasMany(c => c.Services)
                 .WithOne(s => s.Customer)

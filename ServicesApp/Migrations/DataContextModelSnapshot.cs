@@ -197,8 +197,10 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                    b.Property<bool>("Active")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -210,12 +212,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -230,9 +226,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -256,16 +249,13 @@ namespace ServicesApp.Migrations
                         new
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "579f1b48-4be1-4cc5-8973-bc5b36398236",
+                            ConcurrencyStamp = "a1837aba-1275-4964-8baa-3e477f38a89f",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
-                            LockoutEnabled = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGVmM17ZpNpSUTI6A+CB5qcQA8BZYCiofPz/TP/C3LgFxk/OQg1+6GPGu32Pq/YXYg==",
-                            SecurityStamp = "480d40d3-a210-4e08-83ff-5187e71281da",
-                            TwoFactorEnabled = false,
+                            PasswordHash = "AQAAAAIAAYagAAAAEEkyP2O/XP0ZfVNdBsZs7yo6dHDjz6CMCxNbyd26ynLCn/tsGfWZCKjXTnhlSnvNUQ==",
+                            SecurityStamp = "d0d7f713-8c7b-4e33-bfde-14a9413e274c",
                             UserName = "MainAdmin"
                         });
                 });
@@ -345,10 +335,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<int?>("Rate")
                         .HasColumnType("int");
-
-                    b.Property<string>("ReviewerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReviewerRole")
                         .IsRequired()

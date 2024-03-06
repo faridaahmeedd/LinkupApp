@@ -265,12 +265,49 @@ public class AuthRepository : IAuthRepository
 
 				if (result.Succeeded)
 				{
-					return true;
+					SendDeactivationMail(user.Email);
+                    return true;
 				}
 			}
 		}
-		//SEND MAIL
+		
 		return false;
 	}
+    public void SendDeactivationMail(string recipientEmail)
+	{
+        string senderEmail = "linkupp2024@gmail.com";
+        string senderPassword = "mbyo noyk dfbb fhlr";
+     
+        LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
+        LinkedImage.ContentId = "Logo";
+        LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
+        string htmlContent = File.ReadAllText("Mails/InactiveMail.html");
+        AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
+        htmlContent, null, "text/html");
+        htmlView.LinkedResources.Add(LinkedImage);
+
+        MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+        {
+            Subject = "Linkup Deactivation",
+            IsBodyHtml = true,
+        };
+        mailMessage.AlternateViews.Add(htmlView);
+        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(senderEmail, senderPassword),
+            EnableSsl = true
+        };
+        try
+        {
+            smtpClient.Send(mailMessage);
+            smtpClient.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+    }
 
 }

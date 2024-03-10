@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.APIs;
 using ServicesApp.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -188,6 +186,32 @@ public class AuthController : ControllerBase
 				}
 			}
 			return BadRequest(ApiResponse.CanNotChangePass);
+		}
+		catch
+		{
+			return StatusCode(500, ApiResponse.SomethingWrong);
+		}
+	}
+
+	[HttpPut("Deactivate/{UserId}")]
+	public async Task<IActionResult> DeactivateUser(string UserId)
+	{
+		try
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponse.NotValid);
+			}
+			var user = await _authRepository.CheckUserById(UserId);
+			if (user == null)
+			{
+				return NotFound(ApiResponse.UserNotFound);
+			}
+			if(await _authRepository.DeactivateUser(UserId))
+			{
+				return Ok(ApiResponse.UserDeactivated);
+			}
+			return StatusCode(500, ApiResponse.SomethingWrong);
 		}
 		catch
 		{

@@ -7,6 +7,7 @@ namespace ServicesApp.Interfaces
 	public interface IAuthRepository
 	{
 		Task<AppUser?> CheckUser(string email);
+		Task<AppUser?> CheckUserById(string id);
 		Task<AppUser?> CheckAdmin(string email);
 		Task<bool> CheckRole(string role);
 		Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role);
@@ -16,5 +17,7 @@ namespace ServicesApp.Interfaces
 		Task<string> ForgetPassword(string mail);
 		string GenerateRandomCode(int length);
 		Task<bool> ResetPassword(string mail, string newPassword);
-    }
+		Task<bool> DeactivateUser(string userId);
+
+	}
 }

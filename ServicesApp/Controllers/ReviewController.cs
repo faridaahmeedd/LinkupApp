@@ -1,54 +1,50 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Repository;
-using ServicesApp.Dto.Review;
-using ServicesApp.Core.Models;
+using ServicesApp.Dto.Reviews_Reports;
 using AutoMapper;
 using ServicesApp.APIs;
-using Microsoft.AspNetCore.Identity;
 
 namespace ServicesApp.Controllers
 {
-	[Route("/api/[controller]")]
-	[ApiController]
-	public class ReviewController : ControllerBase
-	{
-		private readonly IReviewRepository _ReviewRepository;
+    [Route("/api/[controller]")]
+    [ApiController]
+    public class ReviewController : ControllerBase
+    {
+        private readonly IReviewRepository _ReviewRepository;
         private readonly IMapper _mapper;
         private readonly ICustomerRepository _customerRepository;
         private readonly IProviderRepository _providerRepository;
 
-        public ReviewController(IReviewRepository ReviewRepository , IMapper mapper, IProviderRepository providerRepository, ICustomerRepository customerRepository)
+        public ReviewController(IReviewRepository IReviewRepository, IMapper mapper, IProviderRepository providerRepository, ICustomerRepository customerRepository)
         {
-            _ReviewRepository = ReviewRepository;
-			_customerRepository = customerRepository;
-			_providerRepository = providerRepository;
-			_mapper = mapper;
-			
+            _ReviewRepository = IReviewRepository;
+            _customerRepository = customerRepository;
+            _providerRepository = providerRepository;
+            _mapper = mapper;
+
         }
 
-		[HttpGet]
-		public IActionResult GetReviews()
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponse.NotValid);
-				}
-				var reviews = _ReviewRepository.GetReviews();
-				var mapreviews = _mapper.Map<List<GetReviewDto>>(reviews);
-				return Ok(mapreviews);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-		}
+        [HttpGet]
+        public IActionResult GetReviews()
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ApiResponse.NotValid);
+                }
+                var reviews = _ReviewRepository.GetReviews();
+                var mapreviews = _mapper.Map<List<GetReviewDto>>(reviews);
+                return Ok(mapreviews);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse.SomethingWrong);
+            }
+        }
 
-		[HttpGet("{ReviewId:int}", Name ="GetReviewById")]
+        [HttpGet("{ReviewId}")]
 		public IActionResult GetReview(int ReviewId)
 		{
 			try
@@ -70,8 +66,9 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
-        [HttpGet("GetCustomerReviews/{customerId}")]
-        public IActionResult GetCustomerReviews(string customerId)
+
+        [HttpGet("CustomerReviews/{CustomerId}")]
+        public IActionResult GetCustomerReviews(string CustomerId)
         {
             try
             {
@@ -79,21 +76,17 @@ namespace ServicesApp.Controllers
                 {
                     return BadRequest(ApiResponse.NotValid);
                 }
-                if (!_customerRepository.CustomerExist(customerId))
+                if (!_customerRepository.CustomerExist(CustomerId))
                 {
-                    return NotFound(ApiResponse.ReviewNotFound);
+                    return NotFound(ApiResponse.UserNotFound);
                 }
-                var Review = _ReviewRepository.GetReviewsOfCustomer(customerId);
+                var Review = _ReviewRepository.GetReviewsOfCustomer(CustomerId);
                 var mappedReviews = Review.Select(review =>
                 {
                     var reviewDto = _mapper.Map<GetReviewDto>(review);
-
-                    // Set the ReviewerName based on the customer's name
-                    reviewDto.ReviewerName = review.Customer.FName;
-
+                    reviewDto.ReviewerName = review.Customer.FName + " " + review.Customer.LName;
                     return reviewDto;
                 }).ToList();
-                // var mapReview = _mapper.Map<List<GetReviewDto>>(Review);
                 return Ok(mappedReviews);
             }
             catch
@@ -101,8 +94,9 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-        [HttpGet("GetProviderReviews/{providerId}")]
-        public IActionResult GetProviderReviews(string providerId)
+
+        [HttpGet("ProviderReviews/{ProviderId}")]
+        public IActionResult GetProviderReviews(string ProviderId)
         {
             try
             {
@@ -110,23 +104,19 @@ namespace ServicesApp.Controllers
                 {
                     return BadRequest(ApiResponse.NotValid);
                 }
-                if (!_providerRepository.ProviderExist(providerId))
+                if (!_providerRepository.ProviderExist(ProviderId))
                 {
                     return NotFound(ApiResponse.ReviewNotFound);
                 }
-                var Review = _ReviewRepository.GetReviewsOfProvider(providerId);
+                var Review = _ReviewRepository.GetReviewsOfProvider(ProviderId);
                 var mappedReviews = Review.Select(review =>
                 {
                     var reviewDto = _mapper.Map<GetReviewDto>(review);
-
-                    // Set the ReviewerName based on the customer's name
-                    reviewDto.ReviewerName = review.Provider.FName;
-
-                    return reviewDto;
+                    reviewDto.ReviewerName = review.Provider.FName + " " + review.Provider.LName;
+					return reviewDto;
                 }).ToList();
-                // var mapReview = _mapper.Map<List<GetReviewDto>>(Review);
+
                 return Ok(mappedReviews);
-             
             }
             catch
             {
@@ -134,8 +124,30 @@ namespace ServicesApp.Controllers
             }
         }
 
-        [HttpPost("ReviewCustomer")]
-		public IActionResult CreateCustomerReview([FromBody] PostReviewDto ReviewCreate, string customerId , string providerId)
+		[HttpGet("Rating/{Id}")]
+		public IActionResult GetRating(string Id)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponse.NotValid);
+				}
+				if (!_customerRepository.CustomerExist(Id) && !_providerRepository.ProviderExist(Id))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var rating = _ReviewRepository.CalculateAvgRating(Id);
+				return Ok(rating);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+
+		[HttpPost("Customer/{CustomerId}/{ProviderId}")]
+		public IActionResult CreateCustomerReview(string CustomerId, string ProviderId, [FromBody] PostReviewDto ReviewCreate)
          
 		{
 			try
@@ -146,16 +158,16 @@ namespace ServicesApp.Controllers
 				}
 
 				var mapReview = _mapper.Map<Review>(ReviewCreate);
-                if (!_customerRepository.CustomerExist(customerId))
+                if (!_customerRepository.CustomerExist(CustomerId))
                 {
                     return NotFound(ApiResponse.UserNotFound);
                 }
-                if (!_providerRepository.ProviderExist(providerId))
+                if (!_providerRepository.ProviderExist(ProviderId))
                 {
                     return NotFound(ApiResponse.UserNotFound);
                 }
-                mapReview.Customer = _customerRepository.GetCustomer(customerId);
-                mapReview.Provider = _providerRepository.GetProvider(providerId);
+                mapReview.Customer = _customerRepository.GetCustomer(CustomerId);
+                mapReview.Provider = _providerRepository.GetProvider(ProviderId);
 
                 mapReview.ReviewerRole = "Provider";
                 _ReviewRepository.CreateReview(mapReview);
@@ -172,11 +184,8 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-
-
-        [HttpPost("reviewProvider")]
-        public IActionResult CreateProviderReview([FromBody] PostReviewDto ReviewCreate, string customerId, string providerId)
-
+        [HttpPost("Provider/{CustomerId}/{ProviderId}")]
+        public IActionResult CreateProviderReview(string CustomerId, string ProviderId, [FromBody] PostReviewDto ReviewCreate)
         {
             try
             {
@@ -186,17 +195,16 @@ namespace ServicesApp.Controllers
                 }
 
                 var mapReview = _mapper.Map<Review>(ReviewCreate);
-                if (!_customerRepository.CustomerExist(customerId))
+                if (!_customerRepository.CustomerExist(CustomerId))
                 {
                     return NotFound(ApiResponse.UserNotFound);
                 }
-                if (!_providerRepository.ProviderExist(providerId))
+                if (!_providerRepository.ProviderExist(ProviderId))
                 {
                     return NotFound(ApiResponse.UserNotFound);
                 }
-                mapReview.Customer = _customerRepository.GetCustomer(customerId);
-                mapReview.Provider = _providerRepository.GetProvider(providerId);
-
+                mapReview.Customer = _customerRepository.GetCustomer(CustomerId);
+                mapReview.Provider = _providerRepository.GetProvider(ProviderId);
                 mapReview.ReviewerRole = "Customer";
 
                 _ReviewRepository.CreateReview(mapReview);
@@ -212,6 +220,5 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-
     }
 }

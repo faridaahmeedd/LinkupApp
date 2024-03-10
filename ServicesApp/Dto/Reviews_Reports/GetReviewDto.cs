@@ -1,4 +1,4 @@
-﻿namespace ServicesApp.Dto.Review
+﻿namespace ServicesApp.Dto.Reviews_Reports
 {
 	public class GetReviewDto
 	{

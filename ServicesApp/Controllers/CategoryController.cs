@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Repository;
 using ServicesApp.Dto.Category;
-using ServicesApp.Core.Models;
 using AutoMapper;
 using ServicesApp.APIs;
-using ServicesApp.Dto.Subcategory;
 
 namespace ServicesApp.Controllers
 {

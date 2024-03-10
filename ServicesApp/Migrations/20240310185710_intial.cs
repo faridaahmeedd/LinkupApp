@@ -398,7 +398,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "afba999e-2f4f-4634-a653-384fd0b7595f", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEDDRuY4Q/8xFukL/TqXHXAzR+j2UVGQO1c1a6PkKLM692powVd85+5Rf1vY7MEL8oQ==", "a850639a-af8a-4e06-a93a-a1f064c843f5", "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "55407853-fc12-4acb-8ef5-5d1ef2493daa", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEBIbxywnfMFY5ToDAz9bkrk+TLDgyqyJmCTdI1j76aEBVWGrHykP7jwnlEQlCWyFIA==", "7a26eeb2-df42-4f4d-9c09-4c87246fc217", "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

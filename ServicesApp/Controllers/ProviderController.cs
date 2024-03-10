@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.APIs;
-using ServicesApp.Dto.Users;
+using ServicesApp.Dto.User;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 
@@ -31,7 +31,7 @@ namespace ServicesApp.Controllers
 					return BadRequest(ApiResponse.NotValid);
 				}
 				var providers = _providerRepository.GetProviders();
-				var mapProviders = _mapper.Map<List<ProviderDto>>(providers);
+				var mapProviders = _mapper.Map<List<GetProviderDto>>(providers);
 				return Ok(mapProviders);
 			}
 			catch
@@ -55,7 +55,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.UserNotFound);
 				}
 				var provider = _providerRepository.GetProvider(ProviderId);
-				var mapProvider = _mapper.Map<ProviderDto>(provider);
+				var mapProvider = _mapper.Map<GetProviderDto>(provider);
 				return Ok(mapProvider);
 			}
 			catch
@@ -65,7 +65,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpPut("Profile/{ProviderId}")]
-		public async Task<IActionResult> UpdateProfile(string ProviderId, [FromBody] ProviderDto ProviderUpdate)
+		public async Task<IActionResult> UpdateProfile(string ProviderId, [FromBody] PostProviderDto ProviderUpdate)
 		{
 			try
 			{

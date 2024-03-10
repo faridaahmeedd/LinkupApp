@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
-using ServicesApp.Dto.Users;
 using ServicesApp.Interfaces;
 using ServicesApp.APIs;
+using ServicesApp.Dto.User;
 
 namespace ServicesApp.Controllers
 {
@@ -31,7 +31,7 @@ namespace ServicesApp.Controllers
 					return BadRequest(ApiResponse.NotValid);
 				}
 				var customers = _customerRepository.GetCustomers();
-				var mapCustomers = _mapper.Map<List<CustomerDto>>(customers);
+				var mapCustomers = _mapper.Map<List<GetCustomerDto>>(customers);
 				return Ok(mapCustomers);
 			}
 			catch
@@ -54,7 +54,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.UserNotFound);
 				}
 				var customer = _customerRepository.GetCustomer(CustomerId);
-				var mapCustomer = _mapper.Map<CustomerDto>(customer);
+				var mapCustomer = _mapper.Map<GetCustomerDto>(customer);
 				return Ok(mapCustomer);
 			}
 			catch
@@ -64,7 +64,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpPut("Profile/{CustomerId}")]
-		public async Task<IActionResult> UpdateProfile(string CustomerId, [FromBody] CustomerDto customerUpdate)
+		public async Task<IActionResult> UpdateProfile(string CustomerId, [FromBody] PostCustomerDto customerUpdate)
 		{
 			try
 			{

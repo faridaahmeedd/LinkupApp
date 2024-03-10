@@ -101,6 +101,7 @@ namespace ServicesApp.Controllers
         {
             try
             {
+                Console.WriteLine("dddd");
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ApiResponse.NotValid);

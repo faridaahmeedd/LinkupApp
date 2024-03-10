@@ -12,7 +12,7 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240306104728_intial")]
+    [Migration("20240310173038_intial")]
     partial class intial
     {
         /// <inheritdoc />
@@ -253,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "208d0edc-bb81-40c7-a0e2-126371cb2898",
+                            ConcurrencyStamp = "afba999e-2f4f-4634-a653-384fd0b7595f",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFxgWrY1bkSlWVfb54xMqLHrWn9EPMOdzit8/wetko37gpyJF9Ma8/onFbTmslA9bg==",
-                            SecurityStamp = "552d2e82-298c-4b5a-a624-7a7eecc7fa3e",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDDRuY4Q/8xFukL/TqXHXAzR+j2UVGQO1c1a6PkKLM692powVd85+5Rf1vY7MEL8oQ==",
+                            SecurityStamp = "a850639a-af8a-4e06-a93a-a1f064c843f5",
                             UserName = "MainAdmin"
                         });
                 });

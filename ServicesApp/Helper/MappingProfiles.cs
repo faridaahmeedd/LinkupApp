@@ -5,7 +5,7 @@ using ServicesApp.Dto.Category;
 using ServicesApp.Dto.Reviews_Reports;
 using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Subcategory;
-using ServicesApp.Dto.Users;
+using ServicesApp.Dto.User;
 using ServicesApp.Models;
 
 namespace ServicesApp.Helper
@@ -18,14 +18,18 @@ namespace ServicesApp.Helper
 			CreateMap<ServiceRequestDto, ServiceRequest>();
             CreateMap<ServiceRequest, ServiceDetailsDto>();
             CreateMap<ServiceDetailsDto, ServiceRequest>();
-			CreateMap<Customer, CustomerDto>();
-			CreateMap<CustomerDto, Customer>();
-			CreateMap<RegistrationDto, Customer>();
-			CreateMap<CustomerDto, RegistrationDto>();
-			CreateMap<Provider, ProviderDto>();
-			CreateMap<ProviderDto, Provider>();
-			CreateMap<RegistrationDto, Provider>();
-			CreateMap<ProviderDto, RegistrationDto>();
+			CreateMap<Customer, GetCustomerDto>();
+			CreateMap<GetCustomerDto, Customer>();
+            CreateMap<Customer, PostCustomerDto>();
+            CreateMap<PostCustomerDto, Customer>();
+            CreateMap<RegistrationDto, Customer>();
+			CreateMap<GetCustomerDto, RegistrationDto>();
+			CreateMap<Provider, GetProviderDto>();
+			CreateMap<GetProviderDto, Provider>();
+            CreateMap<Provider, PostProviderDto>();
+            CreateMap<PostProviderDto, Provider>();
+            CreateMap<RegistrationDto, Provider>();
+			CreateMap<GetProviderDto, RegistrationDto>();
 			CreateMap<RegistrationDto, Admin>();
 			CreateMap<Admin, RegistrationDto>();
             CreateMap<AppUser, RegistrationDto>();

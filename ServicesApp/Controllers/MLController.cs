@@ -20,7 +20,6 @@ namespace ServicesApp.Controllers
         public async Task<IActionResult> MatchJobAndService(int serviceId)
         {
             string result = await _ml.MatchJobAndService(serviceId);
-            Console.WriteLine("----------------------");
             Console.WriteLine(result);
 
             return Ok(result);

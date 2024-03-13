@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Nager.Country;
+using Newtonsoft.Json;
 using System.Text;
-
+using System.Net.Http;
 namespace ServicesApp.Repositories
 {
     public class PayMobRepository
@@ -9,147 +10,99 @@ namespace ServicesApp.Repositories
 
         public PayMobRepository(IConfiguration configuration)
         {
-
             _configuration = configuration;
-
         }
 
-        public async Task<string> GenerateToken()
+        //const string APIKey = "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RZMU1ESXlMQ0p1WVcxbElqb2lhVzVwZEdsaGJDSjkuTVJHc2lYMDFlNE04STQ4ekpNRk9CaHhOMzBTUDlEUV92N1RVdVlfMnBLUl9veDRvdXJ4TlJmWFVtVFJ0OTJleGJrN0RDVE9SZUhNTW40M3R5eWw0TkE="; 
+        const int integrationID = 4536584;   //credit
+
+        public async Task FirstStep()
         {
-            var api_key = _configuration["PayMob:ApiKey"];
-          
-            using (HttpClient client = new HttpClient())
-            {
-                var data = new
-                {
-                    api_key = api_key
-                };
+            var data = new { api_key = _configuration["PayMob:ApiKey"] };
+            var response = await PostDataAndGetResponse("https://accept.paymob.com/api/auth/tokens", data);
+            string token = response.token;
+            Console.WriteLine(token.ToString());
 
-                var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(data), System.Text.Encoding.UTF8, "application/json");
-
-                var response = await client.PostAsync("https://accept.paymob.com/api/auth/tokens", content);
-                Console.WriteLine("-----------ssssssssss--------");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var jsonString = await response.Content.ReadAsStringAsync();
-                    var token = JsonConvert.DeserializeObject<dynamic>(jsonString);
-                    Console.WriteLine("-------------------");
-
-                    Console.WriteLine(token); // or Console.WriteLine(token.ToString());
-
-                    string link = await GeneratePaymentLinkAsync(token.token.ToString());
-                    Console.WriteLine("-------------------");
-
-                    Console.WriteLine(link);
-                    return link;
-                }
-                else
-                {
-                    // Handle error if the request was not successful
-                    Console.WriteLine($"Error: {response.StatusCode}");
-                    return "error";
-                }
-            }
+            await SecondStep(token.ToString());
         }
-        public async Task<string> GeneratePaymentLinkAsync(string token)
+
+        public async Task SecondStep(string token)
         {
-            // Replace 'YOUR_INTEGRATION_ID' with your configured integration ID
-            var integrationId = "4538914";
-
-            // Replace with the necessary payment details (amount in cents, Name, email, and Phone number)
-            var paymentDetails = new
+            var data = new
             {
-                payment_method = integrationId,
-                
-                amount_cents = 1000, // Replace with the actual amount in cents
-                billing_name = "Linkup", // Replace with the actual name
-                billing_email = "linkupp2024@gmail.com", // Replace with the actual email
-                billing_phone = "01152034147",// Replace with the actual phone number
-                                              // Add any other necessary fields
-                is_live = true, // Add this field if required
-                integrations = new[] {"PayPal"  },
-
-                // Add the required payment_methods field (replace "credit_card" with the actual payment method)
-                payment_methods = new[] { 831 , 10 , 832 , 6, 158},
-
-
+                auth_token = token,
+                delivery_needed = "false",
+                amount_cents = "1000",
+                currency = "EGP",
+                items = new object[] { }
             };
 
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            var response = await PostDataAndGetResponse("https://accept.paymob.com/api/ecommerce/orders", data);
+            int  id = response.id;
+            Console.WriteLine(id);
 
-                var content = new StringContent(JsonConvert.SerializeObject(paymentDetails), Encoding.UTF8, "application/json");
-                Console.WriteLine($"Request Payload: {await content.ReadAsStringAsync()}");
-
-                using (var response = await httpClient.PostAsync("https://accept.paymob.com/api/ecommerce/payment-links", content))
-                {
-                    Console.WriteLine(response);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        var errorResponse = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Error Response: {errorResponse}");
-                    }
-
-                    var jsonResponse = await response.Content.ReadAsStringAsync();
-                    var paymentLinkResponse = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
-
-                    // Assuming the payment link is a string property in the response, replace 'PropertyName' with the actual property name.
-                    var paymentLink = paymentLinkResponse.PropertyName?.ToString();
-
-                    Console.WriteLine("------shrook--------------");
-
-                    return paymentLink;
-                }
-            }
+            await ThirdStep(token.ToString(), id);
         }
 
-        //public  async Task<string> GeneratePaymentLinkAsync(string token)
-        //{
-        //    // Replace 'YOUR_INTEGRATION_ID' with your configured integration ID
-        //    string integrationId = "4536584";
+        public async Task ThirdStep(string token, int orderId)
+        {
+            var data = new
+            {
+                auth_token = token,
+                amount_cents = "1000",
+                expiration = 3600,
+                order_id = orderId,
+                billing_data = new
+                {
+                    apartment = "803",
+                    email = "claudette09@exa.com",
+                    floor = "42",
+                    first_name = "Clifford",
+                    street = "Ethan Land",
+                    building = "8028",
+                    phone_number = "+86(8)9135210487",
+                    shipping_method = "PKG",
+                    postal_code = "01898",
+                    city = "Jaskolskiburgh",
+                    country = "CR",
+                    last_name = "Nicolas",
+                    state = "Utah"
+                },
+                currency = "EGP",
+                integration_id = integrationID
+            };
 
-        //    // Replace with the necessary payment details (amount in cents, Name, email, and Phone number)
-        //    var paymentDetails = new
-        //    {
-        //        payment_method = integrationId,
-        //        amount_cents = 1000, // Replace with the actual amount in cents
-        //        billing_name = "John Doe", // Replace with the actual name
-        //        billing_email = "john.doe@example.com", // Replace with the actual email
-        //        billing_phone = "1234567890" // Replace with the actual phone number
-        //                                     // Add any other necessary fields
-        //    };
+            var response = await PostDataAndGetResponse("https://accept.paymob.com/api/acceptance/payment_keys", data);
+            string theToken = response.token;
+            Console.WriteLine(theToken.ToString());
 
-        //    using (var httpClient = new HttpClient())
-        //    {
-        //        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            await CardPayment(theToken.ToString());
+        }
 
-        //        var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(paymentDetails), Encoding.UTF8, "application/json");
+        public async Task CardPayment(string token)
+        {
+            var iframeURL = $"https://accept.paymob.com/api/acceptance/iframes/831255?payment_token={token}";
+            Console.WriteLine($"Redirecting to: {iframeURL}");
+        }
 
-        //        using (
-        //            var response = await httpClient.PostAsync("https://accept.paymob.com/api/ecommerce/payment-links", content))
-        //        {
-        //            if (!response.IsSuccessStatusCode)
-        //            {
-        //                var errorResponse = await response.Content.ReadAsStringAsync();
-        //                Console.WriteLine($"Error Response: {errorResponse}");
-        //            }
-        //            Console.WriteLine("-----fefe--------------");
-        //           // response.EnsureSuccessStatusCode();
 
-        //            var jsonResponse = await response.Content.ReadAsStringAsync();
-        //            var paymentLinkResponse = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
-        //            var paymentLink = paymentLinkResponse;
+        public async Task<dynamic> PostDataAndGetResponse(string url, object data)
+        {
+            using (var client = new HttpClient())
+            {
+                var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data), System.Text.Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
 
-        //            Console.WriteLine(paymentLink);
-        //            Console.WriteLine("------shrook--------------");
+                // Read the response content as a string
+                var responseContent = await response.Content.ReadAsStringAsync();
 
-        //            return paymentLink;
-        //        }
-        //    }
-        //}
+                // Deserialize the response content to dynamic or any other type you expect
+                dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(responseContent);
+
+                return result;
+            }
+        }
 
 
     }

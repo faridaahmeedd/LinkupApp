@@ -19,8 +19,8 @@ namespace ServicesApp.Controllers
         {
             try
             {
-               var link =  await _payMobRepository.GenerateToken();
-                return Ok(link); // You can customize the response as needed
+                 await _payMobRepository.FirstStep();
+                return Ok("SUCCESS"); // You can customize the response as needed
             }
             catch (Exception ex)
             {

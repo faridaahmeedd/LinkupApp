@@ -2,37 +2,52 @@
 using Newtonsoft.Json;
 using System.Text;
 using System.Net.Http;
+using ServicesApp.Interfaces;
+using System;
+using ServicesApp.Models;
+using Azure.Core;
+using ServicesApp.Data;
+using Microsoft.EntityFrameworkCore;
 namespace ServicesApp.Repositories
 {
-    public class PayMobRepository
+    public class PayMobRepository : IPayMobRepository
     {
         private readonly IConfiguration _configuration;
+        private readonly IServiceRequestRepository _serviceRepository;
+        private readonly DataContext _context;
 
-        public PayMobRepository(IConfiguration configuration)
+
+
+        public PayMobRepository(IConfiguration configuration , IServiceRequestRepository serviceRequest, DataContext context)
         {
             _configuration = configuration;
+            _serviceRepository = serviceRequest;
+            _context = context;
         }
 
-        //const string APIKey = "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RZMU1ESXlMQ0p1WVcxbElqb2lhVzVwZEdsaGJDSjkuTVJHc2lYMDFlNE04STQ4ekpNRk9CaHhOMzBTUDlEUV92N1RVdVlfMnBLUl9veDRvdXJ4TlJmWFVtVFJ0OTJleGJrN0RDVE9SZUhNTW40M3R5eWw0TkE="; 
-        const int integrationID = 4536584;   //credit
+        
+        const int integrationID = 4536584;   //online card
 
-        public async Task FirstStep()
+        public async Task<string> FirstStep(int ServiceId)
         {
             var data = new { api_key = _configuration["PayMob:ApiKey"] };
             var response = await PostDataAndGetResponse("https://accept.paymob.com/api/auth/tokens", data);
             string token = response.token;
             Console.WriteLine(token.ToString());
 
-            await SecondStep(token.ToString());
+             return await SecondStep(token.ToString(), ServiceId);
         }
 
-        public async Task SecondStep(string token)
+        public async Task<string> SecondStep(string token , int ServiceId)
         {
+            var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
+            var request = _serviceRepository.GetService(ServiceId);
+
             var data = new
             {
                 auth_token = token,
                 delivery_needed = "false",
-                amount_cents = "1000",
+                amount_cents = (100 * offer.Fees).ToString(),
                 currency = "EGP",
                 items = new object[] { }
             };
@@ -41,48 +56,58 @@ namespace ServicesApp.Repositories
             int  id = response.id;
             Console.WriteLine(id);
 
-            await ThirdStep(token.ToString(), id);
+           return  await ThirdStep(token.ToString(), id , ServiceId);
         }
 
-        public async Task ThirdStep(string token, int orderId)
+        public async Task<string> ThirdStep(string token, int orderId , int ServiceId)
         {
+           // var request = _serviceRepository.GetService(ServiceId);
+            var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
+            var request = _context.Requests.Include(c => c.Customer).Where(p => p.Id == ServiceId).FirstOrDefault();
+
             var data = new
             {
                 auth_token = token,
-                amount_cents = "1000",
+                amount_cents = (100* offer.Fees).ToString(), 
                 expiration = 3600,
                 order_id = orderId,
                 billing_data = new
                 {
+                    
+                    email = request.Customer.Email,
+                    first_name = request.Customer.FName,
+                    street = request.Customer.Address,
+                    phone_number = request.Customer.MobileNumber,
+                    city = request.Customer.City,
+                    country = request.Customer.Country,
+                    last_name = request.Customer.LName,
+                    // TODO : not real data , can not reomve
+                    state = "Utah",    
                     apartment = "803",
-                    email = "claudette09@exa.com",
                     floor = "42",
-                    first_name = "Clifford",
-                    street = "Ethan Land",
                     building = "8028",
-                    phone_number = "+86(8)9135210487",
                     shipping_method = "PKG",
-                    postal_code = "01898",
-                    city = "Jaskolskiburgh",
-                    country = "CR",
-                    last_name = "Nicolas",
-                    state = "Utah"
+                    postal_code = "01898"
                 },
                 currency = "EGP",
                 integration_id = integrationID
             };
+            Console.WriteLine("---------------------");
 
+            Console.WriteLine(request.Customer.FName);
             var response = await PostDataAndGetResponse("https://accept.paymob.com/api/acceptance/payment_keys", data);
             string theToken = response.token;
             Console.WriteLine(theToken.ToString());
 
-            await CardPayment(theToken.ToString());
+            return await CardPayment(theToken.ToString());
         }
 
-        public async Task CardPayment(string token)
+        public async Task<string> CardPayment(string token)
         {
             var iframeURL = $"https://accept.paymob.com/api/acceptance/iframes/831255?payment_token={token}";
             Console.WriteLine($"Redirecting to: {iframeURL}");
+            return iframeURL;
+            
         }
 
 
@@ -94,7 +119,6 @@ namespace ServicesApp.Repositories
                 var response = await client.PostAsync(url, content);
                 response.EnsureSuccessStatusCode();
 
-                // Read the response content as a string
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 // Deserialize the response content to dynamic or any other type you expect

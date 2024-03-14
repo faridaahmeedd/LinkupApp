@@ -1,30 +1,49 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServicesApp.APIs;
+using ServicesApp.Interfaces;
 using ServicesApp.Repositories;
 
 namespace ServicesApp.Controllers
 {
     [ApiController]
-    [Route("api/paypal")]
+    [Route("api/paymob")]
     public class PayMobController : ControllerBase
     {
-        private readonly PayMobRepository _payMobRepository;
-        public PayMobController(PayMobRepository payMobRepository)
+        private readonly IPayMobRepository _payMobRepository;
+        private readonly IServiceRequestRepository _serviceRepository;
+
+        public PayMobController(IPayMobRepository payMobRepository , IServiceRequestRepository serviceRequestRepository )
         {
             _payMobRepository = payMobRepository;
+            _serviceRepository = serviceRequestRepository;
             
         }
         [HttpPost]
-        [Route("firstStep")]
-        public async Task<IActionResult> FirstStep()
+        [Route("payment-paymob/{ServiceId}")]
+        public async Task<IActionResult> FirstStep(int ServiceId)
         {
             try
             {
-                 await _payMobRepository.FirstStep();
-                return Ok("SUCCESS"); // You can customize the response as needed
+
+                if (!_serviceRepository.ServiceExist(ServiceId))
+                {
+                    return NotFound(ApiResponse.RequestNotFound);
+                }
+                if (_serviceRepository.GetAcceptedOffer(ServiceId) == null)
+                {
+                    return NotFound(ApiResponse.OfferNotFound);
+                }
+
+                var paymentLink=  await _payMobRepository.FirstStep(ServiceId);
+                if (paymentLink != null)
+                {
+                    return Ok(paymentLink);
+                }
+                return BadRequest(ApiResponse.PaymentError);
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest($"Error: {ex.Message}");
+                return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
     }

@@ -156,7 +156,7 @@ namespace ServicesApp.Repository
                         Date = t.Date.ToString(),
                         FromTime = t.FromTime.ToString()
                     }).ToList(),
-                    Offers = r.Offers.Select(t => new ServiceOfferDto
+                    Offers = r.Offers.Select(t => new PostServiceOfferDto
                     {
                         Fees = t.Fees,
                         Duration = t.Duration.ToString(),

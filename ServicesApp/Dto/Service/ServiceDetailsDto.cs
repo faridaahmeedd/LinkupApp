@@ -11,7 +11,7 @@
         public int MaxFees { get; set; }
 		public int MinFees { get; set; }
 		//public byte[]? Image { get; set; }
-		public ICollection<ServiceOfferDto>? Offers { get; set; }
+		public ICollection<PostServiceOfferDto>? Offers { get; set; }
         public required ICollection<TimeSlotDto> TimeSlots { get; set; }
     }
 }

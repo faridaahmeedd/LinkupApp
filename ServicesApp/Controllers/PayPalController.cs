@@ -41,12 +41,12 @@ public class PayPalController : ControllerBase
 		}
 	}
 
-	[HttpPost("execute-payment/{PaymentId}/{Token}/{PayerId}")]
-	public async Task<IActionResult> ExecutePayment(string PaymentId, string Token, string PayerId)
+	[HttpPost("execute-payment/{ServiceId}/{PaymentId}/{Token}/{PayerId}")]
+	public async Task<IActionResult> ExecutePayment(int ServiceId, string PaymentId, string Token, string PayerId)
 	{
 		try
 		{
-			var responseState = await _payPalRepsoitory.ExecutePayment(PaymentId, Token, PayerId);
+			var responseState = await _payPalRepsoitory.ExecutePayment(ServiceId, PaymentId, Token, PayerId);
 			if (responseState == "approved")
 			{
 				// Redirect to your success page

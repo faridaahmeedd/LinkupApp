@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240310185710_intial")]
-    partial class intial
+    [Migration("20240316213438_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -253,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "55407853-fc12-4acb-8ef5-5d1ef2493daa",
+                            ConcurrencyStamp = "28161f4b-0d6d-455c-b71c-1e4a098a1888",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBIbxywnfMFY5ToDAz9bkrk+TLDgyqyJmCTdI1j76aEBVWGrHykP7jwnlEQlCWyFIA==",
-                            SecurityStamp = "7a26eeb2-df42-4f4d-9c09-4c87246fc217",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBWd/hYDU/rHZr3U/yaIbTiuytDpN4zsfoMx6sneiW14fNx2eQRtgtXSTUySAhX28Q==",
+                            SecurityStamp = "79ad665a-7baf-4940-bd3c-5568fda20af2",
                             UserName = "MainAdmin"
                         });
                 });
@@ -408,6 +408,14 @@ namespace ServicesApp.Migrations
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")

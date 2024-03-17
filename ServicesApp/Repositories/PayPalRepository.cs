@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using System.Net.Http.Headers;
@@ -151,17 +152,19 @@ namespace ServicesApp.Repositories
 			throw new Exception($"PayPal API request failed. Status code: {response.StatusCode}. Response: {errorResponse}");
 		}
 
-		public async Task<string> ExecutePayment(string paymentId, string token, string payerID)
+		public async Task<string> ExecutePayment(int ServiceId, string paymentId, string token, string payerID)
 		{
 			var executePaymentJson = new
 			{
 				payer_id = payerID,
 			};
+			var request = _context.Requests.Where(p => p.Id == ServiceId).FirstOrDefault();
+			request.PaymentStatus = "Paid";
+			_context.SaveChanges();
 			var executePaymentResponse = await SendPayPalRequest($"/v1/payments/payment/{paymentId}/execute?token={token}", executePaymentJson);
 			Console.WriteLine(executePaymentResponse);
 			Console.WriteLine(executePaymentResponse.state);
 			return executePaymentResponse.state;
 		}
-
 	}
 }

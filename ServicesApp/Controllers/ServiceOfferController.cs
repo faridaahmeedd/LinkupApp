@@ -39,7 +39,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOffers());
+				var offers = _mapper.Map<List<PostServiceOfferDto>>(_offerRepository.GetOffers());
 				return Ok(offers);
 			}
 			catch
@@ -61,7 +61,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.OfferNotFound);
 				}
-				var offer = _mapper.Map<ServiceOfferDto>(_offerRepository.GetOffer(OfferId));
+				var offer = _mapper.Map<PostServiceOfferDto>(_offerRepository.GetOffer(OfferId));
 				return Ok(offer);
 			}
 			catch
@@ -71,7 +71,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpPost("{ProviderId}/{RequestId}")]
-		public IActionResult CreateOffer(string ProviderId, int RequestId, [FromBody] ServiceOfferDto serviceOfferDto)
+		public IActionResult CreateOffer(string ProviderId, int RequestId, [FromBody] PostServiceOfferDto serviceOfferDto)
 		{
 			try
 			{
@@ -131,7 +131,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpPut("{OfferId}")]
-		public IActionResult UpdateOffer(int OfferId, [FromBody] ServiceOfferDto serviceOfferDto)
+		public IActionResult UpdateOffer(int OfferId, [FromBody] PostServiceOfferDto serviceOfferDto)
 		{
 			try
 			{
@@ -229,7 +229,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.UserNotFound);
 				}
-				var Offers = _mapper.Map<List<ServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
+				var Offers = _mapper.Map<List<PostServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
 				return Ok(Offers);
 			}
 			catch

@@ -127,7 +127,5 @@ namespace ServicesApp.Repositories
                 return result;
             }
         }
-
-
     }
 }

@@ -17,7 +17,5 @@
         public string? Balance { get; set; }
         public string? Active { get; set; }
         public string? Email { get; set; }
-
     }
-
 }

@@ -35,7 +35,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var services = _mapper.Map<List<PostServiceRequestDto>>(_serviceRepository.GetServices());
+				var services = _mapper.Map<List<GetServiceRequestDto>>(_serviceRepository.GetServices());
 				return Ok(services);
 			}
 			catch
@@ -57,7 +57,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.RequestNotFound);
 				}
-				var service = _mapper.Map<PostServiceRequestDto>(_serviceRepository.GetService(ServiceId));
+				var service = _mapper.Map<GetServiceRequestDto>(_serviceRepository.GetService(ServiceId));
 				return Ok(service);
 			}
 			catch
@@ -80,7 +80,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.UserNotFound);
 				}
 				var services = _serviceRepository.GetServicesByCustomer(CustomerId);
-				var mapServices = _mapper.Map<List<PostServiceRequestDto>>(services);
+				var mapServices = _mapper.Map<List<GetServiceRequestDto>>(services);
 				return Ok(mapServices);
 			}
 			catch
@@ -98,7 +98,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var services = _mapper.Map<List<PostServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
+				var services = _mapper.Map<List<GetServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
 				return Ok(services);
 			}
 			catch

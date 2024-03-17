@@ -6,5 +6,5 @@
         public string Location { get; set; }
 		public string PaymentMethod { get; set; }
 		// public byte[]? Image { get; set; }
-	}
+    }
 }

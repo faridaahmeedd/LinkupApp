@@ -12,7 +12,7 @@ namespace ServicesApp.Interfaces
 		Task<bool> CheckRole(string role);
 		Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role);
 		Task<IdentityResult> CreateAdmin(RegistrationDto registerDto);
-		void SendRegistrtationMail(string recipientEmail);
+		void SendMail(string recipientEmail, string subject , string filename);
 		Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto);
 		Task<string> ForgetPassword(string mail);
 		string GenerateRandomCode(int length);

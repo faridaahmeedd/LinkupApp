@@ -14,8 +14,8 @@ namespace ServicesApp.Helper
 	{
         public MappingProfiles()
         {
-            CreateMap<ServiceRequest, ServiceRequestDto>();
-			CreateMap<ServiceRequestDto, ServiceRequest>();
+            CreateMap<ServiceRequest, PostServiceRequestDto>();
+			CreateMap<PostServiceRequestDto, ServiceRequest>();
             CreateMap<ServiceRequest, ServiceDetailsDto>();
             CreateMap<ServiceDetailsDto, ServiceRequest>();
 			CreateMap<Customer, GetCustomerDto>();
@@ -46,12 +46,12 @@ namespace ServicesApp.Helper
             CreateMap<Report, GetReportDto>();
             CreateMap<PostReportDto, Report>();
             CreateMap<Report, PostReportDto>();
-            CreateMap<ServiceOffer, ServiceOfferDto>()
+            CreateMap<ServiceOffer, PostServiceOfferDto>()
 				.ForMember(
 					dest => dest.Duration,
 					opt => opt.MapFrom(src => ConvertTimeToString(src.Duration))
 				);
-			CreateMap<ServiceOfferDto, ServiceOffer>()
+			CreateMap<PostServiceOfferDto, ServiceOffer>()
 				.ForMember(
 					dest => dest.Duration,
 					opt => opt.MapFrom(src => ConvertStringToTime(src.Duration))

@@ -9,6 +9,6 @@ namespace ServicesApp.Interfaces
 		Task<string> GetAccessToken();
 		string GetApprovalLink(dynamic links);
 		Task<dynamic> SendPayPalRequest(string endpoint, object requestData);
-		Task<string> ExecutePayment(string paymentId, string token, string payerID);
+		Task<string> ExecutePayment(int ServiceId, string paymentId, string token, string payerID);
 	}
 }

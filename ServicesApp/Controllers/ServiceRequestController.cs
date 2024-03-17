@@ -35,7 +35,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServices());
+				var services = _mapper.Map<List<PostServiceRequestDto>>(_serviceRepository.GetServices());
 				return Ok(services);
 			}
 			catch
@@ -57,7 +57,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.RequestNotFound);
 				}
-				var service = _mapper.Map<ServiceRequestDto>(_serviceRepository.GetService(ServiceId));
+				var service = _mapper.Map<PostServiceRequestDto>(_serviceRepository.GetService(ServiceId));
 				return Ok(service);
 			}
 			catch
@@ -80,7 +80,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.UserNotFound);
 				}
 				var services = _serviceRepository.GetServicesByCustomer(CustomerId);
-				var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
+				var mapServices = _mapper.Map<List<PostServiceRequestDto>>(services);
 				return Ok(mapServices);
 			}
 			catch
@@ -98,7 +98,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
+				var services = _mapper.Map<List<PostServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
 				return Ok(services);
 			}
 			catch
@@ -107,7 +107,7 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-		[HttpGet("Complete/{ServiceId}")]
+		[HttpPut("Complete/{ServiceId}")]
         public IActionResult CompleteService(int ServiceId)
 		{
 			try
@@ -130,7 +130,7 @@ namespace ServicesApp.Controllers
 		}
 
         [HttpPost("{CustomerId}/{SubcategoryId}")]
-		public IActionResult CreateService(string CustomerId, int SubcategoryId, [FromBody] ServiceRequestDto serviceRequestDto)
+		public IActionResult CreateService(string CustomerId, int SubcategoryId, [FromBody] PostServiceRequestDto serviceRequestDto)
 		{
 			try
 			{
@@ -170,7 +170,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpPut("{ServiceId}")]
-		public IActionResult UpdateService(int ServiceId, [FromBody] ServiceRequestDto serviceRequestDto)
+		public IActionResult UpdateService(int ServiceId, [FromBody] PostServiceRequestDto serviceRequestDto)
 		{
 			try
 			{
@@ -234,7 +234,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.RequestNotFound);
 				}
 				var offers = _serviceRepository.GetUndeclinedOffersOfService(serviceId);
-				var offersMap = _mapper.Map<List<ServiceOfferDto>>(offers);
+				var offersMap = _mapper.Map<List<PostServiceOfferDto>>(offers);
 				return Ok(offersMap);
 			}
 			catch
@@ -251,7 +251,7 @@ namespace ServicesApp.Controllers
 				var acceptedOffer = _serviceRepository.GetAcceptedOffer(serviceId);
 				if (acceptedOffer != null)
 				{
-					var offerMap = _mapper.Map<ServiceOfferDto>(acceptedOffer);
+					var offerMap = _mapper.Map<PostServiceOfferDto>(acceptedOffer);
 					return Ok(offerMap);
 				}
 				return NotFound(ApiResponse.OfferNotFound);

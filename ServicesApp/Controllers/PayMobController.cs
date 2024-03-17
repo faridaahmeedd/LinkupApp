@@ -19,12 +19,11 @@ namespace ServicesApp.Controllers
             
         }
         [HttpPost]
-        [Route("payment-paymob/{ServiceId}")]
-        public async Task<IActionResult> FirstStep(int ServiceId)
+        [Route("payment/{ServiceId}")]
+        public async Task<IActionResult> PayService(int ServiceId)
         {
             try
             {
-
                 if (!_serviceRepository.ServiceExist(ServiceId))
                 {
                     return NotFound(ApiResponse.RequestNotFound);

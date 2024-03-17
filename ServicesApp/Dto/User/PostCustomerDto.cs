@@ -2,7 +2,6 @@
 {
     public class PostCustomerDto
     {
-    
         public required string FName { get; set; }
         public required string LName { get; set; }
         public required string City { get; set; }

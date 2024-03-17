@@ -9,6 +9,8 @@ namespace ServicesApp.Models
 		public byte[]? Image { get; set; }
 		public string Status { get; set; } = "Requested" ;
 		public string? Location { get; set; }
+		public required string PaymentMethod { get; set; }
+		public string PaymentStatus { get; set; } = "Pending"; //Pending Paid
 		public Subcategory? Subcategory { get; set; }
         public Customer? Customer { get; set; }
         public ICollection<ServiceOffer>? Offers { get; set; }

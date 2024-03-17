@@ -6,6 +6,8 @@
 		public required string Description { get; set; }
 		public string Location { get; set; }
 		public string Status { get; set; } = "Requested";
+		public string PaymentMethod { get; set; }
+		public string PaymentStatus { get; set; } = "Pending";
 		public string ProviderName { get; set; }
 		public string ProviderMobileNumber { get; set; }
 		public byte[]? Image { get; set; }

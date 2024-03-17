@@ -14,19 +14,11 @@ namespace ServicesApp.Helper
 	{
         public MappingProfiles()
         {
-            CreateMap<ServiceRequest, PostServiceRequestDto>();
-			CreateMap<PostServiceRequestDto, ServiceRequest>();
-            CreateMap<ServiceRequest, ServiceDetailsDto>();
-            CreateMap<ServiceDetailsDto, ServiceRequest>();
 			CreateMap<Customer, GetCustomerDto>();
-			CreateMap<GetCustomerDto, Customer>();
-            CreateMap<Customer, PostCustomerDto>();
             CreateMap<PostCustomerDto, Customer>();
             CreateMap<RegistrationDto, Customer>();
 			CreateMap<GetCustomerDto, RegistrationDto>();
 			CreateMap<Provider, GetProviderDto>();
-			CreateMap<GetProviderDto, Provider>();
-            CreateMap<Provider, PostProviderDto>();
             CreateMap<PostProviderDto, Provider>();
             CreateMap<RegistrationDto, Provider>();
 			CreateMap<GetProviderDto, RegistrationDto>();
@@ -38,15 +30,19 @@ namespace ServicesApp.Helper
             CreateMap<CategoryDto, Category>();
 			CreateMap<Subcategory, SubcategoryDto>();
 			CreateMap<SubcategoryDto, Subcategory>();
-            CreateMap<GetReviewDto, Review>();
             CreateMap<Review, GetReviewDto>();
             CreateMap<PostReviewDto, Review>();
-            CreateMap<Review, PostReviewDto>();
-			CreateMap<GetReportDto, Report>();
             CreateMap<Report, GetReportDto>();
             CreateMap<PostReportDto, Report>();
-            CreateMap<Report, PostReportDto>();
-            CreateMap<ServiceOffer, PostServiceOfferDto>()
+			CreateMap<ServiceRequest, GetServiceRequestDto>()
+				.ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Customer.Id))
+				.ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => $"{src.Customer.FName} {src.Customer.LName}"))
+				.ForMember(dest => dest.SubCategoryName, opt => opt.MapFrom(src => src.Subcategory.Name));
+			CreateMap<PostServiceRequestDto, ServiceRequest>();
+			CreateMap<ServiceOffer, GetServiceOfferDto>()
+				.ForMember(dest => dest.ProviderId, opt => opt.MapFrom(src => src.Provider.Id))
+				.ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => $"{src.Provider.FName} {src.Provider.LName}"))
+				.ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Request.Id))
 				.ForMember(
 					dest => dest.Duration,
 					opt => opt.MapFrom(src => ConvertTimeToString(src.Duration))

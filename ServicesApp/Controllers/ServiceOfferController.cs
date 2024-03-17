@@ -39,7 +39,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var offers = _mapper.Map<List<PostServiceOfferDto>>(_offerRepository.GetOffers());
+				var offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOffers());
 				return Ok(offers);
 			}
 			catch
@@ -61,7 +61,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.OfferNotFound);
 				}
-				var offer = _mapper.Map<PostServiceOfferDto>(_offerRepository.GetOffer(OfferId));
+				var offer = _mapper.Map<GetServiceOfferDto>(_offerRepository.GetOffer(OfferId));
 				return Ok(offer);
 			}
 			catch
@@ -229,7 +229,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.UserNotFound);
 				}
-				var Offers = _mapper.Map<List<PostServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
+				var Offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
 				return Ok(Offers);
 			}
 			catch
@@ -292,27 +292,5 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-
-		[HttpGet("ForProvider/{ProviderId}")]
-		public IActionResult OffersDetailsForProvider(string ProviderId)
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponse.NotValid);
-				}
-				if (!_providerRepository.ProviderExist(ProviderId))
-				{
-					return NotFound(ApiResponse.UserNotFound);
-				}
-				var offer = _offerRepository.ServiceDetailsForProvider(ProviderId);
-				return Ok(offer);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-		}
 	}
 }

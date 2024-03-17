@@ -35,7 +35,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var services = _mapper.Map<List<PostServiceRequestDto>>(_serviceRepository.GetServices());
+				var services = _mapper.Map<List<GetServiceRequestDto>>(_serviceRepository.GetServices());
 				return Ok(services);
 			}
 			catch
@@ -57,7 +57,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.RequestNotFound);
 				}
-				var service = _mapper.Map<PostServiceRequestDto>(_serviceRepository.GetService(ServiceId));
+				var service = _mapper.Map<GetServiceRequestDto>(_serviceRepository.GetService(ServiceId));
 				return Ok(service);
 			}
 			catch
@@ -80,7 +80,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.UserNotFound);
 				}
 				var services = _serviceRepository.GetServicesByCustomer(CustomerId);
-				var mapServices = _mapper.Map<List<PostServiceRequestDto>>(services);
+				var mapServices = _mapper.Map<List<GetServiceRequestDto>>(services);
 				return Ok(mapServices);
 			}
 			catch
@@ -98,7 +98,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var services = _mapper.Map<List<PostServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
+				var services = _mapper.Map<List<GetServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
 				return Ok(services);
 			}
 			catch
@@ -234,7 +234,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.RequestNotFound);
 				}
 				var offers = _serviceRepository.GetUndeclinedOffersOfService(serviceId);
-				var offersMap = _mapper.Map<List<PostServiceOfferDto>>(offers);
+				var offersMap = _mapper.Map<List<GetServiceOfferDto>>(offers);
 				return Ok(offersMap);
 			}
 			catch
@@ -251,28 +251,10 @@ namespace ServicesApp.Controllers
 				var acceptedOffer = _serviceRepository.GetAcceptedOffer(serviceId);
 				if (acceptedOffer != null)
 				{
-					var offerMap = _mapper.Map<PostServiceOfferDto>(acceptedOffer);
+					var offerMap = _mapper.Map<GetServiceOfferDto>(acceptedOffer);
 					return Ok(offerMap);
 				}
 				return NotFound(ApiResponse.OfferNotFound);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-		}
-
-		[HttpGet("AllServicesDetails")]
-		public IActionResult GetAllServicesDetails()
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponse.NotValid);
-				}
-				var serviceDetails = _serviceRepository.GetAllServicesDetails();
-				return Ok(serviceDetails);
 			}
 			catch
 			{
@@ -309,27 +291,6 @@ namespace ServicesApp.Controllers
             }
         }
 
-		[HttpGet("ForCustomer/{CustomerId}")]
-		public IActionResult RequestsForCustomer(string CustomerId)
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponse.NotValid);
-				}
-				if (!_customerRepository.CustomerExist(CustomerId))
-				{
-					return NotFound(ApiResponse.UserNotFound);
-				}
-				var requests = _serviceRepository.ServiceDetailsForCustomer(CustomerId);
-				return Ok(requests);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-		}
 
 		//[HttpGet("WithMaxFees")]
 		//public IActionResult GetServicesWithFees()

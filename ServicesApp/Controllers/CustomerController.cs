@@ -41,7 +41,7 @@ namespace ServicesApp.Controllers
 		}
 
 
-		[HttpGet("{CustomerId}", Name = "GetCustomerById")]
+		[HttpGet("{CustomerId}")]
 		public IActionResult GetCustomer(string CustomerId) {
 			try
 			{

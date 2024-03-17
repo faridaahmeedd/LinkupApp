@@ -41,7 +41,7 @@ namespace ServicesApp.Controllers
 		}
 
 
-		[HttpGet("{ProviderId}", Name = "GetProviderById")]
+		[HttpGet("{ProviderId}")]
 		public IActionResult GetProvider(string ProviderId)
 		{
 			try

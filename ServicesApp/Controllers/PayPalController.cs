@@ -28,6 +28,11 @@ public class PayPalController : ControllerBase
 			{
 				return NotFound(ApiResponse.OfferNotFound);
 			}
+			var request = _serviceRepository.GetService(ServiceId);
+			if(request.PaymentStatus == "Paid")
+			{
+				return BadRequest(ApiResponse.PaidAlready);
+			}
 			var approvalLink = await _payPalRepsoitory.CreatePayment(ServiceId);
 			if(approvalLink != null)
 			{
@@ -46,6 +51,10 @@ public class PayPalController : ControllerBase
 	{
 		try
 		{
+			if (!_serviceRepository.ServiceExist(ServiceId))
+			{
+				return NotFound(ApiResponse.RequestNotFound);
+			}
 			var responseState = await _payPalRepsoitory.ExecutePayment(ServiceId, PaymentId, Token, PayerId);
 			if (responseState == "approved")
 			{

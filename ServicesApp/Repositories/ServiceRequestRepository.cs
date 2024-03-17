@@ -18,22 +18,22 @@ namespace ServicesApp.Repository
 
 		public ICollection<ServiceRequest> GetServices()
 		{
-			return _context.Requests.OrderBy(p => p.Id).ToList();
+			return _context.Requests.Include(p => p.Subcategory).Include(p => p.Customer).OrderBy(p => p.Id).ToList();
 		}
 
 		public ServiceRequest GetService(int id)
 		{
-			return _context.Requests.Include(p => p.Subcategory).Where(p => p.Id == id).FirstOrDefault();
+			return _context.Requests.Include(p => p.Subcategory).Include(p => p.Customer).Where(p => p.Id == id).FirstOrDefault();
 		}
 
         public ICollection<ServiceRequest> GetServicesByCustomer(string customerId)
 		{
-			return _context.Requests.Where(p => p.Customer.Id == customerId).ToList();
+			return _context.Requests.Include(p => p.Subcategory).Include(p => p.Customer).Where(p => p.Customer.Id == customerId).ToList();
 		}
 
 		public ICollection<ServiceRequest> GetUncompletedServices()
         {
-			return _context.Requests.Where(p => p.Status == "Requested").ToList();
+			return _context.Requests.Include(p => p.Subcategory).Include(p => p.Customer).Where(p => p.Status == "Requested").ToList();
 		}
 
 		public bool ServiceExist(int id)
@@ -52,14 +52,15 @@ namespace ServicesApp.Repository
             var existingService = _context.Requests.Find(updatedService.Id);
             if (existingService != null)
             {
-                if(existingService.Status == "Requested")
+				existingService.PaymentStatus = updatedService.PaymentStatus;
+				if (existingService.Status == "Requested")
                 {
 					existingService.Description = updatedService.Description;
 					existingService.Image = updatedService.Image;
 					existingService.Location = updatedService.Location;
-					return Save();
 				}
-            }
+				return Save();
+			}
             return false;
         }
 
@@ -133,42 +134,6 @@ namespace ServicesApp.Repository
             return null;
         }
       
-        public ICollection<ServiceDetailsDto> GetAllServicesDetails()
-        {
-            var serviceDetails = _context.Requests
-                .Include(r => r.Subcategory)
-                .Include(r => r.Customer)
-                .Include(r => r.Offers)
-                .Include(r => r.TimeSlots)
-                .Select(r => new ServiceDetailsDto
-                {
-                    Id = r.Id,
-                    Description = r.Description,
-                    Status = r.Status,
-                    CustomerName = r.Customer.FName,
-                    CustomerId = r.Customer.Id,
-                    SubcategoryName = r.Subcategory.Name,
-					MinFees = r.Subcategory.MinFees,
-					MaxFees = r.Subcategory.MaxFees,
-                    TimeSlots = r.TimeSlots.Select(t => new TimeSlotDto
-                    {
-                        Id = t.Id,
-                        Date = t.Date.ToString(),
-                        FromTime = t.FromTime.ToString()
-                    }).ToList(),
-                    Offers = r.Offers.Select(t => new PostServiceOfferDto
-                    {
-                        Fees = t.Fees,
-                        Duration = t.Duration.ToString(),
-                        TimeSlotId = t.TimeSlotId
-                    }).ToList()
-
-                })
-                .ToList();
-
-            return serviceDetails;
-        }
-        
         public bool UpdateUnknownSubcategory(int serviceId, string subcategoryName)
         {
             var service = _context.Requests.Include(c => c.Subcategory).Where(s => s.Id == serviceId).FirstOrDefault();
@@ -190,33 +155,7 @@ namespace ServicesApp.Repository
 			return saved > 0 ? true : false;
 		}
 
-		public ICollection<GetServiceRequestDto> ServiceDetailsForCustomer(string CustomerId)
-		{
-			Console.WriteLine("testt");
-			
-			var requests = _context.Requests
-				.Include(o => o.Customer)
-                .Include(o => o.Subcategory)
-                .Include(o => o.Offers)
-                .ThenInclude(offer => offer.Provider)
-				.Where(p => p.Customer.Id == CustomerId)
-				.Select(o => new GetServiceRequestDto
-				{
-					Id = o.Id,
-					Location = o.Location,
-					Description = o.Description,
-					Status = o.Status,
-					Image = o.Image,
-					SubCategoryName = o.Subcategory.Name,
-					ProviderName = o.Offers.FirstOrDefault().Provider.FName + " " + o.Offers.FirstOrDefault().Provider.LName,
-					ProviderMobileNumber = o.Offers.FirstOrDefault().Provider.MobileNumber ?? " "
-				})
-				.ToList();
-
-			Console.WriteLine(requests[0].Id);
-			return requests;
-		}
-
+		
 		//public ICollection<ServiceRequest> GetServicesWithFees()
 		//{
 		//    return _context.Requests.Where(p => p.MaxFees != 0).ToList();

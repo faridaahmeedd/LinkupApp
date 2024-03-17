@@ -106,8 +106,10 @@ namespace ServicesApp.Repositories
         {
             var iframeURL = $"https://accept.paymob.com/api/acceptance/iframes/831255?payment_token={token}";
             Console.WriteLine($"Redirecting to: {iframeURL}");
-            return iframeURL;
-            
+			//var request = _serviceRepository.GetService(ServiceId);
+			//request.PaymentStatus = "Paid";
+			//_serviceRepository.UpdateService(request);
+			return iframeURL;
         }
 
 

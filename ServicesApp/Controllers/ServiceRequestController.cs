@@ -234,7 +234,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.RequestNotFound);
 				}
 				var offers = _serviceRepository.GetUndeclinedOffersOfService(serviceId);
-				var offersMap = _mapper.Map<List<PostServiceOfferDto>>(offers);
+				var offersMap = _mapper.Map<List<GetServiceOfferDto>>(offers);
 				return Ok(offersMap);
 			}
 			catch

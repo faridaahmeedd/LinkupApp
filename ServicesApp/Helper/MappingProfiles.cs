@@ -48,7 +48,7 @@ namespace ServicesApp.Helper
             CreateMap<Report, GetReportDto>();
             CreateMap<PostReportDto, Report>();
             CreateMap<Report, PostReportDto>();
-            CreateMap<ServiceOffer, PostServiceOfferDto>()
+            CreateMap<ServiceOffer, GetServiceOfferDto>()
 				.ForMember(
 					dest => dest.Duration,
 					opt => opt.MapFrom(src => ConvertTimeToString(src.Duration))
@@ -58,6 +58,7 @@ namespace ServicesApp.Helper
 					dest => dest.Duration,
 					opt => opt.MapFrom(src => ConvertStringToTime(src.Duration))
 				);
+
 			CreateMap<TimeSlot, TimeSlotDto>()
 				.ForMember(
 					dest => dest.Date,

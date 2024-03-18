@@ -39,7 +39,7 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponse.NotValid);
 				}
-				var offers = _mapper.Map<List<PostServiceOfferDto>>(_offerRepository.GetOffers());
+				var offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOffers());
 				return Ok(offers);
 			}
 			catch
@@ -61,7 +61,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.OfferNotFound);
 				}
-				var offer = _mapper.Map<PostServiceOfferDto>(_offerRepository.GetOffer(OfferId));
+				var offer = _mapper.Map<GetServiceOfferDto>(_offerRepository.GetOffer(OfferId));
 				return Ok(offer);
 			}
 			catch
@@ -229,7 +229,7 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponse.UserNotFound);
 				}
-				var Offers = _mapper.Map<List<PostServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
+				var Offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
 				return Ok(Offers);
 			}
 			catch

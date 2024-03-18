@@ -16,6 +16,8 @@ namespace ServicesApp.Helper
         {
             CreateMap<ServiceRequest, PostServiceRequestDto>();
 			CreateMap<PostServiceRequestDto, ServiceRequest>();
+            CreateMap<ServiceRequest, GetServiceRequestDto>();
+            CreateMap<GetServiceRequestDto, ServiceRequest>();
             CreateMap<ServiceRequest, ServiceDetailsDto>();
             CreateMap<ServiceDetailsDto, ServiceRequest>();
 			CreateMap<Customer, GetCustomerDto>();

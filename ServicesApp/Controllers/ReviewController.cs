@@ -171,7 +171,9 @@ namespace ServicesApp.Controllers
 
                 mapReview.ReviewerRole = "Provider";
                 _ReviewRepository.CreateReview(mapReview);
-				return Ok(new
+                _ReviewRepository.Warning(CustomerId);
+
+                return Ok(new
 				{
 					statusMsg = "success",
 					message = "Review Created Successfully.",
@@ -206,6 +208,8 @@ namespace ServicesApp.Controllers
                 mapReview.Customer = _customerRepository.GetCustomer(CustomerId);
                 mapReview.Provider = _providerRepository.GetProvider(ProviderId);
                 mapReview.ReviewerRole = "Customer";
+                _ReviewRepository.Warning(ProviderId);
+
 
                 _ReviewRepository.CreateReview(mapReview);
                 return Ok(new

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -9,10 +10,16 @@ namespace ServicesApp.Repositories
 	public class ReviewRepository : IReviewRepository
 	{
 		private readonly DataContext _context;
+		private readonly IAuthRepository _authRepository;
+        private readonly UserManager<AppUser> _userManager;
 
-		public ReviewRepository(DataContext context)
+
+        public ReviewRepository(DataContext context, IAuthRepository authRepository , UserManager<AppUser> userManager)
 		{
 			_context = context;
+			_authRepository = authRepository;
+			_userManager = userManager;
+
 		}
 
 		public ICollection<Review> GetReviews()
@@ -42,6 +49,7 @@ namespace ServicesApp.Repositories
 
 		public bool CreateReview(Review review)
 		{
+
 			_context.Add(review);
 			return Save();
 		}
@@ -52,24 +60,48 @@ namespace ServicesApp.Repositories
 			return saved > 0 ? true : false;
 		}
 
-		public decimal CalculateAvgRating(string Id)
+		public double CalculateAvgRating(string Id)
 		{
 			var reviews = GetReviews();
 			var userReviews = reviews.Where(review => (review.ReviewerRole == "Customer" && review.Provider.Id == Id) 
 											|| (review.ReviewerRole == "Provider" && review.Customer.Id == Id));
 
-			if (userReviews.Any())
-			{
-				decimal totalRating = userReviews.Sum(review => review.Rate ?? 0);
-				int numberOfReviews = userReviews.Count();
 
-				if (numberOfReviews > 0)
-				{
-					decimal avgRating = totalRating / numberOfReviews;
-					return Math.Round(avgRating, 2);
-				}
-			}
-			return 0;
+            if (userReviews.Any())
+            {
+                double totalRating = userReviews.Sum(review => review.Rate ?? 0);
+                int numberOfReviews = userReviews.Count();
+
+                if (numberOfReviews > 0)
+                {
+                    double avgRating = totalRating / numberOfReviews;
+                    return Math.Round(avgRating, 2);
+                }
+				
+            }
+            return 0;
 		}
+		public async void Warning(string Id)
+		{
+			var reviews = GetReviews();
+			var userReviews = reviews.Where(review => (review.ReviewerRole == "Customer" && review.Provider.Id == Id)
+											|| (review.ReviewerRole == "Provider" && review.Customer.Id == Id));
+
+			var user = await _userManager.FindByIdAsync(Id);
+			double  totalRating = userReviews.Sum(review => review.Rate ?? 0);
+			int numberOfReviews = userReviews.Count();
+            double avgRating = totalRating / numberOfReviews;
+
+            if (numberOfReviews > 2)  // 1 2 1 2 1
+            {
+                if (avgRating < 2.5)
+                {
+					Console.WriteLine("-------------------");
+                    Console.WriteLine(user.Email);
+
+                    _authRepository.SendMail(user.Email, "Warning", "Warning");
+                }
+            }
+        }
 	}
 }

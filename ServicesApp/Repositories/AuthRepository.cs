@@ -265,7 +265,7 @@ public class AuthRepository : IAuthRepository
 
 				if (result.Succeeded)
 				{
-					SendDeactivationMail(user.Email);
+					SendMail(user.Email , "Linkup Deactivation", "InactiveMail");
                     return true;
 				}
 			}
@@ -273,7 +273,7 @@ public class AuthRepository : IAuthRepository
 		
 		return false;
 	}
-    public void SendDeactivationMail(string recipientEmail)
+    public void SendMail(string recipientEmail , string subject , string filename)
 	{
         string senderEmail = "linkupp2024@gmail.com";
         string senderPassword = "mbyo noyk dfbb fhlr";
@@ -281,14 +281,14 @@ public class AuthRepository : IAuthRepository
         LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
         LinkedImage.ContentId = "Logo";
         LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-        string htmlContent = File.ReadAllText("Mails/InactiveMail.html");
+        string htmlContent = File.ReadAllText($"Mails/{filename}.html");
         AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
         htmlContent, null, "text/html");
         htmlView.LinkedResources.Add(LinkedImage);
 
         MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
         {
-            Subject = "Linkup Deactivation",
+            Subject = subject,
             IsBodyHtml = true,
         };
         mailMessage.AlternateViews.Add(htmlView);

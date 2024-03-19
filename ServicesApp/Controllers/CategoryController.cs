@@ -39,7 +39,7 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-		[HttpGet("{CategoryId:int}", Name ="GetCategoryById")]
+		[HttpGet("{CategoryId}")]
 		public IActionResult GetCategory(int CategoryId)
 		{
 			try

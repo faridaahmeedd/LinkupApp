@@ -158,9 +158,9 @@ namespace ServicesApp.Repositories
 			{
 				payer_id = payerID,
 			};
-			var request = _context.Requests.Where(p => p.Id == ServiceId).FirstOrDefault();
+			var request = _serviceRepository.GetService(ServiceId);
 			request.PaymentStatus = "Paid";
-			_context.SaveChanges();
+			_serviceRepository.UpdateService(request);
 			var executePaymentResponse = await SendPayPalRequest($"/v1/payments/payment/{paymentId}/execute?token={token}", executePaymentJson);
 			Console.WriteLine(executePaymentResponse);
 			Console.WriteLine(executePaymentResponse.state);

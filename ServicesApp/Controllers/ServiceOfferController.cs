@@ -292,27 +292,5 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-
-		[HttpGet("ForProvider/{ProviderId}")]
-		public IActionResult OffersDetailsForProvider(string ProviderId)
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponse.NotValid);
-				}
-				if (!_providerRepository.ProviderExist(ProviderId))
-				{
-					return NotFound(ApiResponse.UserNotFound);
-				}
-				var offer = _offerRepository.ServiceDetailsForProvider(ProviderId);
-				return Ok(offer);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-		}
 	}
 }

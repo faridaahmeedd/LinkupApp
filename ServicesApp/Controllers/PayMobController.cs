@@ -19,7 +19,7 @@ namespace ServicesApp.Controllers
             
         }
         [HttpPost]
-        [Route("payment/{ServiceId}")]
+        [Route("CardPayment/{ServiceId}")]
         public async Task<IActionResult> PayService(int ServiceId)
         {
             try
@@ -32,8 +32,12 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponse.OfferNotFound);
                 }
-
-                var paymentLink=  await _payMobRepository.FirstStep(ServiceId);
+				var request = _serviceRepository.GetService(ServiceId);
+				if (request.PaymentStatus == "Paid")
+				{
+					return BadRequest(ApiResponse.PaidAlready);
+				}
+				var paymentLink=  await _payMobRepository.FirstStep(ServiceId);
                 if (paymentLink != null)
                 {
                     return Ok(paymentLink);
@@ -45,5 +49,23 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-    }
+
+		[HttpPost]
+		[Route("Refund/{TransactionId}")]
+		public async Task<IActionResult> RefundService(int TransactionId)
+		{
+			try
+			{
+				if (await _payMobRepository.Refund(TransactionId))
+				{
+					return Ok(ApiResponse.RefundSuccess);
+				}
+				return BadRequest(ApiResponse.RefundedAlready);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+	}
 }

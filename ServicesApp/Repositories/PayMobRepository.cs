@@ -24,7 +24,6 @@ namespace ServicesApp.Repositories
             _serviceRepository = serviceRequest;
             _context = context;
         }
-
         
         const int integrationID = 4536584;   //online card
 
@@ -106,8 +105,10 @@ namespace ServicesApp.Repositories
         {
             var iframeURL = $"https://accept.paymob.com/api/acceptance/iframes/831255?payment_token={token}";
             Console.WriteLine($"Redirecting to: {iframeURL}");
-            return iframeURL;
-            
+			//var request = _serviceRepository.GetService(ServiceId);
+			//request.PaymentStatus = "Paid";
+			//_serviceRepository.UpdateService(request);
+			return iframeURL;
         }
 
 
@@ -127,5 +128,21 @@ namespace ServicesApp.Repositories
                 return result;
             }
         }
-    }
+
+		public async Task<bool> Refund(int TransactionId)
+		{
+			var data = new { api_key = _configuration["PayMob:ApiKey"] };
+			var response = await PostDataAndGetResponse("https://accept.paymob.com/api/auth/tokens", data);
+			string token = response.token;
+			Console.WriteLine(token.ToString());
+
+			var refundData = new {
+				auth_token = token,
+				transaction_id = TransactionId
+			};
+			response = await PostDataAndGetResponse("https://accept.paymob.com/api/acceptance/void_refund/refund", refundData);
+			Console.WriteLine(response);
+            return response.success;
+		}
+	}
 }

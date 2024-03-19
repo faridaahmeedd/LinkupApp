@@ -251,28 +251,10 @@ namespace ServicesApp.Controllers
 				var acceptedOffer = _serviceRepository.GetAcceptedOffer(serviceId);
 				if (acceptedOffer != null)
 				{
-					var offerMap = _mapper.Map<PostServiceOfferDto>(acceptedOffer);
+					var offerMap = _mapper.Map<GetServiceOfferDto>(acceptedOffer);
 					return Ok(offerMap);
 				}
 				return NotFound(ApiResponse.OfferNotFound);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-		}
-
-		[HttpGet("AllServicesDetails")]
-		public IActionResult GetAllServicesDetails()
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponse.NotValid);
-				}
-				var serviceDetails = _serviceRepository.GetAllServicesDetails();
-				return Ok(serviceDetails);
 			}
 			catch
 			{
@@ -309,27 +291,6 @@ namespace ServicesApp.Controllers
             }
         }
 
-		[HttpGet("ForCustomer/{CustomerId}")]
-		public IActionResult RequestsForCustomer(string CustomerId)
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponse.NotValid);
-				}
-				if (!_customerRepository.CustomerExist(CustomerId))
-				{
-					return NotFound(ApiResponse.UserNotFound);
-				}
-				var requests = _serviceRepository.ServiceDetailsForCustomer(CustomerId);
-				return Ok(requests);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-		}
 
 		//[HttpGet("WithMaxFees")]
 		//public IActionResult GetServicesWithFees()

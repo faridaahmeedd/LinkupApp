@@ -11,6 +11,7 @@ namespace ServicesApp.Models
 		public string? Location { get; set; }
 		public required string PaymentMethod { get; set; }
 		public string PaymentStatus { get; set; } = "Pending"; //Pending Paid
+		public bool Volunteer { get; set; } = false;
 		public Subcategory? Subcategory { get; set; }
         public Customer? Customer { get; set; }
         public ICollection<ServiceOffer>? Offers { get; set; }

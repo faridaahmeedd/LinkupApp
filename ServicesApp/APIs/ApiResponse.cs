@@ -182,5 +182,20 @@
             statusMsg = "fail",
             message = "Review not Found."
         };
-    }
+		public static readonly object PaidAlready = new
+		{
+			statusMsg = "fail",
+			message = "This service has already been paid."
+		};
+		public static readonly object RefundedAlready = new
+		{
+			statusMsg = "fail",
+			message = "This service has already been refunded."
+		};
+		public static readonly object RefundSuccess = new
+		{
+			statusMsg = "fail",
+			message = "This service has been refunded successfully."
+		};
+	}
 }

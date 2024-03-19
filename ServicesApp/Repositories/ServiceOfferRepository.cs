@@ -18,12 +18,12 @@ namespace ServicesApp.Repository
 
 		public ICollection<ServiceOffer> GetOffers()
 		{
-			return _context.Offers.OrderBy(p => p.Id).ToList();
+			return _context.Offers.Include(p => p.Provider).Include(p => p.Request).OrderBy(p => p.Id).ToList();
 		}
 
 		public ServiceOffer GetOffer(int id)
 		{
-			return _context.Offers.Include(o => o.Request).Where(p => p.Id == id).FirstOrDefault();
+			return _context.Offers.Include(p => p.Provider).Include(p => p.Request).Include(o => o.Request).Where(p => p.Id == id).FirstOrDefault();
 		}
 
 		public bool OfferExist(int id)
@@ -43,7 +43,7 @@ namespace ServicesApp.Repository
 			if (request != null)
 			{
 				var subCategory = _context.Subcategories.Find(request.Subcategory.Id);
-				if (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees) {
+				if (request.Volunteer || (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees)) {
 					return true;
 				}
 			}
@@ -121,14 +121,13 @@ namespace ServicesApp.Repository
 
 		public bool Save()
 		{
-			//sql code is generated here
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;
 		}
 
 		public ICollection<ServiceOffer> GetUnCompletedOffers(string providerId)
 		{
-			var offers = _context.Offers.Include(o => o.Request).Where(p => p.Provider.Id == providerId).ToList(); ;
+			var offers = _context.Offers.Include(p => p.Provider).Include(p => p.Request).Where(p => p.Provider.Id == providerId).ToList(); ;
 
 			if (offers != null)
 			{
@@ -140,7 +139,7 @@ namespace ServicesApp.Repository
 		}
         public ICollection<ServiceOffer> GetOfffersOfProvider(string providerId)
 		{
-            var offers = _context.Offers.Include(o=> o.Request).Where(p => p.Provider.Id == providerId).ToList(); 
+            var offers = _context.Offers.Include(p => p.Provider).Include(p => p.Request).Where(p => p.Provider.Id == providerId).ToList(); 
             return offers;
         }
 
@@ -159,24 +158,5 @@ namespace ServicesApp.Repository
 			}
             return false;
         }
-
-		public ICollection<GetServiceOfferDto> ServiceDetailsForProvider(string ProviderId)
-		{
-			var offers = _context.Offers
-				.Include(o => o.Request.Customer)
-				.Where(p => p.Provider.Id == ProviderId)
-				.Select(o => new GetServiceOfferDto
-				{
-					Id = o.Id,
-					Duration = o.Duration.ToString("HH:mm"),
-					Fees = o.Fees,
-					TimeSlotId = o.TimeSlotId,
-					Status = o.Status,
-					CustomerName = o.Request.Customer.FName + " " + o.Request.Customer.LName,
-					CustomerMobileNumber = o.Request.Customer.MobileNumber
-				})
-				.ToList();
-			return offers;
-		}
 	}
 }

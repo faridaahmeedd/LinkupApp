@@ -49,5 +49,23 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
-    }
+
+		[HttpPost]
+		[Route("Refund/{TransactionId}")]
+		public async Task<IActionResult> RefundService(int TransactionId)
+		{
+			try
+			{
+				if (await _payMobRepository.Refund(TransactionId))
+				{
+					return Ok(ApiResponse.RefundSuccess);
+				}
+				return BadRequest(ApiResponse.RefundedAlready);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+	}
 }

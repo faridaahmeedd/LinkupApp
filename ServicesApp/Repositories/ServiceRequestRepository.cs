@@ -107,13 +107,13 @@ namespace ServicesApp.Repository
             return false;
         }
 
-		public ICollection<ServiceOffer> GetUndeclinedOffersOfService(int id )
+		public ICollection<ServiceOffer> GetUndeclinedOffersOfService(int id)
 		{
             var request = _context.Requests.Include(o => o.Offers).FirstOrDefault(o => o.Id == id);
            
             if (request != null)
             {
-                var Offers = request.Offers.Where(o => o.Status != "Declined").ToList();
+				var Offers = _context.Offers.Include(o => o.Provider).Where(o => o.Request.Id == id && o.Status != "Declined").ToList();
                 if (request.Offers != null)
                 {
                     return Offers;

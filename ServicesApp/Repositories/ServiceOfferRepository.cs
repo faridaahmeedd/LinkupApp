@@ -43,7 +43,7 @@ namespace ServicesApp.Repository
 			if (request != null)
 			{
 				var subCategory = _context.Subcategories.Find(request.Subcategory.Id);
-				if (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees) {
+				if (request.Volunteer || (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees)) {
 					return true;
 				}
 			}

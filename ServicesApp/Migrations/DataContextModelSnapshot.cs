@@ -250,13 +250,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "ab97ad9d-57a8-4052-b178-4c36c01df9a0",
+                            ConcurrencyStamp = "b9ef9251-8bb1-424c-ba92-b64b1f490db4",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEI4tN5296w36PCyIkWKe7Tx02y/4ClzHTha1ml5ey3pESX83pAh/3md8+K8zo3l6QA==",
-                            SecurityStamp = "0e750650-735a-4e15-8ede-9f175049c00e",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIPnnk5zF9DPeodCSpkCSv4DImN217CufwmxJ1a4UoY661Kax7qRK0X+ArUVOV6YTQ==",
+                            SecurityStamp = "f8c6560f-db44-4b1a-8fa0-3a0c6a7818d7",
                             UserName = "MainAdmin"
                         });
                 });
@@ -421,6 +421,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<int?>("SubcategoryId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Volunteer")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -314,6 +314,7 @@ namespace ServicesApp.Migrations
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Volunteer = table.Column<bool>(type: "bit", nullable: false),
                     SubcategoryId = table.Column<int>(type: "int", nullable: true),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -400,7 +401,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "ab97ad9d-57a8-4052-b178-4c36c01df9a0", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEI4tN5296w36PCyIkWKe7Tx02y/4ClzHTha1ml5ey3pESX83pAh/3md8+K8zo3l6QA==", "0e750650-735a-4e15-8ede-9f175049c00e", "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "b9ef9251-8bb1-424c-ba92-b64b1f490db4", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEIPnnk5zF9DPeodCSpkCSv4DImN217CufwmxJ1a4UoY661Kax7qRK0X+ArUVOV6YTQ==", "f8c6560f-db44-4b1a-8fa0-3a0c6a7818d7", "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

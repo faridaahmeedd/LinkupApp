@@ -51,12 +51,12 @@ namespace ServicesApp.Controllers
         }
 
 		[HttpPost]
-		[Route("Refund/{TransactionId}")]
-		public async Task<IActionResult> RefundService(int TransactionId)
+		[Route("Refund/{TransactionId}/{ServiceId}")] 
+		public async Task<IActionResult> RefundService(int TransactionId , int ServiceId)
 		{
 			try
 			{
-				if (await _payMobRepository.Refund(TransactionId))
+				if (await _payMobRepository.Refund(TransactionId , ServiceId))
 				{
 					return Ok(ApiResponse.RefundSuccess);
 				}

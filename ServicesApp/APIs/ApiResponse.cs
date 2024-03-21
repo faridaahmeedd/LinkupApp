@@ -194,7 +194,7 @@
 		};
 		public static readonly object RefundSuccess = new
 		{
-			statusMsg = "fail",
+			statusMsg = "success",
 			message = "This service has been refunded successfully."
 		};
 	}

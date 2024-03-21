@@ -10,7 +10,7 @@ namespace ServicesApp.Interfaces
         Task<string> ThirdStep(string token, int orderId, int ServiceId);
         Task<string> CardPayment(string token);
         Task<dynamic> PostDataAndGetResponse(string url, object data);
-        Task<bool> Refund(int TransactionId);
+        Task<bool> Refund(int TransactionId, int ServiceId);
 
 	}
 }

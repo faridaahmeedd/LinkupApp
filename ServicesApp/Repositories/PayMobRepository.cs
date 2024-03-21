@@ -81,19 +81,19 @@ namespace ServicesApp.Repositories
                     country = request.Customer.Country,
                     last_name = request.Customer.LName,
                     // TODO : not real data , can not reomve
-                    state = "Utah",    
-                    apartment = "803",
-                    floor = "42",
-                    building = "8028",
-                    shipping_method = "PKG",
-                    postal_code = "01898"
+                    state = "NA",    
+                    apartment = "NA",
+                    floor = "NA",
+                    building = "NA",
+                    shipping_method = "NA",
+                    postal_code = "NA"
                 },
                 currency = "EGP",
                 integration_id = integrationID
             };
             Console.WriteLine("---------------------");
 
-            Console.WriteLine(request.Customer.FName);
+           // Console.WriteLine(request.Customer.FName);
             var response = await PostDataAndGetResponse("https://accept.paymob.com/api/acceptance/payment_keys", data);
             string theToken = response.token;
             Console.WriteLine(theToken.ToString());
@@ -129,20 +129,32 @@ namespace ServicesApp.Repositories
             }
         }
 
-		public async Task<bool> Refund(int TransactionId)
+		public async Task<bool> Refund(int TransactionId , int ServiceId)
 		{
-			var data = new { api_key = _configuration["PayMob:ApiKey"] };
+            var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
+            var request = _context.Requests.Include(c => c.Customer).Where(p => p.Id == ServiceId).FirstOrDefault();
+
+            var data = new { api_key = _configuration["PayMob:ApiKey"] };
 			var response = await PostDataAndGetResponse("https://accept.paymob.com/api/auth/tokens", data);
 			string token = response.token;
-			Console.WriteLine(token.ToString());
+
+            Console.WriteLine(token.ToString());
 
 			var refundData = new {
-				auth_token = token,
-				transaction_id = TransactionId
-			};
-			response = await PostDataAndGetResponse("https://accept.paymob.com/api/acceptance/void_refund/refund", refundData);
-			Console.WriteLine(response);
-            return response.success;
+				transaction_id = TransactionId,
+                amount_cents = (100 * offer.Fees  ).ToString(),
+               // amount_cents = ((100 * offer.Fees) - request.Customer.Balance).ToString(),
+
+            };
+            // TODO : Balance
+            //if (request.Customer.Balance !=0)
+            //{
+            //    request.Customer.Balance = request.Customer.Balance - offer.Fees;
+            //}
+            //_serviceRepository.UpdateService(request);
+            var Refundresponse = await PostDataAndGetResponse($"https://accept.paymobsolutions.com/api/acceptance/void_refund/refund?token={token}", refundData);
+            return Refundresponse.success;
 		}
+
 	}
 }

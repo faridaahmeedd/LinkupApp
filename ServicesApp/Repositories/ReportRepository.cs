@@ -22,12 +22,12 @@ namespace ServicesApp.Repositories
 
         public ICollection<Report> GetReportsOfCustomer(string customerId)
         {
-            return _context.Reports.Include(p => p.Customer).Where(p => p.ReporterRole == "Customer").OrderBy(p => p.Id).ToList();
+            return _context.Reports.Include(p => p.Customer).Where(p => p.ReporterRole == "Provider" && p.Customer.Id == customerId).OrderBy(p => p.Id).ToList();
         }
 
         public ICollection<Report> GetReportsOfProvider(string providerId)
         {
-            return _context.Reports.Include(p => p.Provider).Where(p => p.ReporterRole == "Provider").OrderBy(p => p.Id).ToList();
+            return _context.Reports.Include(p => p.Provider).Where(p => p.ReporterRole == "Customer" && p.Provider.Id == providerId).OrderBy(p => p.Id).ToList();
         }
 
         public Report GetReport(int id)

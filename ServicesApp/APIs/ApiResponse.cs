@@ -205,7 +205,7 @@
         public static readonly object CaptureSuccess = new
         {
             statusMsg = "success",
-            message = "This service has been capture successfully."
+            message = "This service has been captured successfully."
         };
     }
 }

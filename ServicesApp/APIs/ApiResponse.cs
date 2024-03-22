@@ -197,5 +197,15 @@
 			statusMsg = "success",
 			message = "This service has been refunded successfully."
 		};
-	}
+        public static readonly object CannotCapture = new
+        {
+            statusMsg = "fail",
+            message = "Can not capture this transaction."
+        };
+        public static readonly object CaptureSuccess = new
+        {
+            statusMsg = "success",
+            message = "This service has been capture successfully."
+        };
+    }
 }

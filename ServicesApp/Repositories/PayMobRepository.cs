@@ -25,7 +25,7 @@ namespace ServicesApp.Repositories
             _context = context;
         }
         
-        const int integrationID = 4536584;   //online card
+        const int integrationID = 4544296;   //online card old 4536584
 
         public async Task<string> FirstStep(int ServiceId)
         {
@@ -53,6 +53,7 @@ namespace ServicesApp.Repositories
 
             var response = await PostDataAndGetResponse("https://accept.paymob.com/api/ecommerce/orders", data);
             int  id = response.id;
+         
             Console.WriteLine(id);
 
            return  await ThirdStep(token.ToString(), id , ServiceId);
@@ -105,9 +106,7 @@ namespace ServicesApp.Repositories
         {
             var iframeURL = $"https://accept.paymob.com/api/acceptance/iframes/831255?payment_token={token}";
             Console.WriteLine($"Redirecting to: {iframeURL}");
-			//var request = _serviceRepository.GetService(ServiceId);
-			//request.PaymentStatus = "Paid";
-			//_serviceRepository.UpdateService(request);
+			
 			return iframeURL;
         }
 
@@ -128,8 +127,41 @@ namespace ServicesApp.Repositories
                 return result;
             }
         }
+        public async Task<bool> Capture(int TransactionId, int ServiceId)
+        {
+            var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
+            var request = _context.Requests.Include(c => c.Customer).Where(p => p.Id == ServiceId).FirstOrDefault();
 
-		public async Task<bool> Refund(int TransactionId , int ServiceId)
+            var data = new { api_key = _configuration["PayMob:ApiKey"] };
+            var response = await PostDataAndGetResponse("https://accept.paymob.com/api/auth/tokens", data);
+            string token = response.token;
+
+
+            var captureData = new
+            {
+                auth_token = token,
+                transaction_id = TransactionId,  
+                amount_cents = (100 * offer.Fees).ToString(),
+
+            };
+            var Captureresponse = await PostDataAndGetResponse($"https://accept.paymob.com/api/acceptance/capture", captureData);
+           // Console.WriteLine("-------------------------");
+
+          //  Console.WriteLine(Captureresponse.success);
+            //if ( Captureresponse.success )
+            //{
+                request = _serviceRepository.GetService(ServiceId);
+                request.PaymentStatus = "Paid";
+                Console.WriteLine("-------------------------");
+
+                Console.WriteLine(request.PaymentStatus);
+                _serviceRepository.UpdateService(request);
+           // }
+            return Captureresponse.success;
+
+        }
+
+        public async Task<bool> Refund(int TransactionId , int ServiceId)
 		{
             var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
             var request = _context.Requests.Include(c => c.Customer).Where(p => p.Id == ServiceId).FirstOrDefault();
@@ -139,19 +171,14 @@ namespace ServicesApp.Repositories
 			string token = response.token;
 
             Console.WriteLine(token.ToString());
+          
 
-			var refundData = new {
+            var refundData = new {
 				transaction_id = TransactionId,
-                amount_cents = (100 * offer.Fees  ).ToString(),
-               // amount_cents = ((100 * offer.Fees) - request.Customer.Balance).ToString(),
+                amount_cents = (100 * offer.Fees).ToString(),
 
             };
-            // TODO : Balance
-            //if (request.Customer.Balance !=0)
-            //{
-            //    request.Customer.Balance = request.Customer.Balance - offer.Fees;
-            //}
-            //_serviceRepository.UpdateService(request);
+           
             var Refundresponse = await PostDataAndGetResponse($"https://accept.paymobsolutions.com/api/acceptance/void_refund/refund?token={token}", refundData);
             return Refundresponse.success;
 		}

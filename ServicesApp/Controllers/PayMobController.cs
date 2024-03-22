@@ -56,6 +56,7 @@ namespace ServicesApp.Controllers
 		{
 			try
 			{
+
 				if (await _payMobRepository.Refund(TransactionId , ServiceId))
 				{
 					return Ok(ApiResponse.RefundSuccess);
@@ -67,5 +68,25 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
-	}
+
+        [HttpPost]
+        [Route("Capture/{TransactionId}/{ServiceId}")]
+        public async Task<IActionResult> CaptureTransaction(int TransactionId, int ServiceId)
+        {
+            try
+            {
+               
+                if (await _payMobRepository.Capture(TransactionId, ServiceId))
+                {
+
+                    return Ok(ApiResponse.CaptureSuccess);
+                }
+                return BadRequest(ApiResponse.CannotCapture);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse.SomethingWrong);
+            }
+        }
+    }
 }

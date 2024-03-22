@@ -11,6 +11,8 @@ namespace ServicesApp.Interfaces
         Task<string> CardPayment(string token);
         Task<dynamic> PostDataAndGetResponse(string url, object data);
         Task<bool> Refund(int TransactionId, int ServiceId);
+        Task<bool> Capture(int TransactionId, int ServiceId);
 
-	}
+
+    }
 }

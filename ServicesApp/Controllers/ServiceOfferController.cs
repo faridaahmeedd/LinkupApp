@@ -108,11 +108,11 @@ namespace ServicesApp.Controllers
 				{
 					return StatusCode(500, ApiResponse.TimeSlotConflict);
 				}
-				if (!_providerRepository.CheckProviderBalance(ProviderId))  
-				{
-					return BadRequest(ApiResponse.PayFine);
-				}
-                if (!_offerRepository.CheckFeesRange(offerMap))
+				//if (!_providerRepository.CheckProviderBalance(ProviderId))  
+				//{
+				//	return BadRequest(ApiResponse.PayBalance);
+				//}
+				if (!_offerRepository.CheckFeesRange(offerMap))
                 {
                     return BadRequest(ApiResponse.FeesOutsideRange);
                 }

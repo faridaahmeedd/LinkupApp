@@ -54,7 +54,7 @@ namespace ServicesApp.Repositories
 							{
 								name = "Linkup Service Fees",
 								sku = request.Subcategory.Name,
-								price = offer.Fees.ToString(),
+								price = (offer.Fees + request.Customer.Balance).ToString(),
 								currency = "USD",
 								quantity = 1
 							}
@@ -62,10 +62,10 @@ namespace ServicesApp.Repositories
 					},
 					amount = new
 					{
-						currency = "USD",
-						total = offer.Fees.ToString()
+						total = (offer.Fees + request.Customer.Balance).ToString(),
+						currency = "USD"
 					},
-					//description = ""
+					description = request.Customer.Balance != 0 ? $"Service Fees: {offer.Fees} , Balance: {request.Customer.Balance}" : $"Service Fees: {offer.Fees}",
 				}
 			}
 			};
@@ -77,7 +77,6 @@ namespace ServicesApp.Repositories
 			Console.WriteLine($"Create Payment JSON: {JsonConvert.SerializeObject(createPaymentJson)}");
 
 			var createPaymentResponse = await SendPayPalRequest("/v1/payments/payment", createPaymentJson);
-
 			Console.WriteLine($"Create Payment Response: {JsonConvert.SerializeObject(createPaymentResponse)}");
 
 			var approvalLink = GetApprovalLink(createPaymentResponse.links);
@@ -108,7 +107,6 @@ namespace ServicesApp.Repositories
 				var tokenData = JsonConvert.DeserializeObject<dynamic>(responseContent);
 				return tokenData.access_token;
 			}
-
 			throw new Exception($"Failed to retrieve PayPal access token. Response: {responseContent}");
 		}
 
@@ -159,11 +157,15 @@ namespace ServicesApp.Repositories
 				payer_id = payerID,
 			};
 			var request = _serviceRepository.GetService(ServiceId);
-			request.PaymentStatus = "Paid";
-			_serviceRepository.UpdateService(request);
 			var executePaymentResponse = await SendPayPalRequest($"/v1/payments/payment/{paymentId}/execute?token={token}", executePaymentJson);
+			if (executePaymentResponse.state == "approved")
+			{
+				request.PaymentStatus = "Paid";
+				_serviceRepository.UpdateService(request);
+				request.Customer.Balance = 0;
+				_serviceRepository.Save();
+			}
 			Console.WriteLine(executePaymentResponse);
-			Console.WriteLine(executePaymentResponse.state);
 			return executePaymentResponse.state;
 		}
 	}

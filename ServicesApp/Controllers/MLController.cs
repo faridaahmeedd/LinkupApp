@@ -17,9 +17,9 @@ namespace ServicesApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> MatchJobAndService(int serviceId)
+        public async Task<IActionResult> MatchJobAndService(int serviceId , string jobtitle)
         {
-            string result = await _ml.MatchJobAndService(serviceId);
+            bool result = await _ml.MatchJobAndService(serviceId , jobtitle);
             Console.WriteLine(result);
 
             return Ok(result);

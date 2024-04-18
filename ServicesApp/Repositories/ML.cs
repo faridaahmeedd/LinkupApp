@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using System.Net.Http;
@@ -21,50 +23,58 @@ namespace ServicesApp.Repositories
 
         }
 
-        public async Task<string> MatchJobAndService(int serviceId)
+        public async Task<bool> MatchJobAndService(int serviceId , string jobTitle)
         {
 
             var request = _context.Requests.Find(serviceId);
+       
             Console.WriteLine("-------------");
             Console.WriteLine(request.Id);
 
 
-            var providers = _context.Providers.Select(provider => provider.Description).ToList();
+           // var JobTitles = _context.Providers.Select(provider => provider.JobTitle).ToList();
             Console.WriteLine("-------------");
-            Console.WriteLine(providers);
             var payload = new
             {
-                service_description = request.Description , 
-                job_descriptions = providers
+                jobtitles = jobTitle
 
-              
+
             };
-            foreach (var provider in providers) 
-            {
-                Console.WriteLine("-------------");
 
-                Console.WriteLine(provider);
-            }
+            var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
-            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.PostAsync("http://127.0.0.1:5001/match", content);
+            var response = await _httpClient.PostAsync("http://127.0.0.1:5000/predict", content);
             Console.WriteLine(response.Content);
             Console.WriteLine("----------------------");
 
-            Console.WriteLine(response.IsSuccessStatusCode);
+            //Console.WriteLine(response.IsSuccessStatusCode);
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("----------------------");
-                Console.WriteLine(result);
 
-                return result;
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var jsonObject = JObject.Parse(jsonResponse);
+                var predictions = jsonObject["predictions"];
+                foreach (var prediction in predictions)
+                {
+                    string predictionValue = prediction.ToString();
+                    Console.WriteLine(predictionValue);
+
+                    // Compare predictionValue with your string value
+                    if (predictionValue == (request.Subcategory).ToString())
+                    {
+
+                        return true;
+                    }
+                }
+                Console.WriteLine("----------------------");
+
+
+                return false;
             }
             else
             {
                 // Handle error
-                return $"Error: {response.StatusCode}";
+                return false;
             }
         }
 

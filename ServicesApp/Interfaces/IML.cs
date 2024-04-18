@@ -2,7 +2,7 @@
 {
     public interface IML
     {
-        Task<string> MatchJobAndService(int serviceId);
+        Task<bool> MatchJobAndService(int serviceId, string jobTitle);
 
 
     }

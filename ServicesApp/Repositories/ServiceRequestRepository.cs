@@ -4,16 +4,19 @@ using ServicesApp.Data;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using System.Collections.Generic;
 
 namespace ServicesApp.Repository
 {
     public class ServiceRequestRepository : IServiceRequestRepository
 	{
 		private readonly DataContext _context;
+		private readonly ITimeSlotsRepository _timeSlotsRepository;
 
-		public ServiceRequestRepository(DataContext context)
+		public ServiceRequestRepository(DataContext context, ITimeSlotsRepository timeSlotsRepository)
 		{
 			_context = context;
+			_timeSlotsRepository = timeSlotsRepository;
 		}
 
 		public ICollection<ServiceRequest> GetServices()
@@ -155,7 +158,29 @@ namespace ServicesApp.Repository
 			return saved > 0 ? true : false;
 		}
 
-		
+		public ICollection<GetCalendarDto> GetCalendarDetails(string CustomerId)
+		{
+			var requests = _context.Requests.Include(p => p.Customer).Include(p => p.Subcategory).Where(p => p.Customer.Id == CustomerId).Where(p => p.Status != "Requested").ToList();
+			ICollection<GetCalendarDto> calendarDtos = new List<GetCalendarDto>();
+			foreach(var request in requests)
+			{
+				var acceptedTimeSlot = _timeSlotsRepository.GetAcceptedTimeSlot(request.Id);
+				var calendarDto = new GetCalendarDto
+				{
+					RequestId = request.Id,
+					OfferId = (GetAcceptedOffer(request.Id)).Id,
+					Date = acceptedTimeSlot.Date.ToString("yyyy-M-d"),
+					FromTime = acceptedTimeSlot.FromTime.ToString("HH:mm"),
+					ToTime = acceptedTimeSlot.ToTime.ToString("HH:mm"),
+					SubcategoryName = request.Subcategory?.Name 
+				};
+				calendarDtos.Add(calendarDto);
+			}
+			return calendarDtos;
+		}
+
+
+
 		//public ICollection<ServiceRequest> GetServicesWithFees()
 		//{
 		//    return _context.Requests.Where(p => p.MaxFees != 0).ToList();

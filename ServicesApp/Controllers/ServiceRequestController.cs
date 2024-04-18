@@ -290,7 +290,29 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
+		
 
+		[HttpGet("CustomerCalendar/{CustomerId}")]
+		public IActionResult GetCalendarByCustomer(string CustomerId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ModelState);
+				}
+				if (!_customerRepository.CustomerExist(CustomerId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var calendarDtos = _serviceRepository.GetCalendarDetails(CustomerId);
+				return Ok(calendarDtos);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
 
 		//[HttpGet("WithMaxFees")]
 		//public IActionResult GetServicesWithFees()

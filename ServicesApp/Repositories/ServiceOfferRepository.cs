@@ -158,5 +158,27 @@ namespace ServicesApp.Repository
 			}
             return false;
         }
+
+		public ICollection<GetCalendarDto> GetCalendarDetails(string ProviderId)
+		{
+			var offers = _context.Offers.Include(p => p.Provider).Include(p => p.Request).Where(p => p.Provider.Id == ProviderId).Where(p => p.Status == "Accepted").ToList();
+			ICollection<GetCalendarDto> calendarDtos = new List<GetCalendarDto>();
+			foreach (var offer in offers)
+			{
+				var acceptedTimeSlot = _context.TimeSlots.Where(p => p.Id == offer.TimeSlotId).FirstOrDefault();
+				var request = _context.Requests.Include(p => p.Subcategory).Where(p => p.Id == offer.Request.Id).FirstOrDefault();
+				var calendarDto = new GetCalendarDto
+				{
+					RequestId = offer.Request.Id,
+					OfferId = offer.Id,
+					Date = acceptedTimeSlot.Date.ToString("yyyy-M-d"),
+					FromTime = acceptedTimeSlot.FromTime.ToString("HH:mm"),
+					ToTime = acceptedTimeSlot.ToTime.ToString("HH:mm"),
+					SubcategoryName = request.Subcategory?.Name
+				};
+				calendarDtos.Add(calendarDto);
+			}
+			return calendarDtos;
+		}
 	}
 }

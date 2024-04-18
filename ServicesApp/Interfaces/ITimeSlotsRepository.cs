@@ -14,5 +14,6 @@ namespace ServicesApp.Interfaces
 		bool DeleteTimeSlot(int id);
 		bool Save();
 		bool CheckConflict(ServiceOffer offer);
+		TimeSlot GetAcceptedTimeSlot(int serviceId);
 	}
 }

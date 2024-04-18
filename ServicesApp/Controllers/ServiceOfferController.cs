@@ -4,6 +4,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.APIs;
+using ServicesApp.Repository;
 
 namespace ServicesApp.Controllers
 {
@@ -292,5 +293,27 @@ namespace ServicesApp.Controllers
                 return StatusCode(500, ApiResponse.SomethingWrong);
             }
         }
+
+		[HttpGet("ProviderCalendar/{ProviderId}")]
+		public IActionResult GetCalendarByProvider(string ProviderId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ModelState);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var calendarDtos = _offerRepository.GetCalendarDetails(ProviderId);
+				return Ok(calendarDtos);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
 	}
 }

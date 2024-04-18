@@ -142,12 +142,12 @@
             statusMsg = "fail",
             message = "Invalid Password."
         };
-        public static readonly object PayFine = new
-        {
-            statusMsg = "fail",
-            message = "Please Pay For the Previous Service First."
-        };
-        public static readonly object ProviderCanOffer = new
+		//public static readonly object PayBalance = new
+		//{
+		//    statusMsg = "fail",
+		//    message = "Please Pay For the Previous Service First."
+		//};
+		public static readonly object ProviderCanOffer = new
         {
             statusMsg = "success",
             message = "Provider Can Offer." 

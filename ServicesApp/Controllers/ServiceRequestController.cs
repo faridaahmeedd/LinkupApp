@@ -151,10 +151,10 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.UserNotFound);
 				}
 				serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
-				if (!_customerRepository.CheckCustomerBalance(CustomerId))
-				{
-					return BadRequest(ApiResponse.PayFine);
-				}
+				//if (!_customerRepository.CheckCustomerBalance(CustomerId))
+				//{
+				//	return BadRequest(ApiResponse.PayBalance);
+				//}
 				_serviceRepository.CreateService(serviceMap);
 				return Ok(new
 				{

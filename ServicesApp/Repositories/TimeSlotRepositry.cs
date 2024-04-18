@@ -1,4 +1,5 @@
-﻿using ServicesApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ServicesApp.Data;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -124,6 +125,19 @@ namespace ServicesApp.Repository
 				}
 			}
 			return true;
+		}
+
+		public TimeSlot GetAcceptedTimeSlot(int serviceId)
+		{
+			var serviceRequest = _context.Requests.FirstOrDefault(sr => sr.Id == serviceId);
+
+			if (serviceRequest != null)
+			{
+				var acceptedOffer = _context.Offers.FirstOrDefault(o => o.Request.Id == serviceId && o.Status == "Accepted");
+				var acceptedTimeSlot = _context.TimeSlots.FirstOrDefault(o => o.Id == acceptedOffer.TimeSlotId);
+				return acceptedTimeSlot;
+			}
+			return null;
 		}
 
 		public bool Save()

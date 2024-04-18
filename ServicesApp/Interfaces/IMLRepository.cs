@@ -1,9 +1,7 @@
 ﻿namespace ServicesApp.Interfaces
 {
-    public interface IML
+    public interface IMLRepository
     {
         Task<bool> MatchJobAndService(int serviceId, string jobTitle);
-
-
     }
 }

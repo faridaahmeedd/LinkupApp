@@ -19,7 +19,6 @@ namespace ServicesApp.Models
 		public int Balance { get; set; }
         public byte[]? Image { get; set; }
         public ICollection<ServiceOffer>? Offers { get; set; }
-		public ICollection<Review> Reviews { get; set; }
 		// SKILLS
 	}
 }

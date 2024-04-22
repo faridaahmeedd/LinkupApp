@@ -9,7 +9,6 @@ namespace ServicesApp.Models
 		public string? Comment { get; set; }
 		//public required string ReviewerName { get; set; }
 		public required string ReviewerRole { get; set; }
-		public required Provider Provider { get; set; }
-		public required Customer Customer { get; set; }
+		public required ServiceRequest request { get; set; }
 	}
 }

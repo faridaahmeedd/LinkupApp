@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240326104527_initial")]
-    partial class initial
+    [Migration("20240422122853_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -253,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "c442701b-eeef-4454-8056-0d82aef6b3a7",
+                            ConcurrencyStamp = "d4db68af-6c88-4cc4-944d-0abed4f65d57",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFK16oXR90AEqirOfvRWY1beMuRu6ZZpIn5K98MPmgtaBH/U96TTkGOXlna8Vi3vYQ==",
-                            SecurityStamp = "6b96ccf0-208f-42fc-b100-87b4177a298e",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPuN6V0JNtJlBFcE1Mp24zv7Luu9F634c+wWWCw/lMOTXhWolYv7eFdHt/fnvxbNqg==",
+                            SecurityStamp = "22e9cd4c-5470-4753-a0a2-e9895d9aa221",
                             UserName = "MainAdmin"
                         });
                 });
@@ -297,12 +297,6 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProviderId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ReporterName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -311,11 +305,12 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("requestId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("requestId");
 
                     b.ToTable("Reports");
                 });
@@ -331,12 +326,6 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProviderId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int?>("Rate")
                         .HasColumnType("int");
 
@@ -344,11 +333,12 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("requestId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("requestId");
 
                     b.ToTable("Reviews");
                 });
@@ -635,32 +625,24 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
                 {
-                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId");
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "request")
+                        .WithMany("Reports")
+                        .HasForeignKey("requestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ServicesApp.Models.Provider", "Provider")
-                        .WithMany()
-                        .HasForeignKey("ProviderId");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Provider");
+                    b.Navigation("request");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Review", b =>
                 {
-                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "request")
                         .WithMany("Reviews")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("requestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ServicesApp.Models.Provider", "Provider")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ProviderId");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Provider");
+                    b.Navigation("request");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>
@@ -747,6 +729,10 @@ namespace ServicesApp.Migrations
                 {
                     b.Navigation("Offers");
 
+                    b.Navigation("Reports");
+
+                    b.Navigation("Reviews");
+
                     b.Navigation("TimeSlots");
                 });
 
@@ -757,16 +743,12 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Core.Models.Customer", b =>
                 {
-                    b.Navigation("Reviews");
-
                     b.Navigation("Services");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Provider", b =>
                 {
                     b.Navigation("Offers");
-
-                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

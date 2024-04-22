@@ -5,6 +5,7 @@ using ServicesApp.Dto.Reviews_Reports;
 using AutoMapper;
 using ServicesApp.APIs;
 using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace ServicesApp.Controllers
 {
@@ -17,16 +18,21 @@ namespace ServicesApp.Controllers
         private readonly ICustomerRepository _customerRepository;
         private readonly IProviderRepository _providerRepository;
         private readonly IServiceRequestRepository _serviceRequestRepository;
+        private readonly IServiceOfferRepository _serviceOfferRepository;
+
+
 
 
         public ReviewController(IReviewRepository IReviewRepository, IMapper mapper, 
-            IProviderRepository providerRepository, ICustomerRepository customerRepository, IServiceRequestRepository serviceRequestRepository)
+            IProviderRepository providerRepository, ICustomerRepository customerRepository, 
+            IServiceRequestRepository serviceRequestRepository , IServiceOfferRepository serviceOfferRepository)
         {
             _ReviewRepository = IReviewRepository;
             _customerRepository = customerRepository;
             _providerRepository = providerRepository;
             _mapper = mapper;
             _serviceRequestRepository = serviceRequestRepository;
+            _serviceOfferRepository = serviceOfferRepository;
         }
 
         [HttpGet]
@@ -88,8 +94,10 @@ namespace ServicesApp.Controllers
                 var mappedReviews = Review.Select(review =>
                 {
                     var reviewDto = _mapper.Map<GetReviewDto>(review);
-                    reviewDto.ReviewerName = "shrouk";
-                  //  reviewDto.ReviewerName = review.Customer.FName + " " + review.Customer.LName;
+                    
+                    var accOffer = _serviceOfferRepository.GetOfferAccepted(review.request.Id);
+                    reviewDto.ReviewerName = accOffer?.Provider?.FName +  " " + accOffer?.Provider?.LName;
+
                     return reviewDto;
                 }).ToList();
                 return Ok(mappedReviews);
@@ -111,7 +119,7 @@ namespace ServicesApp.Controllers
                 }
                 if (!_providerRepository.ProviderExist(ProviderId))
                 {
-                    return NotFound(ApiResponse.ReviewNotFound);
+                    return NotFound(ApiResponse.UserNotFound);
                 }
                 var Reviews = _ReviewRepository.GetReviewsOfProvider(ProviderId);
                 var mappedReviews = Reviews.Select(review =>

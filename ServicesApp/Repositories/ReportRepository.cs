@@ -20,15 +20,30 @@ namespace ServicesApp.Repositories
             return _context.Reports.OrderBy(p => p.Id).ToList();
         }
 
-        //public ICollection<Report> GetReportsOfCustomer(string customerId)
-        //{
-        //    return _context.Reports.Include(p => p.Customer).Where(p => p.ReporterRole == "Provider" && p.Customer.Id == customerId).OrderBy(p => p.Id).ToList();
-        //}
+        public ICollection<Report> GetReportsOfCustomer(string customerId)
+        {
+            return _context.Reports
+               .Include(r => r.request)
+               .Where(r => r.request.Customer.Id == customerId && r.ReporterRole == "Provider")
+               .OrderBy(r => r.Id)
+               .ToList();
+        }
 
-        //public ICollection<Report> GetReportsOfProvider(string providerId)
-        //{
-        //    return _context.Reports.Include(p => p.Provider).Where(p => p.ReporterRole == "Customer" && p.Provider.Id == providerId).OrderBy(p => p.Id).ToList();
-        //}
+        public ICollection<Report> GetReportsOfProvider(string providerId)
+        {
+            var offers = _context.Offers.Include(o => o.Request).Where(o => o.Provider.Id == providerId).ToList();
+
+            var requestIds = offers.Select(o => o.Request.Id).ToList();
+
+            var reports = _context.Reports
+                .Include(r => r.request)
+                    .ThenInclude(req => req.Customer)
+                .Where(r => requestIds.Contains(r.request.Id) && r.ReporterRole == "Customer")
+                .OrderBy(r => r.Id)
+                .ToList();
+
+            return reports;
+        }
 
         public Report GetReport(int id)
         {

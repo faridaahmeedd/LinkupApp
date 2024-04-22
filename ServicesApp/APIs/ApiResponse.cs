@@ -180,7 +180,7 @@
         public static readonly object ReportNotFound = new
         {
             statusMsg = "fail",
-            message = "Review not Found."
+            message = "Report not Found."
         };
 		public static readonly object PaidAlready = new
 		{

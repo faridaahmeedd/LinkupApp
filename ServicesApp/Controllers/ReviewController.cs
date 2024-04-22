@@ -125,7 +125,6 @@ namespace ServicesApp.Controllers
                 var mappedReviews = Reviews.Select(review =>
                 {
                     var reviewDto = _mapper.Map<GetReviewDto>(review);
-                    //reviewDto.ReviewerName = "fefe";
                     reviewDto.ReviewerName = review.request.Customer.FName + " " + review.request.Customer.LName;
                     return reviewDto;
                 }).ToList();

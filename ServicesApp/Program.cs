@@ -30,7 +30,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IPayPalRepository, PayPalRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
-builder.Services.AddScoped<IML, ML>();
+builder.Services.AddScoped<IMLRepository, MLRepository>();
 builder.Services.AddScoped<IPayMobRepository,PayMobRepository>();
 
 

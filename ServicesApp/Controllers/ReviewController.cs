@@ -209,6 +209,10 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponse.RequestNotFound);
                 }
+                if (!_ReviewRepository.checkRequestOfReviewCompleted(RequestId))
+                {
+                    return NotFound("not foundd");
+                }
 
                 mapReview.request = _serviceRequestRepository.GetService(RequestId);
                 mapReview.ReviewerRole = "Customer";

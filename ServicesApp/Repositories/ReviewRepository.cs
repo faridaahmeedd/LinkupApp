@@ -71,13 +71,23 @@ namespace ServicesApp.Repositories
 
 		public bool CreateReview(Review review)
 		{
-
-            _context.Add(review);
-			return Save();
+          
+				_context.Add(review);
+				return Save();
+		
 		}
+		public bool checkRequestOfReviewCompleted(int requestId)
+		{
+            var request = _context.Requests.FirstOrDefault(r => r.Id == requestId && r.Status == "Completed");
+            if (request != null)
+            {
+				return true;
+            }
+            return false;
 
+        }
 
-		public bool Save()
+        public bool Save()
 		{
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;

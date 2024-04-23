@@ -207,5 +207,15 @@
             statusMsg = "success",
             message = "This service has been capture successfully."
         };
-    }
+		public static readonly object UncompletedService = new
+		{
+			statusMsg = "fail",
+			message = "This service is not completed."
+		};
+		public static readonly object ServiceAlreadyReviewed = new
+		{
+			statusMsg = "fail",
+			message = "This service has already been reviewed."
+		};
+	}
 }

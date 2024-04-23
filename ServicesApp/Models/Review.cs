@@ -8,6 +8,6 @@ namespace ServicesApp.Models
 		public int? Rate { get; set; }
 		public string? Comment { get; set; }
 		public required string ReviewerRole { get; set; }
-		public required ServiceRequest request { get; set; }
+		public required ServiceRequest Request { get; set; }
 	}
 }

@@ -180,21 +180,5 @@ namespace ServicesApp.Repository
 			}
 			return calendarDtos;
 		}
-
-        public ServiceOffer GetOfferAccepted(int requestId) // for provider name in reviews
-        {
-            var offer = _context.Offers
-                .Include(offer => offer.Provider)
-                .Include(offer => offer.Request)
-                .Where(offer => offer.Request.Id == requestId && offer.Status == "Accepted")
-                .FirstOrDefault();
-
-			if(offer != null){
-                return offer;
-            }
-
-            return null;
-        }
-
     }
 }

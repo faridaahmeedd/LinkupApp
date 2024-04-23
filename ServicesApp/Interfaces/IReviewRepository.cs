@@ -6,6 +6,7 @@ namespace ServicesApp.Interfaces
 	public interface IReviewRepository
 	{
 		ICollection<Review> GetReviews();
+		ICollection<Review> GetReviewsOfRequest(int requestId);
 		ICollection<Review> GetReviewsOfCustomer(string customerId);
 		ICollection<Review> GetReviewsOfProvider(string providerId);
 		Review GetReview(int id);
@@ -13,8 +14,7 @@ namespace ServicesApp.Interfaces
 		bool CreateReview(Review review);
 		Task<double> CalculateAvgRating(string Id);
 		void Warning(string Id);
-		bool checkRequestOfReviewCompleted(int RequestId);
-
+		bool CheckRequestOfReviewCompleted(int RequestId);
         bool Save();
 	}
 }

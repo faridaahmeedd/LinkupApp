@@ -279,7 +279,7 @@ namespace ServicesApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
@@ -305,7 +305,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("requestId");
 
-                    b.ToTable("Reports");
+                    b.ToTable("Reports", (string)null);
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Review", b =>
@@ -333,7 +333,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("requestId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>
@@ -369,7 +369,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("RequestId");
 
-                    b.ToTable("Offers");
+                    b.ToTable("Offers", (string)null);
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
@@ -417,7 +417,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("SubcategoryId");
 
-                    b.ToTable("Requests");
+                    b.ToTable("Requests", (string)null);
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Subcategory", b =>
@@ -449,7 +449,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Subcategories");
+                    b.ToTable("Subcategories", (string)null);
                 });
 
             modelBuilder.Entity("ServicesApp.Models.TimeSlot", b =>
@@ -476,7 +476,7 @@ namespace ServicesApp.Migrations
 
                     b.HasIndex("ServiceRequestId");
 
-                    b.ToTable("TimeSlots");
+                    b.ToTable("TimeSlots", (string)null);
                 });
 
             modelBuilder.Entity("ServicesApp.Core.Models.Customer", b =>
@@ -519,7 +519,7 @@ namespace ServicesApp.Migrations
                     b.Property<string>("MobileNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customer", (string)null);
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Provider", b =>
@@ -562,7 +562,7 @@ namespace ServicesApp.Migrations
                     b.Property<string>("MobileNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Provider");
+                    b.ToTable("Provider", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -19,8 +19,6 @@ namespace ServicesApp.Interfaces
 		bool ProviderAlreadyOffered(string providerId, int requestId);
 		bool CheckFeesRange(ServiceOffer serviceOffer);
 		ICollection<GetCalendarDto> GetCalendarDetails(string ProviderId);
-		ServiceOffer GetOfferAccepted(int requestId);
-
         bool Save();
 	}
 }

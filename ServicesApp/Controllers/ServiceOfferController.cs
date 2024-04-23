@@ -5,6 +5,7 @@ using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.APIs;
 using ServicesApp.Repository;
+using ServicesApp.Repositories;
 
 namespace ServicesApp.Controllers
 {
@@ -17,17 +18,20 @@ namespace ServicesApp.Controllers
 		private readonly IProviderRepository _providerRepository;
 		private readonly ITimeSlotsRepository _timeSlotsRepository;
 		private readonly IMapper _mapper;
+        private readonly IReviewRepository _reviewRepository;
 
-		public ServiceOfferController(IServiceRequestRepository RequestRepository, 
+        public ServiceOfferController(IServiceRequestRepository RequestRepository, 
 			IServiceOfferRepository OfferRepository,
 			IProviderRepository ProviderRepository,
 			ITimeSlotsRepository TimeSlotsRepository,
+			IReviewRepository reviewRepository,
 			IMapper mapper)
 		{
 			_offerRepository = OfferRepository;
 			_requestRepository = RequestRepository;
 			_providerRepository = ProviderRepository;
 			_timeSlotsRepository = TimeSlotsRepository;
+			_reviewRepository = reviewRepository;
 			_mapper = mapper;
 		}
 
@@ -41,7 +45,11 @@ namespace ServicesApp.Controllers
 					return BadRequest(ApiResponse.NotValid);
 				}
 				var offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOffers());
-				return Ok(offers);
+                foreach (var offer in offers)
+                {
+                    offer.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                }
+                return Ok(offers);
 			}
 			catch
 			{
@@ -63,7 +71,10 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.OfferNotFound);
 				}
 				var offer = _mapper.Map<GetServiceOfferDto>(_offerRepository.GetOffer(OfferId));
-				return Ok(offer);
+             
+                offer.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                
+                return Ok(offer);
 			}
 			catch
 			{
@@ -231,7 +242,13 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponse.UserNotFound);
 				}
 				var Offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
-				return Ok(Offers);
+
+                foreach (var offer in Offers)
+                {
+                    offer.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                }
+
+                return Ok(Offers);
 			}
 			catch
 			{

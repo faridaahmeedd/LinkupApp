@@ -7,6 +7,7 @@ namespace ServicesApp.Models
         public int Id { get; set; }
         public string Comment { get; set; }
         public required string ReporterRole { get; set; }
-        public required ServiceRequest Request { get; set; }
+		public required string ReporterName { get; set; }
+		public required ServiceRequest Request { get; set; }
     }
 }

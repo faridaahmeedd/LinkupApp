@@ -90,10 +90,6 @@ namespace ServicesApp.Controllers
                 var mappedReviews = Review.Select(review =>
                 {
                     var reviewDto = _mapper.Map<GetReviewDto>(review);
-                    
-                    var accOffer = _serviceRequestRepository.GetAcceptedOffer(review.Request.Id);
-                    reviewDto.ReviewerName = accOffer?.Provider?.FName +  " " + accOffer?.Provider?.LName;
-
                     return reviewDto;
                 }).ToList();
                 return Ok(mappedReviews);
@@ -121,7 +117,6 @@ namespace ServicesApp.Controllers
                 var mappedReviews = Reviews.Select(review =>
                 {
                     var reviewDto = _mapper.Map<GetReviewDto>(review);
-                    reviewDto.ReviewerName = review.Request.Customer.FName + " " + review.Request.Customer.LName;
                     return reviewDto;
                 }).ToList();
 
@@ -177,12 +172,14 @@ namespace ServicesApp.Controllers
 				}
 
 				mapReview.Request = _serviceRequestRepository.GetService(RequestId);
+				var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(mapReview.Request.Id);
+				mapReview.ReviewerName = acceptedOffer?.Provider?.FName + " " + acceptedOffer?.Provider?.LName;
 
-				if (_ReviewRepository.GetReviewsOfRequest(mapReview.Request.Id).Count > 2)
+				if (_ReviewRepository.GetReviewsOfRequest(mapReview.Request.Id).Any(review => review.ReviewerRole == "Provider"))
 				{
-					return BadRequest(ApiResponse.ServiceAlreadyReviewed);
-				}
-				mapReview.ReviewerRole = "Provider";
+                    return BadRequest(ApiResponse.ServiceAlreadyReviewed);
+                }
+                mapReview.ReviewerRole = "Provider";
                 _ReviewRepository.CreateReview(mapReview);
                 //  _ReviewRepository.Warning(CustomerId);
 
@@ -220,11 +217,13 @@ namespace ServicesApp.Controllers
 				}
 
                 mapReview.Request = _serviceRequestRepository.GetService(RequestId);
-				if (_ReviewRepository.GetReviewsOfRequest(mapReview.Request.Id).Count > 2)
-				{
-					return BadRequest(ApiResponse.ServiceAlreadyReviewed);
-				}
-				mapReview.ReviewerRole = "Customer";
+				mapReview.ReviewerName = mapReview.Request.Customer.FName + " " + mapReview.Request.Customer.LName;
+
+                if (_ReviewRepository.GetReviewsOfRequest(mapReview.Request.Id).Any(review => review.ReviewerRole == "Customer"))
+                {
+                    return BadRequest(ApiResponse.ServiceAlreadyReviewed);
+                }
+                mapReview.ReviewerRole = "Customer";
                 _ReviewRepository.CreateReview(mapReview);
 
 				// _ReviewRepository.Warning(ProviderId);

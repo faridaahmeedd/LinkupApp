@@ -89,8 +89,8 @@ namespace ServicesApp.Controllers
                 {
                     var reportDto = _mapper.Map<GetReportDto>(report);
 
-                    var accOffer = _serviceRequestRepository.GetAcceptedOffer(report.Request.Id);
-                    reportDto.ReporterName = accOffer?.Provider?.FName + " " + accOffer?.Provider?.LName;
+                    //var accOffer = _serviceRequestRepository.GetAcceptedOffer(report.Request.Id);
+                    //reportDto.ReporterName = accOffer?.Provider?.FName + " " + accOffer?.Provider?.LName;
                     return reportDto;
                 }).ToList();
 
@@ -119,7 +119,7 @@ namespace ServicesApp.Controllers
                 var mappedReports = Report.Select(report =>
                 {
                     var reportDto = _mapper.Map<GetReportDto>(report);
-                    reportDto.ReporterName = report.Request.Customer.FName + " " + report.Request.Customer.LName;
+                    //reportDto.ReporterName = report.Request.Customer.FName + " " + report.Request.Customer.LName;
                     return reportDto;
                 }).ToList();
 
@@ -148,6 +148,9 @@ namespace ServicesApp.Controllers
                 }
 
                 mapReport.Request = _serviceRequestRepository.GetService(RequestId);
+				var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(mapReport.Request.Id);
+				mapReport.ReporterName = acceptedOffer?.Provider?.FName + " " + acceptedOffer?.Provider?.LName;
+
 				if (mapReport.Request.Status != "Completed")
 				{
 					return BadRequest(ApiResponse.UncompletedService);
@@ -170,7 +173,6 @@ namespace ServicesApp.Controllers
 
         [HttpPost("Provider/{RequestId}")]
         public IActionResult CreateProviderReport([FromBody] PostReportDto ReportCreate, int RequestId)
-
         {
             try
             {
@@ -186,7 +188,8 @@ namespace ServicesApp.Controllers
                 }
 
                 mapReport.Request = _serviceRequestRepository.GetService(RequestId);
-                if(mapReport.Request.Status != "Completed")
+				mapReport.ReporterName = mapReport.Request.Customer.FName + " " + mapReport.Request.Customer.LName;
+				if (mapReport.Request.Status != "Completed")
                 {
                     return BadRequest(ApiResponse.UncompletedService);
                 }

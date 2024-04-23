@@ -12,11 +12,13 @@ namespace ServicesApp.Repository
 	{
 		private readonly DataContext _context;
 		private readonly ITimeSlotsRepository _timeSlotsRepository;
+		private readonly IMLRepository _MLRepository;
 
-		public ServiceRequestRepository(DataContext context, ITimeSlotsRepository timeSlotsRepository)
+		public ServiceRequestRepository(DataContext context, ITimeSlotsRepository timeSlotsRepository, IMLRepository MLRepository)
 		{
 			_context = context;
 			_timeSlotsRepository = timeSlotsRepository;
+			_MLRepository = MLRepository;
 		}
 
 		public ICollection<ServiceRequest> GetServices()
@@ -179,7 +181,23 @@ namespace ServicesApp.Repository
 			return calendarDtos;
 		}
 
+		public ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string providerId)
+		{
+			var requests = GetUncompletedServices();
+			var matchedRequests = new List<ServiceRequest>();
 
+			foreach (var request in requests)
+			{
+				Console.WriteLine(request.Subcategory.Name);
+				bool isMatched = _MLRepository.MatchJobAndService(request.Id, providerId).Result;
+				Console.WriteLine(isMatched);
+				if (isMatched)
+				{
+					matchedRequests.Add(request);
+				}
+			}
+			return matchedRequests;
+		}
 
 		//public ICollection<ServiceRequest> GetServicesWithFees()
 		//{

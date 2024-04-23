@@ -14,16 +14,18 @@ namespace ServicesApp.Controllers
 		private readonly IServiceRequestRepository _serviceRepository;
 		private readonly ISubcategoryRepository _subcategoryRepository;
 		private readonly ICustomerRepository _customerRepository;
+		private readonly IProviderRepository _providerRepository;
 		private readonly IMapper _mapper;
 
 		public ServiceRequestController(IServiceRequestRepository serviceRepository,
 			ISubcategoryRepository subcategoryRepository, ICustomerRepository customerRepository,
-			IMapper mapper)
+			IProviderRepository providerRepository, IMapper mapper)
 		{
 			_serviceRepository = serviceRepository;
 			_subcategoryRepository = subcategoryRepository;
 			_customerRepository = customerRepository;
-            _mapper = mapper;
+			_providerRepository = providerRepository;
+			_mapper = mapper;
 		}
 
 		[HttpGet]
@@ -307,6 +309,29 @@ namespace ServicesApp.Controllers
 				}
 				var calendarDtos = _serviceRepository.GetCalendarDetails(CustomerId);
 				return Ok(calendarDtos);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponse.SomethingWrong);
+			}
+		}
+
+		[HttpGet("MatchedRequestsOfProvider/{ProviderId}")]
+		public IActionResult GetMatchedRequestsOfProvider(string ProviderId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ModelState);
+				}
+				if (! _providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponse.UserNotFound);
+				}
+				var services = _serviceRepository.GetMatchedRequestsOfProvider(ProviderId);
+				var mapServices = _mapper.Map<List<GetServiceRequestDto>>(services);
+				return Ok(mapServices);
 			}
 			catch
 			{

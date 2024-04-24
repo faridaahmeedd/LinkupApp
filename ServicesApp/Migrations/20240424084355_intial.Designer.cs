@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240422212130_new")]
-    partial class @new
+    [Migration("20240424084355_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -253,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "cec205bd-e853-4dd9-a4d0-f2e850af0187",
+                            ConcurrencyStamp = "fa084864-4598-4361-86f6-2da6305991fc",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEF4bk5VR+SlTddwiQDrNFUD27MbCX3aoK88CJOoawGeq5Qhml0NYEGFN7uoEf37U8g==",
-                            SecurityStamp = "24638ae5-0ca6-4e47-981a-ec9df3291679",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHQKz0JEuvxmL534g+JP0hYARs1CMQyi5xM9aBJdQgcfnM7VaorU//i7l703jelqqw==",
+                            SecurityStamp = "358f035a-cae5-46d9-99eb-ca875cdbea4c",
                             UserName = "MainAdmin"
                         });
                 });
@@ -297,16 +297,20 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ReporterName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ReporterRole")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("requestId")
+                    b.Property<int>("RequestId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("requestId");
+                    b.HasIndex("RequestId");
 
                     b.ToTable("Reports");
                 });
@@ -325,16 +329,20 @@ namespace ServicesApp.Migrations
                     b.Property<int?>("Rate")
                         .HasColumnType("int");
 
+                    b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ReviewerRole")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("requestId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("requestId");
+                    b.HasIndex("RequestId");
 
                     b.ToTable("Reviews");
                 });
@@ -621,24 +629,24 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
                 {
-                    b.HasOne("ServicesApp.Models.ServiceRequest", "request")
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Reports")
-                        .HasForeignKey("requestId")
+                        .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("request");
+                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Review", b =>
                 {
-                    b.HasOne("ServicesApp.Models.ServiceRequest", "request")
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Reviews")
-                        .HasForeignKey("requestId")
+                        .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("request");
+                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>

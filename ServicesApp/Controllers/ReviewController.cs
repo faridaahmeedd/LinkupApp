@@ -151,7 +151,7 @@ namespace ServicesApp.Controllers
         }
 
         [HttpPost("Customer/{RequestId}")]
-        public IActionResult CreateCustomerReview(int RequestId, [FromBody] PostReviewDto ReviewCreate)
+        public async Task<IActionResult> CreateCustomerReview(int RequestId, [FromBody] PostReviewDto ReviewCreate)
         {
             try
             {
@@ -181,7 +181,9 @@ namespace ServicesApp.Controllers
                 }
                 mapReview.ReviewerRole = "Provider";
                 _ReviewRepository.CreateReview(mapReview);
-                //  _ReviewRepository.Warning(CustomerId);
+                
+                 await _ReviewRepository.Warning(mapReview.Request.Customer.Id);
+                Console.WriteLine(mapReview.Request.Customer.Id+ " mapReview.Request.Customer.Id");
 
                 return Ok(new
                 {
@@ -197,7 +199,7 @@ namespace ServicesApp.Controllers
         }
 
         [HttpPost("Provider/{RequestId}")]
-        public IActionResult CreateProviderReview(int RequestId, [FromBody] PostReviewDto ReviewCreate)
+        public async Task<IActionResult> CreateProviderReview(int RequestId, [FromBody] PostReviewDto ReviewCreate)
         {
             try
             {
@@ -224,10 +226,12 @@ namespace ServicesApp.Controllers
                     return BadRequest(ApiResponse.ServiceAlreadyReviewed);
                 }
                 mapReview.ReviewerRole = "Customer";
-                _ReviewRepository.CreateReview(mapReview);
+                 _ReviewRepository.CreateReview(mapReview);
+                var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(mapReview.Request.Id);
 
-				// _ReviewRepository.Warning(ProviderId);
-				return Ok(new
+                Console.WriteLine("---------------------" + acceptedOffer.Provider.Id);
+                await _ReviewRepository.Warning(acceptedOffer?.Provider?.Id);
+                return Ok(new
                 {
                     statusMsg = "success",
                     message = "Review Created Successfully.",

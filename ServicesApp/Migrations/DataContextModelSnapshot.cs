@@ -250,13 +250,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "a3774a28-e38b-4631-8011-93d1b4928081",
+                            ConcurrencyStamp = "fa084864-4598-4361-86f6-2da6305991fc",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGSPlr1P9ptfMpU+071a6smq1R9RSceYHR6Ss91btB/XBPZj2xlpLlqbF/n+l4tQZw==",
-                            SecurityStamp = "f2349ee0-840a-4c4f-b574-4bed83b36f64",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHQKz0JEuvxmL534g+JP0hYARs1CMQyi5xM9aBJdQgcfnM7VaorU//i7l703jelqqw==",
+                            SecurityStamp = "358f035a-cae5-46d9-99eb-ca875cdbea4c",
                             UserName = "MainAdmin"
                         });
                 });

@@ -13,8 +13,9 @@ namespace ServicesApp.Interfaces
 		bool ReviewExist(int id);
 		bool CreateReview(Review review);
 		Task<double> CalculateAvgRating(string Id);
-		void Warning(string Id);
-		bool CheckRequestOfReviewCompleted(int RequestId);
+		Task<bool> Warning(string Id);
+
+        bool CheckRequestOfReviewCompleted(int RequestId);
         bool Save();
 	}
 }

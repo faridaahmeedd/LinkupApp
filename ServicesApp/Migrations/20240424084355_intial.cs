@@ -318,16 +318,16 @@ namespace ServicesApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReporterName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReporterRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    requestId = table.Column<int>(type: "int", nullable: false)
+                    ReporterName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reports_Requests_requestId",
-                        column: x => x.requestId,
+                        name: "FK_Reports_Requests_RequestId",
+                        column: x => x.RequestId,
                         principalTable: "Requests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -342,14 +342,15 @@ namespace ServicesApp.Migrations
                     Rate = table.Column<int>(type: "int", nullable: true),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReviewerRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    requestId = table.Column<int>(type: "int", nullable: false)
+                    ReviewerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reviews_Requests_requestId",
-                        column: x => x.requestId,
+                        name: "FK_Reviews_Requests_RequestId",
+                        column: x => x.RequestId,
                         principalTable: "Requests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -391,7 +392,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "d4db68af-6c88-4cc4-944d-0abed4f65d57", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEPuN6V0JNtJlBFcE1Mp24zv7Luu9F634c+wWWCw/lMOTXhWolYv7eFdHt/fnvxbNqg==", "22e9cd4c-5470-4753-a0a2-e9895d9aa221", "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "fa084864-4598-4361-86f6-2da6305991fc", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEHQKz0JEuvxmL534g+JP0hYARs1CMQyi5xM9aBJdQgcfnM7VaorU//i7l703jelqqw==", "358f035a-cae5-46d9-99eb-ca875cdbea4c", "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -448,9 +449,9 @@ namespace ServicesApp.Migrations
                 column: "RequestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reports_requestId",
+                name: "IX_Reports_RequestId",
                 table: "Reports",
-                column: "requestId");
+                column: "RequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Requests_CustomerId",
@@ -463,9 +464,9 @@ namespace ServicesApp.Migrations
                 column: "SubcategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_requestId",
+                name: "IX_Reviews_RequestId",
                 table: "Reviews",
-                column: "requestId");
+                column: "RequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subcategories_CategoryId",

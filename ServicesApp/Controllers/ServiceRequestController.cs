@@ -15,16 +15,18 @@ namespace ServicesApp.Controllers
 		private readonly ISubcategoryRepository _subcategoryRepository;
 		private readonly ICustomerRepository _customerRepository;
 		private readonly IProviderRepository _providerRepository;
+		private readonly IReviewRepository _reviewRepository;
 		private readonly IMapper _mapper;
 
 		public ServiceRequestController(IServiceRequestRepository serviceRepository,
 			ISubcategoryRepository subcategoryRepository, ICustomerRepository customerRepository,
-			IProviderRepository providerRepository, IMapper mapper)
+			IProviderRepository providerRepository, IReviewRepository reviewRepository , IMapper mapper)
 		{
 			_serviceRepository = serviceRepository;
 			_subcategoryRepository = subcategoryRepository;
 			_customerRepository = customerRepository;
 			_providerRepository = providerRepository;
+			_reviewRepository = reviewRepository;
 			_mapper = mapper;
 		}
 
@@ -237,7 +239,12 @@ namespace ServicesApp.Controllers
 				}
 				var offers = _serviceRepository.GetUndeclinedOffersOfService(serviceId);
 				var offersMap = _mapper.Map<List<GetServiceOfferDto>>(offers);
-				return Ok(offersMap);
+
+                foreach (var offer in offersMap)
+                {
+                    offer.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                }
+                return Ok(offersMap);
 			}
 			catch
 			{
@@ -254,7 +261,10 @@ namespace ServicesApp.Controllers
 				if (acceptedOffer != null)
 				{
 					var offerMap = _mapper.Map<GetServiceOfferDto>(acceptedOffer);
-					return Ok(offerMap);
+
+                    offerMap.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offerMap.ProviderId);
+                    
+                    return Ok(offerMap);
 				}
 				return NotFound(ApiResponse.OfferNotFound);
 			}

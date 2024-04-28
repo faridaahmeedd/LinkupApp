@@ -42,6 +42,10 @@ namespace ServicesApp.Repository
 			var request = _context.Requests.Include(r => r.Subcategory).Where(r=> r.Id == serviceOffer.Request.Id).FirstOrDefault();
 			if (request != null)
 			{
+				if (request.Volunteer == true)
+				{
+					return true;
+				}
 				var subCategory = _context.Subcategories.Find(request.Subcategory.Id);
 				if (request.Volunteer || (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees)) {
 					return true;

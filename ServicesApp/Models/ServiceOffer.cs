@@ -9,5 +9,7 @@
 		public  Provider? Provider { get; set; }
 		public string Status { get; set; } = "Offered";// declined Accepted
         public required ServiceRequest Request { get; set; }
+
+
 	}
 }

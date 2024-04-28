@@ -16,5 +16,9 @@ namespace ServicesApp.Models
         public Customer? Customer { get; set; }
         public ICollection<ServiceOffer>? Offers { get; set; }
 		public required ICollection<TimeSlot> TimeSlots { get; set; }
-	}
+        public ICollection<Review> Reviews { get; set; }
+        public ICollection<Report> Reports { get; set; }
+
+
+    }
 }

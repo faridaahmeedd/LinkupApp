@@ -9,6 +9,8 @@
 		public string Status { get; set; }
 		public string ProviderId { get; set; }
 		public string ProviderName { get; set; }
+        public double ProviderAvgRating { get; set; }
+
         public int RequestId { get; set; }
     }
 }

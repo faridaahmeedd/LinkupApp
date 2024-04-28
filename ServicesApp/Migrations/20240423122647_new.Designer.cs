@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicesApp.Data;
 
@@ -11,9 +12,11 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240423122647_new")]
+    partial class @new
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "fa084864-4598-4361-86f6-2da6305991fc",
+                            ConcurrencyStamp = "ce6b90b6-a94f-4789-a1f4-33de02040167",
                             Email = "MainAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "MAINADMIN@GMAIL.COM",
                             NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHQKz0JEuvxmL534g+JP0hYARs1CMQyi5xM9aBJdQgcfnM7VaorU//i7l703jelqqw==",
-                            SecurityStamp = "358f035a-cae5-46d9-99eb-ca875cdbea4c",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAfhYiLNL0yeq6FXsH5y/Mo2VAvtcfzpUeHY5btZ/uiugqo+1N5EMp7xPSMT5hDvJQ==",
+                            SecurityStamp = "712fcccd-a66c-4413-8d86-04465dce6557",
                             UserName = "MainAdmin"
                         });
                 });
@@ -294,6 +297,12 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("ReporterName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -302,12 +311,11 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RequestId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("RequestId");
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProviderId");
 
                     b.ToTable("Reports");
                 });
@@ -323,15 +331,14 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int?>("Rate")
                         .HasColumnType("int");
-
-                    b.Property<int>("RequestId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReviewerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReviewerRole")
                         .IsRequired()
@@ -339,7 +346,9 @@ namespace ServicesApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RequestId");
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProviderId");
 
                     b.ToTable("Reviews");
                 });
@@ -626,24 +635,32 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
                 {
-                    b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
-                        .WithMany("Reports")
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId");
 
-                    b.Navigation("Request");
+                    b.HasOne("ServicesApp.Models.Provider", "Provider")
+                        .WithMany()
+                        .HasForeignKey("ProviderId");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Review", b =>
                 {
-                    b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
+                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
                         .WithMany("Reviews")
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomerId");
 
-                    b.Navigation("Request");
+                    b.HasOne("ServicesApp.Models.Provider", "Provider")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ProviderId");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>
@@ -730,10 +747,6 @@ namespace ServicesApp.Migrations
                 {
                     b.Navigation("Offers");
 
-                    b.Navigation("Reports");
-
-                    b.Navigation("Reviews");
-
                     b.Navigation("TimeSlots");
                 });
 
@@ -744,12 +757,16 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Core.Models.Customer", b =>
                 {
+                    b.Navigation("Reviews");
+
                     b.Navigation("Services");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Provider", b =>
                 {
                     b.Navigation("Offers");
+
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

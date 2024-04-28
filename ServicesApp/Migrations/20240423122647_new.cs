@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class @new : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -401,7 +401,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "c442701b-eeef-4454-8056-0d82aef6b3a7", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEFK16oXR90AEqirOfvRWY1beMuRu6ZZpIn5K98MPmgtaBH/U96TTkGOXlna8Vi3vYQ==", "6b96ccf0-208f-42fc-b100-87b4177a298e", "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "ce6b90b6-a94f-4789-a1f4-33de02040167", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEAfhYiLNL0yeq6FXsH5y/Mo2VAvtcfzpUeHY5btZ/uiugqo+1N5EMp7xPSMT5hDvJQ==", "712fcccd-a66c-4413-8d86-04465dce6557", "MainAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

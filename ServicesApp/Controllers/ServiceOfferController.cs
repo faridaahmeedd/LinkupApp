@@ -332,5 +332,28 @@ namespace ServicesApp.Controllers
 				return StatusCode(500, ApiResponse.SomethingWrong);
 			}
 		}
-	}
+
+
+        [HttpGet("AcceptedOffer/{serviceId}")]
+        public IActionResult GetAcceptedOffer(int serviceId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                if (!_requestRepository.ServiceExist(serviceId))
+                {
+                    return NotFound(ApiResponse.RequestNotFound);
+                }
+                var acceptedOffer = _requestRepository.GetAcceptedOffer(serviceId);
+                return Ok(acceptedOffer);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse.SomethingWrong);
+            }
+        }
+    }
 }

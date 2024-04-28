@@ -4,6 +4,7 @@ using ServicesApp.Models;
 using ServicesApp.Dto.Reviews_Reports;
 using AutoMapper;
 using ServicesApp.APIs;
+using ServicesApp.Repository;
 
 namespace ServicesApp.Controllers
 {
@@ -15,14 +16,17 @@ namespace ServicesApp.Controllers
         private readonly IMapper _mapper;
         private readonly ICustomerRepository _customerRepository;
         private readonly IProviderRepository _providerRepository;
+        private readonly IServiceRequestRepository _serviceRequestRepository;
 
-        public ReportController(IReportRepository ReportRepository, IMapper mapper, IProviderRepository providerRepository, ICustomerRepository customerRepository)
+        public ReportController(IReportRepository ReportRepository, IMapper mapper, 
+            IProviderRepository providerRepository, ICustomerRepository customerRepository, 
+            IServiceRequestRepository serviceRequestRepository)
         {
             _ReportRepository = ReportRepository;
             _customerRepository = customerRepository;
             _providerRepository = providerRepository;
-            _mapper = mapper;
-
+			_serviceRequestRepository = serviceRequestRepository;
+			_mapper = mapper;
         }
 
         [HttpGet]
@@ -84,10 +88,12 @@ namespace ServicesApp.Controllers
                 var mappedReports = Report.Select(report =>
                 {
                     var reportDto = _mapper.Map<GetReportDto>(report);
-                    reportDto.ReporterName = report.Customer.FName;
 
+                    //var accOffer = _serviceRequestRepository.GetAcceptedOffer(report.Request.Id);
+                    //reportDto.ReporterName = accOffer?.Provider?.FName + " " + accOffer?.Provider?.LName;
                     return reportDto;
                 }).ToList();
+
                 return Ok(mappedReports);
             }
             catch
@@ -101,7 +107,6 @@ namespace ServicesApp.Controllers
         {
             try
             {
-                Console.WriteLine("dddd");
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ApiResponse.NotValid);
@@ -114,10 +119,10 @@ namespace ServicesApp.Controllers
                 var mappedReports = Report.Select(report =>
                 {
                     var reportDto = _mapper.Map<GetReportDto>(report);
-                    reportDto.ReporterName = report.Provider.FName;
-
+                    //reportDto.ReporterName = report.Request.Customer.FName + " " + report.Request.Customer.LName;
                     return reportDto;
                 }).ToList();
+
                 return Ok(mappedReports);
             }
             catch
@@ -126,8 +131,8 @@ namespace ServicesApp.Controllers
             }
         }
 
-        [HttpPost("ReportCustomer/{CustomerId}/{ProviderId}")]
-        public IActionResult CreateCustomerReport([FromBody] PostReportDto ReportCreate, string CustomerId, string ProviderId)
+        [HttpPost("Customer/{RequestId}")]
+        public IActionResult CreateCustomerReport([FromBody] PostReportDto ReportCreate,int RequestId)
         {
             try
             {
@@ -137,21 +142,22 @@ namespace ServicesApp.Controllers
                 }
 
                 var mapReport = _mapper.Map<Report>(ReportCreate);
-                if (!_customerRepository.CustomerExist(CustomerId))
+                if (!_serviceRequestRepository.ServiceExist(RequestId))
                 {
-                    return NotFound(ApiResponse.UserNotFound);
+                    return NotFound(ApiResponse.RequestNotFound);
                 }
-                if (!_providerRepository.ProviderExist(ProviderId))
-                {
-                    return NotFound(ApiResponse.UserNotFound);
-                }
-                mapReport.Customer = _customerRepository.GetCustomer(CustomerId);
-                mapReport.Provider = _providerRepository.GetProvider(ProviderId);
 
-                mapReport.ReporterName = mapReport.Provider.FName;
-                mapReport.ReporterRole = "Provider";
+                mapReport.Request = _serviceRequestRepository.GetService(RequestId);
+				var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(mapReport.Request.Id);
+				mapReport.ReporterName = acceptedOffer?.Provider?.FName + " " + acceptedOffer?.Provider?.LName;
 
+				if (mapReport.Request.Status != "Completed")
+				{
+					return BadRequest(ApiResponse.UncompletedService);
+				}
+				mapReport.ReporterRole = "Provider";
                 _ReportRepository.CreateReport(mapReport);
+
                 return Ok(new
                 {
                     statusMsg = "success",
@@ -165,9 +171,8 @@ namespace ServicesApp.Controllers
             }
         }
 
-        [HttpPost("ReportProvider/{CustomerId}/{ProviderId}")]
-		public IActionResult CreateProviderReport([FromBody] PostReportDto ReportCreate, string CustomerId, string ProviderId)
-
+        [HttpPost("Provider/{RequestId}")]
+        public IActionResult CreateProviderReport([FromBody] PostReportDto ReportCreate, int RequestId)
         {
             try
             {
@@ -177,22 +182,20 @@ namespace ServicesApp.Controllers
                 }
 
                 var mapReport = _mapper.Map<Report>(ReportCreate);
-                if (!_customerRepository.CustomerExist(CustomerId))
+                if (!_serviceRequestRepository.ServiceExist(RequestId))
                 {
-                    return NotFound(ApiResponse.UserNotFound);
+                    return NotFound(ApiResponse.RequestNotFound);
                 }
-                if (!_providerRepository.ProviderExist(ProviderId))
+
+                mapReport.Request = _serviceRequestRepository.GetService(RequestId);
+				mapReport.ReporterName = mapReport.Request.Customer.FName + " " + mapReport.Request.Customer.LName;
+				if (mapReport.Request.Status != "Completed")
                 {
-                    return NotFound(ApiResponse.UserNotFound);
+                    return BadRequest(ApiResponse.UncompletedService);
                 }
-                mapReport.Customer = _customerRepository.GetCustomer(CustomerId);
-                mapReport.Provider = _providerRepository.GetProvider(ProviderId);
-
-                mapReport.ReporterName = mapReport.Customer.FName;
-
-                mapReport.ReporterRole = "Customer";
-
+				mapReport.ReporterRole = "Customer";
                 _ReportRepository.CreateReport(mapReport);
+
                 return Ok(new
                 {
                     statusMsg = "success",

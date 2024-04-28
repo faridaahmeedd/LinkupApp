@@ -225,7 +225,7 @@ namespace ServicesApp.Controllers
 		}
 
         [HttpGet("ServiceUndeclinedOffers/{serviceId}")]
-        public IActionResult GetUndeclinedOffersOfService(int serviceId)
+        public async Task<IActionResult> GetUndeclinedOffersOfService(int serviceId)
         {
 			try
 			{
@@ -242,7 +242,7 @@ namespace ServicesApp.Controllers
 
                 foreach (var offer in offersMap)
                 {
-                    offer.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                    offer.ProviderAvgRating = await _reviewRepository.CalculateAvgRating(offer.ProviderId);
                 }
                 return Ok(offersMap);
 			}
@@ -253,7 +253,7 @@ namespace ServicesApp.Controllers
 		}
 
         [HttpGet("AcceptedOffer/{serviceId}")]
-        public IActionResult GetAcceptedOffer(int serviceId)
+        public async Task<IActionResult> GetAcceptedOffer(int serviceId)
         {
 			try
 			{
@@ -262,7 +262,7 @@ namespace ServicesApp.Controllers
 				{
 					var offerMap = _mapper.Map<GetServiceOfferDto>(acceptedOffer);
 
-                    offerMap.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offerMap.ProviderId);
+                    offerMap.ProviderAvgRating = await _reviewRepository.CalculateAvgRating(offerMap.ProviderId);
                     
                     return Ok(offerMap);
 				}

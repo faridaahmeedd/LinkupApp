@@ -183,7 +183,6 @@ namespace ServicesApp.Controllers
                 _ReviewRepository.CreateReview(mapReview);
                 
                  await _ReviewRepository.Warning(mapReview.Request.Customer.Id);
-                Console.WriteLine(mapReview.Request.Customer.Id+ " mapReview.Request.Customer.Id");
 
                 return Ok(new
                 {
@@ -229,7 +228,6 @@ namespace ServicesApp.Controllers
                  _ReviewRepository.CreateReview(mapReview);
                 var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(mapReview.Request.Id);
 
-                Console.WriteLine("---------------------" + acceptedOffer.Provider.Id);
                 await _ReviewRepository.Warning(acceptedOffer?.Provider?.Id);
                 return Ok(new
                 {

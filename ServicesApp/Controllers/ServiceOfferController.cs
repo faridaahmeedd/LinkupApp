@@ -36,7 +36,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult GetOffers()
+		public async Task<IActionResult> GetOffers()
 		{
 			try
 			{
@@ -47,7 +47,7 @@ namespace ServicesApp.Controllers
 				var offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOffers());
                 foreach (var offer in offers)
                 {
-                    offer.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                    offer.ProviderAvgRating = await _reviewRepository.CalculateAvgRating(offer.ProviderId);
                 }
                 return Ok(offers);
 			}
@@ -58,7 +58,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet("{OfferId}")]
-		public IActionResult GetOffer(int OfferId)
+		public async Task<IActionResult> GetOffer(int OfferId)
 		{
 			try
 			{
@@ -72,7 +72,7 @@ namespace ServicesApp.Controllers
 				}
 				var offer = _mapper.Map<GetServiceOfferDto>(_offerRepository.GetOffer(OfferId));
              
-                offer.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                offer.ProviderAvgRating = await _reviewRepository.CalculateAvgRating(offer.ProviderId);
                 
                 return Ok(offer);
 			}
@@ -229,7 +229,7 @@ namespace ServicesApp.Controllers
 
 
         [HttpGet("ProviderOffers/{ProviderId}")]
-        public IActionResult GetOffersOfProvider(string ProviderId)
+        public async Task<IActionResult> GetOffersOfProvider(string ProviderId)
         {
 			try
 			{
@@ -245,7 +245,7 @@ namespace ServicesApp.Controllers
 
                 foreach (var offer in Offers)
                 {
-                    offer.ProviderAvgRating = _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                    offer.ProviderAvgRating = await _reviewRepository.CalculateAvgRating(offer.ProviderId);
                 }
 
                 return Ok(Offers);

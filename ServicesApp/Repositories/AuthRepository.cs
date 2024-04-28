@@ -307,7 +307,5 @@ public class AuthRepository : IAuthRepository
         {
             Console.WriteLine($"Error: {ex.Message}");
         }
-
     }
-
 }

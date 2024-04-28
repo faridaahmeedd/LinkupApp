@@ -44,14 +44,12 @@ namespace ServicesApp.Repositories
 				var jsonResponse = await response.Content.ReadAsStringAsync();
 				var jsonObject = JObject.Parse(jsonResponse);
 				var predictedSubcategory = jsonObject["subcategory"].ToString();
-				Console.WriteLine(predictedSubcategory);
 
 				if (predictedSubcategory == request.Subcategory.Name)
 				{
 					return true;
 				}
 			}
-
 			return false;
 		}
 	}

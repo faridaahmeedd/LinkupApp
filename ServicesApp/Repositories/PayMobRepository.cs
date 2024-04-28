@@ -30,7 +30,6 @@ namespace ServicesApp.Repositories
             var data = new { api_key = _configuration["PayMob:ApiKey"] };
             var response = await PostDataAndGetResponse("https://accept.paymob.com/api/auth/tokens", data);
             string token = response.token;
-            Console.WriteLine(token.ToString());
 
             return await SecondStep(token.ToString(), ServiceId);
         }
@@ -87,7 +86,6 @@ namespace ServicesApp.Repositories
 
             var response = await PostDataAndGetResponse("https://accept.paymob.com/api/acceptance/payment_keys", data);
             string theToken = response.token;
-            Console.WriteLine(theToken.ToString());
 
             return await CardPayment(theToken.ToString());
         }
@@ -95,8 +93,6 @@ namespace ServicesApp.Repositories
         public async Task<string> CardPayment(string token)
         {
             var iframeURL = $"https://accept.paymob.com/api/acceptance/iframes/831255?payment_token={token}";
-            Console.WriteLine($"Redirecting to: {iframeURL}");
-			
 			return iframeURL;
         }
 

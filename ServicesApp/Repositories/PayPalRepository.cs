@@ -29,7 +29,6 @@ namespace ServicesApp.Repositories
 			var request = _serviceRepository.GetService(ServiceId);
 			var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
 			var accessToken = await GetAccessToken();
-			Console.WriteLine(accessToken);
 			var createPaymentJson = new
 			{
 				intent = "sale",
@@ -73,11 +72,7 @@ namespace ServicesApp.Repositories
 			_httpClient.DefaultRequestHeaders.Remove("Authorization");   // Clear any existing authorization header
 			_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
 
-			Console.WriteLine($"Request Headers: {string.Join(", ", _httpClient.DefaultRequestHeaders)}");
-			Console.WriteLine($"Create Payment JSON: {JsonConvert.SerializeObject(createPaymentJson)}");
-
 			var createPaymentResponse = await SendPayPalRequest("/v1/payments/payment", createPaymentJson);
-			Console.WriteLine($"Create Payment Response: {JsonConvert.SerializeObject(createPaymentResponse)}");
 
 			var approvalLink = GetApprovalLink(createPaymentResponse.links);
 			return approvalLink;
@@ -99,7 +94,6 @@ namespace ServicesApp.Repositories
 			_httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {base64Auth}");
 
 			var response = await _httpClient.PostAsync("https://api.sandbox.paypal.com/v1/oauth2/token", new FormUrlEncodedContent(tokenRequest));
-			Console.WriteLine(response.ToString());
 			var responseContent = await response.Content.ReadAsStringAsync();
 
 			if (response.IsSuccessStatusCode)
@@ -125,7 +119,6 @@ namespace ServicesApp.Repositories
 		public async Task<dynamic> SendPayPalRequest(string endpoint, object requestData)
 		{
 			var requestJson = JsonConvert.SerializeObject(requestData);
-			Console.WriteLine($"Request JSON: {requestJson}");
 
 			var fullUrl = new Uri(new Uri(PayPalApiBaseUrl), endpoint);
 
@@ -134,10 +127,6 @@ namespace ServicesApp.Repositories
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
 			var response = await _httpClient.PostAsync(fullUrl, new StringContent(requestJson, Encoding.UTF8, "application/json"));
-
-			Console.WriteLine($"responsee: {response}");
-			Console.WriteLine($"Full URL: {fullUrl}");
-			Console.WriteLine($"Request Headers: {string.Join(", ", _httpClient.DefaultRequestHeaders)}");
 
 			if (response.IsSuccessStatusCode)
 			{
@@ -165,7 +154,6 @@ namespace ServicesApp.Repositories
 				request.Customer.Balance = 0;
 				_serviceRepository.Save();
 			}
-			Console.WriteLine(executePaymentResponse);
 			return executePaymentResponse.state;
 		}
 	}

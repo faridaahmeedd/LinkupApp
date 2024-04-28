@@ -104,7 +104,7 @@ namespace ServicesApp.Repository
 			var newTimeSlot = _context.TimeSlots.Where(t =>  t.Id == offer.TimeSlotId).FirstOrDefault();
 			TimeOnly toTime = newTimeSlot.FromTime.AddHours(offer.Duration.Hour);
 			toTime = toTime.AddMinutes(offer.Duration.Minute);
-			Console.WriteLine(toTime);
+
 			if (pendingOffers != null)
 			{
 				foreach(var item in pendingOffers)

@@ -188,9 +188,7 @@ namespace ServicesApp.Repository
 
 			foreach (var request in requests)
 			{
-				Console.WriteLine(request.Subcategory.Name);
 				bool isMatched = _MLRepository.MatchJobAndService(request.Id, providerId).Result;
-				Console.WriteLine(isMatched);
 				if (isMatched)
 				{
 					matchedRequests.Add(request);
@@ -198,26 +196,5 @@ namespace ServicesApp.Repository
 			}
 			return matchedRequests;
 		}
-
-		//public ICollection<ServiceRequest> GetServicesWithFees()
-		//{
-		//    return _context.Requests.Where(p => p.MaxFees != 0).ToList();
-		//}
-
-		//public ICollection<ServiceRequest> GetServicesWithFees(string customerId)
-		//{
-		//	return _context.Requests.Where(p => p.Customer.Id == customerId && p.MaxFees != 0).ToList();
-		//}
-
-		//public bool UpdateMaxFees(int serviceId, int maxFees)
-		//{
-		//	var service = _context.Requests.Where(s => s.Id == serviceId).FirstOrDefault();
-		//	if (service != null)
-		//	{
-		//		service.MaxFees = maxFees;
-		//		return Save();
-		//	}
-		//	return false;
-		//}
 	}
 }

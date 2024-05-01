@@ -59,6 +59,10 @@ namespace ServicesApp.Repository
             var existingOffer = _context.Offers.Include(o => o.Request).FirstOrDefault(o => o.Id == id);
 			if (existingOffer != null)
 			{
+				if (IsOfferAccepted(existingOffer.Request.Id))
+				{
+					return false;
+				}
 				existingOffer.Status = "Accepted";
                 var service = _context.Requests.Find(existingOffer.Request.Id);
 				service.Status = "Pending";
@@ -67,6 +71,14 @@ namespace ServicesApp.Repository
 			}
 			return false;
 		}
+        public bool IsOfferAccepted(int requestId)
+        {
+            var acceptedOffer = _context.Offers
+                                    .Include(o => o.Request)
+                                    .FirstOrDefault(o => o.Request.Id == requestId && o.Status == "Accepted");
+
+            return acceptedOffer != null;
+        }
 
         public bool DeclineOffer(int offerId)
         {

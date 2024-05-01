@@ -13,7 +13,8 @@ namespace ServicesApp.Interfaces
 		bool UpdateOffer(ServiceOffer updatedOffer);
 		bool DeleteOffer(int id);
 		bool AcceptOffer(int id);
-		bool DeclineOffer(int offerId);
+		bool IsOfferAccepted(int requestId);
+        bool DeclineOffer(int offerId);
 		ICollection<ServiceOffer> GetUnCompletedOffers(string providerId);
 		ICollection<ServiceOffer> GetOfffersOfProvider(string providerId);
 		bool ProviderAlreadyOffered(string providerId, int requestId);

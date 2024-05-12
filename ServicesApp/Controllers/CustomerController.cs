@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Core.Models;
 using ServicesApp.Interfaces;
-using ServicesApp.APIs;
 using ServicesApp.Dto.User;
+using ServicesApp.Helper;
 
 namespace ServicesApp.Controllers
 {
@@ -28,7 +28,7 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var customers = _customerRepository.GetCustomers();
 				var mapCustomers = _mapper.Map<List<GetCustomerDto>>(customers);
@@ -36,7 +36,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -47,11 +47,11 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_customerRepository.CustomerExist(CustomerId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				var customer = _customerRepository.GetCustomer(CustomerId);
 				var mapCustomer = _mapper.Map<GetCustomerDto>(customer);
@@ -59,7 +59,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -70,20 +70,20 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid || customerUpdate == null)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_customerRepository.CustomerExist(CustomerId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				var mapCustomer = _mapper.Map<Customer>(customerUpdate);
 				mapCustomer.Id = CustomerId;
 				await _customerRepository.UpdateCustomer(mapCustomer);
-				return Ok(ApiResponse.SuccessUpdated);
+				return Ok(ApiResponses.SuccessUpdated);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -94,18 +94,18 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_customerRepository.CustomerExist(CustomerId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				await _customerRepository.DeleteCustomer(CustomerId);
-				return Ok(ApiResponse.SuccessDeleted);
+				return Ok(ApiResponses.SuccessDeleted);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 	}

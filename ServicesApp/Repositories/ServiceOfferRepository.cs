@@ -115,6 +115,10 @@ namespace ServicesApp.Repository
 		public bool DeleteOffer(int id)
 		{
 			var offer = _context.Offers.Include(c => c.Provider).Include(c => c.Request).Where(p => p.Id == id).FirstOrDefault();
+			if(offer.Request.Status == "Completed")
+			{
+				return false;
+			}
 			if (offer.Status == "Accepted")
 			{
 				var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();

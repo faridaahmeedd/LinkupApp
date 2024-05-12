@@ -72,6 +72,10 @@ namespace ServicesApp.Repository
         public bool DeleteService(int id)
 		{
 			var service = _context.Requests.Include(c => c.Customer).Where(p => p.Id == id).FirstOrDefault();
+			if (service.Status == "Completed")
+			{
+				return false;
+			}
             if(service.Status == "Pending")
             {
 				var offer = _context.Offers.Include(c => c.Request).Where(p => p.Request.Id == id && p.Status == "Accepted").FirstOrDefault();

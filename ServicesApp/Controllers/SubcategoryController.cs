@@ -2,13 +2,13 @@
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using AutoMapper;
-using ServicesApp.APIs;
 using ServicesApp.Dto.Subcategory;
 using System.Collections.Generic;
+using ServicesApp.Helper;
 
 namespace ServicesApp.Controllers
 {
-	[Route("/api/[controller]")]
+    [Route("/api/[controller]")]
 	[ApiController]
 	public class SubcategoryController : ControllerBase
 	{
@@ -30,7 +30,7 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var subcategories = _subcategoryRepository.GetSubcategories();
 				var mapSubcategories = _mapper.Map<List<SubcategoryDto>>(subcategories);
@@ -38,7 +38,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -49,11 +49,11 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_categoryRepository.CategoryExist(CategoryId))
 				{
-					return NotFound(ApiResponse.CategoryNotFound);
+					return NotFound(ApiResponses.CategoryNotFound);
 				}
 				var subcategories = _subcategoryRepository.GetSubcategories(CategoryId);
 				var mapSubcategories = _mapper.Map<List<SubcategoryDto>>(subcategories);
@@ -61,7 +61,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -72,11 +72,11 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_subcategoryRepository.SubcategoryExist(SubcategoryId))
 				{
-					return NotFound(ApiResponse.SubcategoryNotFound);
+					return NotFound(ApiResponses.SubcategoryNotFound);
 				}
 				var subcategory = _subcategoryRepository.GetSubcategory(SubcategoryId);
 				var mapSubcategories = _mapper.Map<SubcategoryDto>(subcategory);
@@ -84,7 +84,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -95,19 +95,19 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var subcategory = _subcategoryRepository.GetSubcategory(SubcategoryName);
 				if (subcategory == null)
 				{
-					return NotFound(ApiResponse.SubcategoryNotFound);
+					return NotFound(ApiResponses.SubcategoryNotFound);
 				}
 				var mapSubcategories = _mapper.Map<SubcategoryDto>(subcategory);
 				return Ok(mapSubcategories);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -118,16 +118,16 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var subcategory = _subcategoryRepository.GetSubcategory(subcategoryCreate.Name);
 				if (subcategory != null)
 				{
-					return BadRequest(ApiResponse.SubcategoryAlreadyExist);
+					return BadRequest(ApiResponses.SubcategoryAlreadyExist);
 				}
 				if (!_categoryRepository.CategoryExist(CategoryId))
 				{
-					return NotFound(ApiResponse.CategoryNotFound);
+					return NotFound(ApiResponses.CategoryNotFound);
 				}
 				var mapSubcategory = _mapper.Map<Subcategory>(subcategoryCreate);
 				mapSubcategory.Category = _categoryRepository.GetCategory(CategoryId);
@@ -141,7 +141,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -152,20 +152,20 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_subcategoryRepository.SubcategoryExist(subcategoryUpdate.Id))
 				{
-					return NotFound(ApiResponse.SubcategoryNotFound);
+					return NotFound(ApiResponses.SubcategoryNotFound);
 				}
 				var mapSubcategory = _mapper.Map<Subcategory>(subcategoryUpdate);
 
 				_subcategoryRepository.UpdateSubcategory(mapSubcategory);
-				return Ok(ApiResponse.SuccessUpdated);
+				return Ok(ApiResponses.SuccessUpdated);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -176,18 +176,18 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_subcategoryRepository.SubcategoryExist(SubcategoryId))
 				{
-					return NotFound(ApiResponse.SubcategoryNotFound);
+					return NotFound(ApiResponses.SubcategoryNotFound);
 				}
 				_subcategoryRepository.DeleteSubcategory(SubcategoryId);
-				return Ok(ApiResponse.SuccessDeleted);
+				return Ok(ApiResponses.SuccessDeleted);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 	}

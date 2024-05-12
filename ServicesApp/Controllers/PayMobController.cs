@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ServicesApp.APIs;
+using ServicesApp.Helper;
 using ServicesApp.Interfaces;
 using ServicesApp.Repositories;
 
@@ -26,27 +26,27 @@ namespace ServicesApp.Controllers
             {
                 if (!_serviceRepository.ServiceExist(ServiceId))
                 {
-                    return NotFound(ApiResponse.RequestNotFound);
+                    return NotFound(ApiResponses.RequestNotFound);
                 }
                 if (_serviceRepository.GetAcceptedOffer(ServiceId) == null)
                 {
-                    return NotFound(ApiResponse.OfferNotFound);
+                    return NotFound(ApiResponses.OfferNotFound);
                 }
 				var request = _serviceRepository.GetService(ServiceId);
 				if (request.PaymentStatus == "Paid")
 				{
-					return BadRequest(ApiResponse.PaidAlready);
+					return BadRequest(ApiResponses.PaidAlready);
 				}
 				var paymentLink=  await _payMobRepository.FirstStep(ServiceId);
                 if (paymentLink != null)
                 {
                     return Ok(paymentLink);
                 }
-                return BadRequest(ApiResponse.PaymentError);
+                return BadRequest(ApiResponses.PaymentError);
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -59,13 +59,13 @@ namespace ServicesApp.Controllers
 
 				if (await _payMobRepository.Refund(TransactionId , ServiceId))
 				{
-					return Ok(ApiResponse.RefundSuccess);
+					return Ok(ApiResponses.RefundSuccess);
 				}
-				return BadRequest(ApiResponse.RefundedAlready);
+				return BadRequest(ApiResponses.RefundedAlready);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -79,13 +79,13 @@ namespace ServicesApp.Controllers
                 if (await _payMobRepository.Capture(TransactionId, ServiceId))
                 {
 
-                    return Ok(ApiResponse.CaptureSuccess);
+                    return Ok(ApiResponses.CaptureSuccess);
                 }
-                return BadRequest(ApiResponse.CannotCapture);
+                return BadRequest(ApiResponses.CannotCapture);
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
     }

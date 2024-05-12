@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.APIs;
 using ServicesApp.Repository;
 using ServicesApp.Repositories;
+using ServicesApp.Helper;
+using FluentAssertions.Common;
 
 namespace ServicesApp.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class ServiceOfferController : ControllerBase
 	{
@@ -42,7 +43,7 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOffers());
                 foreach (var offer in offers)
@@ -53,7 +54,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -64,11 +65,11 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_offerRepository.OfferExist(OfferId))
 				{
-					return NotFound(ApiResponse.OfferNotFound);
+					return NotFound(ApiResponses.OfferNotFound);
 				}
 				var offer = _mapper.Map<GetServiceOfferDto>(_offerRepository.GetOffer(OfferId));
              
@@ -78,7 +79,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -89,19 +90,19 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid || serviceOfferDto == null)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_providerRepository.ProviderExist(ProviderId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				if (!_requestRepository.ServiceExist(RequestId))
 				{
-					return NotFound(ApiResponse.RequestNotFound);
+					return NotFound(ApiResponses.RequestNotFound);
 				}
 				if (!_requestRepository.TimeSlotsExistInService(RequestId, serviceOfferDto.TimeSlotId))
 				{
-					return NotFound(ApiResponse.TimeSlotNotFound);
+					return NotFound(ApiResponses.TimeSlotNotFound);
 				}
 
 				var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
@@ -110,15 +111,15 @@ namespace ServicesApp.Controllers
 
 				if (_timeSlotsRepository.GetTimeSlot(serviceOfferDto.TimeSlotId) == null)
 				{
-					return NotFound(ApiResponse.TimeSlotNotFound);
+					return NotFound(ApiResponses.TimeSlotNotFound);
 				}
 				if (_offerRepository.ProviderAlreadyOffered(ProviderId, RequestId)) 
 				{
-					return BadRequest(ApiResponse.AlreadyOffered);
+					return BadRequest(ApiResponses.AlreadyOffered);
 				}
 				if (!_timeSlotsRepository.CheckConflict(offerMap))
 				{
-					return StatusCode(500, ApiResponse.TimeSlotConflict);
+					return StatusCode(500, ApiResponses.TimeSlotConflict);
 				}
 				//if (!_providerRepository.CheckProviderBalance(ProviderId))  
 				//{
@@ -126,7 +127,7 @@ namespace ServicesApp.Controllers
 				//}
 				if (!_offerRepository.CheckFeesRange(offerMap))
                 {
-                    return BadRequest(ApiResponse.FeesOutsideRange);
+                    return BadRequest(ApiResponses.FeesOutsideRange);
                 }
                 _offerRepository.CreateOffer(offerMap);
 				return Ok(new
@@ -138,7 +139,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -149,33 +150,33 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid || serviceOfferDto == null)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_offerRepository.OfferExist(OfferId))
 				{
-					return NotFound(ApiResponse.OfferNotFound);
+					return NotFound(ApiResponses.OfferNotFound);
 				}
 				var offer = _offerRepository.GetOffer(OfferId);
 				if (!_requestRepository.TimeSlotsExistInService(offer.Request.Id, serviceOfferDto.TimeSlotId))
 				{
-					return NotFound(ApiResponse.TimeSlotNotFound);
+					return NotFound(ApiResponses.TimeSlotNotFound);
 				}
 				var offerMap = _mapper.Map<ServiceOffer>(serviceOfferDto);
 				offerMap.Id = OfferId;
 				offerMap.Request = _offerRepository.GetOffer(OfferId).Request;
 				if (!_offerRepository.CheckFeesRange(offerMap))
 				{
-					return BadRequest(ApiResponse.FeesOutsideRange);
+					return BadRequest(ApiResponses.FeesOutsideRange);
 				}
 				if (!_offerRepository.UpdateOffer(offerMap))
 				{
-					return BadRequest(ApiResponse.FailedToUpdate);
+					return BadRequest(ApiResponses.FailedToUpdate);
 				}
-				return Ok(ApiResponse.SuccessUpdated);
+				return Ok(ApiResponses.SuccessUpdated);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -186,22 +187,22 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_offerRepository.OfferExist(OfferId))
 				{
-					return NotFound(ApiResponse.OfferNotFound);
+					return NotFound(ApiResponses.OfferNotFound);
 				}
 				if(!_offerRepository.AcceptOffer(OfferId))
 				{
-					return StatusCode(500, ApiResponse.FailedToUpdate);
+					return StatusCode(500, ApiResponses.FailedToUpdate);
 				}
 				_timeSlotsRepository.UpdateToTime(OfferId);
-				return Ok(ApiResponse.OfferAccepted);
+				return Ok(ApiResponses.OfferAccepted);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -212,18 +213,21 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_offerRepository.OfferExist(OfferId))
 				{
-					return NotFound(ApiResponse.OfferNotFound);
+					return NotFound(ApiResponses.OfferNotFound);
 				}
-				_offerRepository.DeleteOffer(OfferId);
-				return Ok(ApiResponse.SuccessDeleted);
+				if (!_offerRepository.DeleteOffer(OfferId))
+				{
+					return NotFound(ApiResponses.FailedToDelete);
+				}
+				return Ok(ApiResponses.SuccessDeleted);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -235,11 +239,11 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_providerRepository.ProviderExist(ProviderId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				var Offers = _mapper.Map<List<GetServiceOfferDto>>(_offerRepository.GetOfffersOfProvider(ProviderId));
 
@@ -252,7 +256,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
         }
 
@@ -264,25 +268,25 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_providerRepository.ProviderExist(ProviderId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				if (!_requestRepository.ServiceExist(RequestId))
 				{
-					return NotFound(ApiResponse.RequestNotFound);
+					return NotFound(ApiResponses.RequestNotFound);
 				}
 				if (_offerRepository.ProviderAlreadyOffered(ProviderId, RequestId))
 				{
-					return BadRequest(ApiResponse.AlreadyOffered);
+					return BadRequest(ApiResponses.AlreadyOffered);
 				}
-				return Ok(ApiResponse.ProviderCanOffer);
+				return Ok(ApiResponses.ProviderCanOffer);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -293,21 +297,21 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_offerRepository.OfferExist(OfferId))
                 {
-                    return NotFound(ApiResponse.OfferNotFound);
+                    return NotFound(ApiResponses.OfferNotFound);
                 }
                 if (!_offerRepository.DeclineOffer(OfferId))
                 {
-                    return StatusCode(500, ApiResponse.FailedToUpdate);
+                    return StatusCode(500, ApiResponses.FailedToUpdate);
                 }
-                return Ok(ApiResponse.OfferDeclined);
+                return Ok(ApiResponses.OfferDeclined);
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -322,38 +326,15 @@ namespace ServicesApp.Controllers
 				}
 				if (!_providerRepository.ProviderExist(ProviderId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				var calendarDtos = _offerRepository.GetCalendarDetails(ProviderId);
 				return Ok(calendarDtos);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
-
-
-        [HttpGet("AcceptedOffer/{serviceId}")]
-        public IActionResult GetAcceptedOffer(int serviceId)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                if (!_requestRepository.ServiceExist(serviceId))
-                {
-                    return NotFound(ApiResponse.RequestNotFound);
-                }
-                var acceptedOffer = _requestRepository.GetAcceptedOffer(serviceId);
-                return Ok(acceptedOffer);
-            }
-            catch
-            {
-                return StatusCode(500, ApiResponse.SomethingWrong);
-            }
-        }
     }
 }

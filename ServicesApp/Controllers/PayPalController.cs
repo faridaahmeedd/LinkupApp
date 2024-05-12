@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ServicesApp.APIs;
+using ServicesApp.Helper;
 using ServicesApp.Interfaces;
 
 [ApiController]
@@ -22,27 +22,27 @@ public class PayPalController : ControllerBase
 		{
 			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
-				return NotFound(ApiResponse.RequestNotFound);
+				return NotFound(ApiResponses.RequestNotFound);
 			}
 			if(_serviceRepository.GetAcceptedOffer(ServiceId) == null)
 			{
-				return NotFound(ApiResponse.OfferNotFound);
+				return NotFound(ApiResponses.OfferNotFound);
 			}
 			var request = _serviceRepository.GetService(ServiceId);
 			if(request.PaymentStatus == "Paid")
 			{
-				return BadRequest(ApiResponse.PaidAlready);
+				return BadRequest(ApiResponses.PaidAlready);
 			}
 			var approvalLink = await _payPalRepsoitory.CreatePayment(ServiceId);
 			if(approvalLink != null)
 			{
 				return Ok(approvalLink);
 			}
-			return BadRequest(ApiResponse.PaymentError);
+			return BadRequest(ApiResponses.PaymentError);
 		}
 		catch
 		{
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 	}
 
@@ -53,7 +53,7 @@ public class PayPalController : ControllerBase
 		{
 			if (!_serviceRepository.ServiceExist(ServiceId))
 			{
-				return NotFound(ApiResponse.RequestNotFound);
+				return NotFound(ApiResponses.RequestNotFound);
 			}
 			var responseState = await _payPalRepsoitory.ExecutePayment(ServiceId, PaymentId, Token, PayerId);
 			if (responseState == "approved")
@@ -63,12 +63,12 @@ public class PayPalController : ControllerBase
 			}
 			else
 			{
-				return BadRequest(ApiResponse.PaymentError);
+				return BadRequest(ApiResponses.PaymentError);
 			}
 		}
 		catch
 		{
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 	}
 }

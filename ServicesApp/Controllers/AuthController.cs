@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Authentication;
-using ServicesApp.APIs;
 using ServicesApp.Interfaces;
+using ServicesApp.Helper;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -21,16 +21,16 @@ public class AuthController : ControllerBase
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ApiResponse.NotValid);
+				return BadRequest(ApiResponses.NotValid);
 			}
 			if (!await _authRepository.CheckRole(Role))
 			{
-				return BadRequest(ApiResponse.RoleDoesNotExist);
+				return BadRequest(ApiResponses.RoleDoesNotExist);
 			}
 			var appUser = await _authRepository.CheckUser(registerDto.Email);
 			if (appUser != null)
 			{
-				return BadRequest(ApiResponse.UserAlreadyExist);
+				return BadRequest(ApiResponses.UserAlreadyExist);
 			}
 			var res = await _authRepository.CreateUser(registerDto, Role);
 			if (res.Succeeded)
@@ -47,14 +47,14 @@ public class AuthController : ControllerBase
 			{
 				if (error.Code.StartsWith("Password"))
 				{
-					return BadRequest(ApiResponse.InvalidPass);
+					return BadRequest(ApiResponses.InvalidPass);
 				}
 			}
-			return BadRequest(ApiResponse.NotValid);
+			return BadRequest(ApiResponses.NotValid);
 		}
 		catch
 		{
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 	}
 
@@ -66,12 +66,12 @@ public class AuthController : ControllerBase
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ApiResponse.NotValid);
+				return BadRequest(ApiResponses.NotValid);
 			}
 			var appUser = await _authRepository.CheckAdmin(registerDto.Email);
 			if (appUser != null)
 			{
-				return BadRequest(ApiResponse.AdminAlreadyExist);
+				return BadRequest(ApiResponses.AdminAlreadyExist);
 			}
 			var res = await _authRepository.CreateAdmin(registerDto);
 			if (res.Succeeded)
@@ -88,14 +88,14 @@ public class AuthController : ControllerBase
 			{
 				if (error.Code.StartsWith("Password"))
 				{
-					return BadRequest(ApiResponse.InvalidPass);
+					return BadRequest(ApiResponses.InvalidPass);
 				}
 			}
-			return BadRequest(ApiResponse.NotValid);
+			return BadRequest(ApiResponses.NotValid);
 		}
 		catch
 		{
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class AuthController : ControllerBase
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ApiResponse.NotValid);
+				return BadRequest(ApiResponses.NotValid);
 			}
 			var (token, expiration) = await _authRepository.LoginUser(loginDto);
 			if (token != null)
@@ -119,11 +119,11 @@ public class AuthController : ControllerBase
 					Expiration = expiration,
 				});
 			}
-			return Unauthorized(ApiResponse.Unauthorized);
+			return Unauthorized(ApiResponses.Unauthorized);
 		}
 		catch
 		{
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 	}
 
@@ -134,12 +134,12 @@ public class AuthController : ControllerBase
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ApiResponse.NotValid);
+				return BadRequest(ApiResponses.NotValid);
 			}
 			var user = await _authRepository.CheckUser(Mail);
 			if (user == null)
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				return NotFound(ApiResponses.UserNotFound);
 			}
 			var resetCode = await _authRepository.ForgetPassword(Mail);
 
@@ -152,11 +152,11 @@ public class AuthController : ControllerBase
 					message = "Reset Code Sent Successfully.",
 				});
 			}
-			return BadRequest(ApiResponse.CanNotSentMail);
+			return BadRequest(ApiResponses.CanNotSentMail);
 		}
 		catch
 		{
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 	}
 
@@ -167,12 +167,12 @@ public class AuthController : ControllerBase
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ApiResponse.NotValid);
+				return BadRequest(ApiResponses.NotValid);
 			}
 			var user = await _authRepository.CheckUser(registrationDto.Email);
 			if (user == null)
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				return NotFound(ApiResponses.UserNotFound);
 			}
 			if (registrationDto.Password == registrationDto.ConfirmPassword)
 			{
@@ -182,14 +182,14 @@ public class AuthController : ControllerBase
 
 				if (resetPassword)
 				{
-					return Ok(ApiResponse.PassChanged);
+					return Ok(ApiResponses.PassChanged);
 				}
 			}
-			return BadRequest(ApiResponse.CanNotChangePass);
+			return BadRequest(ApiResponses.CanNotChangePass);
 		}
 		catch
 		{
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 	}
 
@@ -200,22 +200,22 @@ public class AuthController : ControllerBase
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest(ApiResponse.NotValid);
+				return BadRequest(ApiResponses.NotValid);
 			}
 			var user = await _authRepository.CheckUserById(UserId);
 			if (user == null)
 			{
-				return NotFound(ApiResponse.UserNotFound);
+				return NotFound(ApiResponses.UserNotFound);
 			}
 			if(await _authRepository.DeactivateUser(UserId))
 			{
-				return Ok(ApiResponse.UserDeactivated);
+				return Ok(ApiResponses.UserDeactivated);
 			}
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 		catch
 		{
-			return StatusCode(500, ApiResponse.SomethingWrong);
+			return StatusCode(500, ApiResponses.SomethingWrong);
 		}
 	}
 }

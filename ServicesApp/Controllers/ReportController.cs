@@ -3,8 +3,8 @@ using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Dto.Reviews_Reports;
 using AutoMapper;
-using ServicesApp.APIs;
 using ServicesApp.Repository;
+using ServicesApp.Helper;
 
 namespace ServicesApp.Controllers
 {
@@ -36,7 +36,7 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 var reports = _ReportRepository.GetReports();
                 var mapreports = _mapper.Map<List<GetReportDto>>(reports);
@@ -44,7 +44,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -55,11 +55,11 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_ReportRepository.ReportExist(ReportId))
                 {
-                    return NotFound(ApiResponse.ReportNotFound);
+                    return NotFound(ApiResponses.ReportNotFound);
                 }
                 var Report = _ReportRepository.GetReport(ReportId);
                 var mapReport = _mapper.Map<GetReportDto>(Report);
@@ -67,7 +67,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -78,11 +78,11 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_customerRepository.CustomerExist(CustomerId))
                 {
-                    return NotFound(ApiResponse.ReportNotFound);
+                    return NotFound(ApiResponses.ReportNotFound);
                 }
                 var Report = _ReportRepository.GetReportsOfCustomer(CustomerId);
                 var mappedReports = Report.Select(report =>
@@ -98,7 +98,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -109,11 +109,11 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_providerRepository.ProviderExist(ProviderId))
                 {
-                    return NotFound(ApiResponse.ReportNotFound);
+                    return NotFound(ApiResponses.ReportNotFound);
                 }
                 var Report = _ReportRepository.GetReportsOfProvider(ProviderId);
                 var mappedReports = Report.Select(report =>
@@ -127,7 +127,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -138,13 +138,13 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
 
                 var mapReport = _mapper.Map<Report>(ReportCreate);
                 if (!_serviceRequestRepository.ServiceExist(RequestId))
                 {
-                    return NotFound(ApiResponse.RequestNotFound);
+                    return NotFound(ApiResponses.RequestNotFound);
                 }
 
                 mapReport.Request = _serviceRequestRepository.GetService(RequestId);
@@ -153,7 +153,7 @@ namespace ServicesApp.Controllers
 
 				if (mapReport.Request.Status != "Completed")
 				{
-					return BadRequest(ApiResponse.UncompletedService);
+					return BadRequest(ApiResponses.UncompletedService);
 				}
 				mapReport.ReporterRole = "Provider";
                 _ReportRepository.CreateReport(mapReport);
@@ -167,7 +167,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -178,20 +178,20 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
 
                 var mapReport = _mapper.Map<Report>(ReportCreate);
                 if (!_serviceRequestRepository.ServiceExist(RequestId))
                 {
-                    return NotFound(ApiResponse.RequestNotFound);
+                    return NotFound(ApiResponses.RequestNotFound);
                 }
 
                 mapReport.Request = _serviceRequestRepository.GetService(RequestId);
 				mapReport.ReporterName = mapReport.Request.Customer.FName + " " + mapReport.Request.Customer.LName;
 				if (mapReport.Request.Status != "Completed")
                 {
-                    return BadRequest(ApiResponse.UncompletedService);
+                    return BadRequest(ApiResponses.UncompletedService);
                 }
 				mapReport.ReporterRole = "Customer";
                 _ReportRepository.CreateReport(mapReport);
@@ -205,7 +205,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
     }

@@ -3,10 +3,10 @@ using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Dto.Reviews_Reports;
 using AutoMapper;
-using ServicesApp.APIs;
 using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using ServicesApp.Repositories;
+using ServicesApp.Helper;
 
 namespace ServicesApp.Controllers
 {
@@ -38,7 +38,7 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 var reviews = _ReviewRepository.GetReviews();
                 var mapreviews = _mapper.Map<List<GetReviewDto>>(reviews);
@@ -46,7 +46,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -57,11 +57,11 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_ReviewRepository.ReviewExist(ReviewId))
                 {
-                    return NotFound(ApiResponse.ReviewNotFound);
+                    return NotFound(ApiResponses.ReviewNotFound);
                 }
                 var Review = _ReviewRepository.GetReview(ReviewId);
                 var mapReview = _mapper.Map<GetReviewDto>(Review);
@@ -69,7 +69,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -80,11 +80,11 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_customerRepository.CustomerExist(CustomerId))
                 {
-                    return NotFound(ApiResponse.UserNotFound);
+                    return NotFound(ApiResponses.UserNotFound);
                 }
                 var Review = _ReviewRepository.GetReviewsOfCustomer(CustomerId);
                 var mappedReviews = Review.Select(review =>
@@ -96,7 +96,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -107,11 +107,11 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_providerRepository.ProviderExist(ProviderId))
                 {
-                    return NotFound(ApiResponse.UserNotFound);
+                    return NotFound(ApiResponses.UserNotFound);
                 }
                 var Reviews = _ReviewRepository.GetReviewsOfProvider(ProviderId);
                 var mappedReviews = Reviews.Select(review =>
@@ -124,7 +124,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -135,18 +135,18 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_customerRepository.CustomerExist(Id) && !_providerRepository.ProviderExist(Id))
                 {
-                    return NotFound(ApiResponse.UserNotFound);
+                    return NotFound(ApiResponses.UserNotFound);
                 }
                 var rating = await _ReviewRepository.CalculateAvgRating(Id);
                 return Ok(rating);
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -157,18 +157,18 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
 
                 var mapReview = _mapper.Map<Review>(ReviewCreate);
                 if (!_serviceRequestRepository.ServiceExist(RequestId))
                 {
-                    return NotFound(ApiResponse.RequestNotFound);
+                    return NotFound(ApiResponses.RequestNotFound);
                 }
 
 				if (!_ReviewRepository.CheckRequestOfReviewCompleted(RequestId))
 				{
-					return BadRequest(ApiResponse.UncompletedService);
+					return BadRequest(ApiResponses.UncompletedService);
 				}
 
 				mapReview.Request = _serviceRequestRepository.GetService(RequestId);
@@ -177,7 +177,7 @@ namespace ServicesApp.Controllers
 
 				if (_ReviewRepository.GetReviewsOfRequest(mapReview.Request.Id).Any(review => review.ReviewerRole == "Provider"))
 				{
-                    return BadRequest(ApiResponse.ServiceAlreadyReviewed);
+                    return BadRequest(ApiResponses.ServiceAlreadyReviewed);
                 }
                 mapReview.ReviewerRole = "Provider";
                 _ReviewRepository.CreateReview(mapReview);
@@ -193,7 +193,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
 
@@ -204,17 +204,17 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ApiResponse.NotValid);
+                    return BadRequest(ApiResponses.NotValid);
                 }
 
                 var mapReview = _mapper.Map<Review>(ReviewCreate);
                 if (!_serviceRequestRepository.ServiceExist(RequestId))
                 {
-                    return NotFound(ApiResponse.RequestNotFound);
+                    return NotFound(ApiResponses.RequestNotFound);
                 }
                 if (!_ReviewRepository.CheckRequestOfReviewCompleted(RequestId))
                 {
-                    return BadRequest(ApiResponse.UncompletedService);
+                    return BadRequest(ApiResponses.UncompletedService);
 				}
 
                 mapReview.Request = _serviceRequestRepository.GetService(RequestId);
@@ -222,7 +222,7 @@ namespace ServicesApp.Controllers
 
                 if (_ReviewRepository.GetReviewsOfRequest(mapReview.Request.Id).Any(review => review.ReviewerRole == "Customer"))
                 {
-                    return BadRequest(ApiResponse.ServiceAlreadyReviewed);
+                    return BadRequest(ApiResponses.ServiceAlreadyReviewed);
                 }
                 mapReview.ReviewerRole = "Customer";
                  _ReviewRepository.CreateReview(mapReview);
@@ -238,7 +238,7 @@ namespace ServicesApp.Controllers
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
     }

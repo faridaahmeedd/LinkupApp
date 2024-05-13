@@ -185,20 +185,20 @@ namespace ServicesApp.Repository
 			return calendarDtos;
 		}
 
-		public ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string providerId)
-		{
-			var requests = GetUncompletedServices();
-			var matchedRequests = new List<ServiceRequest>();
+		//public ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string providerId)
+		//{
+		//	var requests = GetUncompletedServices();
+		//	var matchedRequests = new List<ServiceRequest>();
 
-			foreach (var request in requests)
-			{
-				bool isMatched = _MLRepository.MatchJobAndService(request.Id, providerId).Result;
-				if (isMatched)
-				{
-					matchedRequests.Add(request);
-				}
-			}
-			return matchedRequests;
-		}
+		//	foreach (var request in requests)
+		//	{
+		//		bool isMatched = _MLRepository.MatchJobAndService(request.Id, providerId).Result;
+		//		if (isMatched)
+		//		{
+		//			matchedRequests.Add(request);
+		//		}
+		//	}
+		//	return matchedRequests;
+		//}
 	}
 }

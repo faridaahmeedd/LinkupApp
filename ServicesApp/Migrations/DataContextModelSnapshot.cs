@@ -74,8 +74,8 @@ namespace ServicesApp.Migrations
                         {
                             Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958",
                             ConcurrencyStamp = "4",
-                            Name = "MainAdmin",
-                            NormalizedName = "MainAdmin"
+                            Name = "SuperAdmin",
+                            NormalizedName = "SuperAdmin"
                         });
                 });
 
@@ -250,14 +250,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "fa084864-4598-4361-86f6-2da6305991fc",
-                            Email = "MainAdmin@gmail.com",
+                            ConcurrencyStamp = "133d49db-22d5-437d-889d-15ba2c9d1d3b",
+                            Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
-                            NormalizedEmail = "MAINADMIN@GMAIL.COM",
-                            NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHQKz0JEuvxmL534g+JP0hYARs1CMQyi5xM9aBJdQgcfnM7VaorU//i7l703jelqqw==",
-                            SecurityStamp = "358f035a-cae5-46d9-99eb-ca875cdbea4c",
-                            UserName = "MainAdmin"
+                            NormalizedEmail = "SUPERADMIN@GMAIL.COM",
+                            NormalizedUserName = "SUPERADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMb2KNwTCxRW4/ey/4vmYjyDL3V84kA5FVYv1O6LxgrNECTTBLToYEA8cawrHkTnfA==",
+                            SecurityStamp = "583ce101-63a2-4858-933a-6771301eceda",
+                            UserName = "SuperAdmin"
                         });
                 });
 

@@ -60,7 +60,7 @@ namespace ServicesApp.Data
                 .OnDelete(DeleteBehavior.SetNull);
             base.OnModelCreating(modelBuilder);
 		    SeedRoles(modelBuilder);
-			SeedMainAdminUser(modelBuilder);
+			SeedSuperAdminUser(modelBuilder);
 			//modelBuilder.HasDefaultSchema("dbo");
 			//modelBuilder.Entity<IdentityUser>().ToTable("Users");
 			//modelBuilder.Entity<IdentityRole>().ToTable("Roles");
@@ -78,22 +78,22 @@ namespace ServicesApp.Data
 					new IdentityRole() { Id = "6e83945a-31f7-4a85-9679-e5e12895df12", Name = "Customer", ConcurrencyStamp = "1", NormalizedName = "Customer" },
 					new IdentityRole() { Id = "43626702-ab6b-4481-89f0-769da1a485c2", Name = "Provider", ConcurrencyStamp = "2", NormalizedName = "Provider" },
 					new IdentityRole() { Id = "fee70a81-e665-4566-afc0-5d0c84e3f4fe", Name = "Admin", ConcurrencyStamp = "3", NormalizedName = "Admin" },
-					new IdentityRole() { Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", Name = "MainAdmin", ConcurrencyStamp = "4", NormalizedName = "MainAdmin" }
+					new IdentityRole() { Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", Name = "SuperAdmin", ConcurrencyStamp = "4", NormalizedName = "SuperAdmin" }
 				);
 		}
 
-		private void SeedMainAdminUser(ModelBuilder builder)
+		private void SeedSuperAdminUser(ModelBuilder builder)
 		{
 			var hasher = new PasswordHasher<AppUser>();
 			builder.Entity<AppUser>().HasData(
 			   new AppUser()
 			   {
 				   Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
-				   UserName = "MainAdmin",
-				   Email = "MainAdmin@gmail.com",
-				   NormalizedUserName = "MainAdmin".ToUpper(),
-				   NormalizedEmail = "MainAdmin@gmail.com".ToUpper(),
-				   PasswordHash = hasher.HashPassword(null, "Admin123-"),
+				   UserName = "SuperAdmin",
+				   Email = "SuperAdmin@gmail.com",
+				   NormalizedUserName = "SuperAdmin".ToUpper(),
+				   NormalizedEmail = "SuperAdmin@gmail.com".ToUpper(),
+				   PasswordHash = hasher.HashPassword(null, "SuperAdmin123-"),
 				   EmailConfirmed = true,
 				   LockoutEnabled = true,
 				   PhoneNumberConfirmed = true,

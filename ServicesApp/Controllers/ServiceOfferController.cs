@@ -6,7 +6,6 @@ using ServicesApp.Models;
 using ServicesApp.Repository;
 using ServicesApp.Repositories;
 using ServicesApp.Helper;
-using FluentAssertions.Common;
 
 namespace ServicesApp.Controllers
 {

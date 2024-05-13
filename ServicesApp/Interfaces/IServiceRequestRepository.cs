@@ -21,7 +21,7 @@ namespace ServicesApp.Interfaces
 		bool CompleteService(int id);
 		bool UpdateUnknownSubcategory(int serviceId, string subcategoryName);
 		ICollection<GetCalendarDto> GetCalendarDetails(string CustomerId);
-		ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
+		//ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
 		//bool CheckServiceMinFees(ServiceRequest service, int categoryId);
 		//bool UpdateMaxFees(int serviceId, int maxFees);
 		//ICollection<ServiceRequest> GetServicesWithFees();

@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240423122734_new1")]
-    partial class new1
+    [Migration("20240513114524_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,8 +77,8 @@ namespace ServicesApp.Migrations
                         {
                             Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958",
                             ConcurrencyStamp = "4",
-                            Name = "MainAdmin",
-                            NormalizedName = "MainAdmin"
+                            Name = "SuperAdmin",
+                            NormalizedName = "SuperAdmin"
                         });
                 });
 
@@ -253,14 +253,14 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "047a7b45-89d6-4b9f-9519-e5428abd0195",
-                            Email = "MainAdmin@gmail.com",
+                            ConcurrencyStamp = "133d49db-22d5-437d-889d-15ba2c9d1d3b",
+                            Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
-                            NormalizedEmail = "MAINADMIN@GMAIL.COM",
-                            NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE+qCzFtpsHKq0Z+UJ1HrMDjMU/PsXZYA7AWPZH99Iw72Boa6QwJTii8BgEaruOc8Q==",
-                            SecurityStamp = "2d6a6fb3-f8d2-4489-a7b6-684766ff5c57",
-                            UserName = "MainAdmin"
+                            NormalizedEmail = "SUPERADMIN@GMAIL.COM",
+                            NormalizedUserName = "SUPERADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMb2KNwTCxRW4/ey/4vmYjyDL3V84kA5FVYv1O6LxgrNECTTBLToYEA8cawrHkTnfA==",
+                            SecurityStamp = "583ce101-63a2-4858-933a-6771301eceda",
+                            UserName = "SuperAdmin"
                         });
                 });
 
@@ -297,12 +297,6 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProviderId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ReporterName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -311,11 +305,12 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("RequestId");
 
                     b.ToTable("Reports");
                 });
@@ -331,14 +326,15 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProviderId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int?>("Rate")
                         .HasColumnType("int");
+
+                    b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReviewerRole")
                         .IsRequired()
@@ -346,9 +342,7 @@ namespace ServicesApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("RequestId");
 
                     b.ToTable("Reviews");
                 });
@@ -635,32 +629,24 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
                 {
-                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId");
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
+                        .WithMany("Reports")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ServicesApp.Models.Provider", "Provider")
-                        .WithMany()
-                        .HasForeignKey("ProviderId");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Provider");
+                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Review", b =>
                 {
-                    b.HasOne("ServicesApp.Core.Models.Customer", "Customer")
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
                         .WithMany("Reviews")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ServicesApp.Models.Provider", "Provider")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ProviderId");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Provider");
+                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>
@@ -747,6 +733,10 @@ namespace ServicesApp.Migrations
                 {
                     b.Navigation("Offers");
 
+                    b.Navigation("Reports");
+
+                    b.Navigation("Reviews");
+
                     b.Navigation("TimeSlots");
                 });
 
@@ -757,16 +747,12 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Core.Models.Customer", b =>
                 {
-                    b.Navigation("Reviews");
-
                     b.Navigation("Services");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Provider", b =>
                 {
                     b.Navigation("Offers");
-
-                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

@@ -258,7 +258,7 @@ public class AuthRepository : IAuthRepository
 		if (user != null)
 		{
 			var role = await _userManager.GetRolesAsync(user);
-			if (! role.Contains("MainAdmin"))
+			if (! role.Contains("SuperAdmin"))
 			{
 				user.Active = false;
 				var result = await _userManager.UpdateAsync(user);

@@ -59,7 +59,8 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("RegisterAdmin")]
-	// [Authorize(Roles = "MainAdmin")]
+	// [Authorize(Roles = "
+	// ")]
 	public async Task<IActionResult> RegisterAdmin([FromBody] RegistrationDto registerDto)
 	{
 		try

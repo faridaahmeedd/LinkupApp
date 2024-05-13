@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class @new : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -249,60 +249,6 @@ namespace ServicesApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Reports",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReporterName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReporterRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reports", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Reports_Customer_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customer",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Reports_Provider_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "Provider",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Reviews",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Rate = table.Column<int>(type: "int", nullable: true),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReviewerRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reviews", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Reviews_Customer_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customer",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Reviews_Provider_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "Provider",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Requests",
                 columns: table => new
                 {
@@ -366,6 +312,51 @@ namespace ServicesApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Reports",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReporterRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReporterName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reports_Requests_RequestId",
+                        column: x => x.RequestId,
+                        principalTable: "Requests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Rate = table.Column<int>(type: "int", nullable: true),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReviewerRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReviewerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Requests_RequestId",
+                        column: x => x.RequestId,
+                        principalTable: "Requests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TimeSlots",
                 columns: table => new
                 {
@@ -393,7 +384,7 @@ namespace ServicesApp.Migrations
                 values: new object[,]
                 {
                     { "43626702-ab6b-4481-89f0-769da1a485c2", "2", "Provider", "Provider" },
-                    { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "4", "MainAdmin", "MainAdmin" },
+                    { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "4", "SuperAdmin", "SuperAdmin" },
                     { "6e83945a-31f7-4a85-9679-e5e12895df12", "1", "Customer", "Customer" },
                     { "fee70a81-e665-4566-afc0-5d0c84e3f4fe", "3", "Admin", "Admin" }
                 });
@@ -401,7 +392,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "ce6b90b6-a94f-4789-a1f4-33de02040167", "MainAdmin@gmail.com", true, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEAfhYiLNL0yeq6FXsH5y/Mo2VAvtcfzpUeHY5btZ/uiugqo+1N5EMp7xPSMT5hDvJQ==", "712fcccd-a66c-4413-8d86-04465dce6557", "MainAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "133d49db-22d5-437d-889d-15ba2c9d1d3b", "SuperAdmin@gmail.com", true, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEMb2KNwTCxRW4/ey/4vmYjyDL3V84kA5FVYv1O6LxgrNECTTBLToYEA8cawrHkTnfA==", "583ce101-63a2-4858-933a-6771301eceda", "SuperAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -458,14 +449,9 @@ namespace ServicesApp.Migrations
                 column: "RequestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reports_CustomerId",
+                name: "IX_Reports_RequestId",
                 table: "Reports",
-                column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reports_ProviderId",
-                table: "Reports",
-                column: "ProviderId");
+                column: "RequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Requests_CustomerId",
@@ -478,14 +464,9 @@ namespace ServicesApp.Migrations
                 column: "SubcategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_CustomerId",
+                name: "IX_Reviews_RequestId",
                 table: "Reviews",
-                column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reviews_ProviderId",
-                table: "Reviews",
-                column: "ProviderId");
+                column: "RequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subcategories_CategoryId",

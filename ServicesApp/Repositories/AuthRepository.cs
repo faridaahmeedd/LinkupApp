@@ -140,7 +140,7 @@ public class AuthRepository : IAuthRepository
 
         SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
         {
-            Port = 58337,
+            Port = 587,
             Credentials = new NetworkCredential(senderEmail, senderPassword),
             EnableSsl = true
         };
@@ -200,11 +200,11 @@ public class AuthRepository : IAuthRepository
         {
             return resetCode;
         }
-
-        return string.Empty;
+        return resetCode;
+        //return string.Empty;
     }
 
-    private bool SendResetPasswordEmail(string recipientEmail, string resetCode)
+    public bool SendResetPasswordEmail(string recipientEmail, string resetCode)
     {
         string senderEmail = "linkupp2024@gmail.com";
         string senderPassword = "mbyo noyk dfbb fhlr";

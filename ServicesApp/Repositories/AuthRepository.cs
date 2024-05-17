@@ -97,7 +97,10 @@ public class AuthRepository : IAuthRepository
         if (result.Succeeded)
         {
             await _userManager.AddToRoleAsync(userMap, role);
-            SendRegistrtationMail(userMap.Email);
+            if(await SendRegistrtationMail(userMap.Email))
+            {
+                return result;
+            }
         }
         return result;
     }
@@ -116,7 +119,7 @@ public class AuthRepository : IAuthRepository
 		return result;
 	}
 
-	public void SendRegistrtationMail(string recipientEmail)
+	public async Task<bool> SendRegistrtationMail(string recipientEmail)
 	{
         string senderEmail = "linkupp2024@gmail.com";
         string senderPassword = "mbyo noyk dfbb fhlr";
@@ -137,17 +140,19 @@ public class AuthRepository : IAuthRepository
 
         SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
         {
-            Port = 587,
+            Port = 58337,
             Credentials = new NetworkCredential(senderEmail, senderPassword),
             EnableSsl = true
         };
 		try
 		{
 			smtpClient.Send(mailMessage);
+            return true;
 		}
 		catch (Exception ex)
 		{
 			Console.WriteLine($"Error: {ex.Message}");
+            return false;
 		}
     }
 
@@ -181,51 +186,70 @@ public class AuthRepository : IAuthRepository
 		return (null, DateTime.MinValue);
 	}
 
+
     public async Task<string> ForgetPassword(string mail)
-	{
+    {
         var user = await _userManager.FindByEmailAsync(mail);
-		if (user == null){
-			return string.Empty;
-		}
-
-		var resetCode = GenerateRandomCode();
-
-		string senderEmail = "linkupp2024@gmail.com";
-		string senderPassword = "mbyo noyk dfbb fhlr";
-		string recipientEmail = mail;
-		LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-		LinkedImage.ContentId = "Logo";
-		LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-		string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
-		htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
-		AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-	    htmlContent, null, "text/html");
-		htmlView.LinkedResources.Add(LinkedImage);
-
-		MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-		{
-			Subject = "Linkup Reset Password",
-			IsBodyHtml = true, 
-        };
-		mailMessage.AlternateViews.Add(htmlView);
-		SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+        if (user == null)
         {
-            Port = 587,
-            Credentials = new NetworkCredential(senderEmail, senderPassword),
-            EnableSsl = true
-        };
+            return string.Empty;
+        }
+
+        var resetCode = GenerateRandomCode();
+        if (SendResetPasswordEmail(mail, resetCode))
+        {
+            return resetCode;
+        }
+
+        return string.Empty;
+    }
+
+    private bool SendResetPasswordEmail(string recipientEmail, string resetCode)
+    {
+        string senderEmail = "linkupp2024@gmail.com";
+        string senderPassword = "mbyo noyk dfbb fhlr";
+
         try
         {
-            smtpClient.Send(mailMessage);
-			smtpClient.Dispose();
-            return resetCode;
+            string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
+            htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
+
+            LinkedResource linkedImage = new LinkedResource(@"wwwroot\images\Logo.png")
+            {
+                ContentId = "Logo",
+                ContentType = new ContentType(MediaTypeNames.Image.Png)
+            };
+
+            AlternateView htmlView = AlternateView.CreateAlternateViewFromString(htmlContent, null, "text/html");
+            htmlView.LinkedResources.Add(linkedImage);
+
+            MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+            {
+                Subject = "Linkup Reset Password",
+                IsBodyHtml = true,
+            };
+            mailMessage.AlternateViews.Add(htmlView);
+
+            
+            using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(senderEmail, senderPassword),
+                EnableSsl = true
+            })
+            {
+                smtpClient.Send(mailMessage);
+            }
+
+            return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+            return false;
         }
-        return string.Empty;
-	}
+    }
+
 
     public string GenerateRandomCode(int length = 6)
     {
@@ -265,15 +289,21 @@ public class AuthRepository : IAuthRepository
 
 				if (result.Succeeded)
 				{
-					SendMail(user.Email , "Linkup Deactivation", "InactiveMail");
+                    if (await SendMail(user.Email, "Linkup Deactivation", "InactiveMail"))
+                    {
+                        return true;
+                    }
                     return true;
+
+                    //SendMail(user.Email , "Linkup Deactivation", "InactiveMail");
+                    //return true;
 				}
 			}
 		}
 		
 		return false;
 	}
-    public void SendMail(string recipientEmail , string subject , string filename)
+    public async Task<bool> SendMail(string recipientEmail , string subject , string filename)
 	{
         string senderEmail = "linkupp2024@gmail.com";
         string senderPassword = "mbyo noyk dfbb fhlr";
@@ -302,10 +332,12 @@ public class AuthRepository : IAuthRepository
         {
             smtpClient.Send(mailMessage);
             smtpClient.Dispose();
+            return true; 
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+            return false;
         }
     }
 }

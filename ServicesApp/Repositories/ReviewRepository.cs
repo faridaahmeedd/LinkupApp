@@ -140,7 +140,10 @@ namespace ServicesApp.Repositories
 			{
 				if (avgRating < 2.5)
 				{
-					_authRepository.SendMail(appUser.Email, "Warning", "Warning");
+					if(await _authRepository.SendMail(appUser.Email, "Warning", "Warning"))
+					{
+						return true;
+					}
 					return true;
 				}
 			}

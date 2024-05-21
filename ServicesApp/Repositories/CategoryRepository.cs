@@ -25,7 +25,7 @@ namespace ServicesApp.Repository
 
 		public Category GetCategory(string name)
 		{
-			return _context.Categories.Where(p => p.Name.Trim().ToUpper() == name.ToUpper()).FirstOrDefault();
+			return _context.Categories.Where(p => p.NameEn.Trim().ToUpper() == name.ToUpper() || p.NameAr == name).FirstOrDefault();
 		}
 
 		public bool CategoryExist(int id)
@@ -35,7 +35,7 @@ namespace ServicesApp.Repository
 
         public bool CategoryExist(string name)
         {
-            return _context.Categories.Any(p => p.Name == name);
+            return _context.Categories.Any(p => p.NameEn == name || p.NameAr == name);
         }
 
         public bool CreateCategory(Category category)

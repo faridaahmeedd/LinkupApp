@@ -40,7 +40,9 @@ namespace ServicesApp.Helper
 			CreateMap<ServiceRequest, GetServiceRequestDto>()
 				.ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Customer.Id))
 				.ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => $"{src.Customer.FName} {src.Customer.LName}"))
-				.ForMember(dest => dest.SubCategoryName, opt => opt.MapFrom(src => src.Subcategory.Name));
+				.ForMember(dest => dest.SubCategoryNameAr, opt => opt.MapFrom(src => src.Subcategory.NameAr))
+                .ForMember(dest => dest.SubCategoryNameEn, opt => opt.MapFrom(src => src.Subcategory.NameEn)
+                );
 			CreateMap<PostServiceRequestDto, ServiceRequest>();
 
 			CreateMap<ServiceOffer, GetServiceOfferDto>()

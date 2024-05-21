@@ -7,6 +7,8 @@
 		public required string Date { get; set; }
 		public required string FromTime { get; set; }
 		public required string ToTime { get; set; }
-		public string SubcategoryName { get; set; }
-	}
+		public string SubcategoryNameAr { get; set; }
+        public string SubcategoryNameEn { get; set; }
+
+    }
 }

@@ -120,8 +120,10 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponses.NotValid);
 				}
-				var subcategory = _subcategoryRepository.GetSubcategory(subcategoryCreate.Name);
-				if (subcategory != null)
+				var subcategoryEn = _subcategoryRepository.GetSubcategory(subcategoryCreate.NameEn);
+                var subcategoryAr = _subcategoryRepository.GetSubcategory(subcategoryCreate.NameAr);
+
+                if (subcategoryAr != null || subcategoryEn != null)
 				{
 					return BadRequest(ApiResponses.SubcategoryAlreadyExist);
 				}

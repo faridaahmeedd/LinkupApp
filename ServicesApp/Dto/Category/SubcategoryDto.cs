@@ -9,7 +9,7 @@
         public required string DescriptionAr { get; set; }
         public required int MinFeesEn { get; set; }
         public required int MaxFeesEn { get; set; }
-        public required int MinFeesAr { get; set; }
-        public required int MaxFeesAr { get; set; }
+        public required string MinFeesAr { get; set; }
+        public required string MaxFeesAr { get; set; }
     }
 }

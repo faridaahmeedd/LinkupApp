@@ -250,13 +250,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "1d199eb6-147e-4636-875b-c30f4bbc242c",
+                            ConcurrencyStamp = "24b04480-6c72-4ff9-9c81-bff34a3d385e",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE/e57I2293gMkzekmOfIXPnweq8d6e79fn88vVaI2zQ02lS5NqjqgV0arWi4N3naA==",
-                            SecurityStamp = "183810ca-bfb4-4ed3-bf50-841fdac07397",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOXygtoj07BV5+uhY/8eY1FpxJi8uRUy6/8mzbtM0bLGtWTY5M67zqSiY4xR+QOyFw==",
+                            SecurityStamp = "a5612dc6-c8e0-476f-a078-b913e097b9df",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -455,14 +455,16 @@ namespace ServicesApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MaxFeesAr")
-                        .HasColumnType("int");
+                    b.Property<string>("MaxFeesAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MaxFeesEn")
                         .HasColumnType("int");
 
-                    b.Property<int>("MinFeesAr")
-                        .HasColumnType("int");
+                    b.Property<string>("MinFeesAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MinFeesEn")
                         .HasColumnType("int");

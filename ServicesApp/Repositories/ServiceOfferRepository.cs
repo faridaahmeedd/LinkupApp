@@ -47,9 +47,8 @@ namespace ServicesApp.Repository
 					return true;
 				}
 				var subCategory = _context.Subcategories.Find(request.Subcategory.Id);
-				if (request.Volunteer || ( (subCategory.MaxFeesEn >= serviceOffer.Fees && subCategory.MinFeesEn <= serviceOffer.Fees)  ||
-                    (subCategory.MaxFeesAr >= serviceOffer.Fees && subCategory.MinFeesAr <= serviceOffer.Fees)
-                    )) {
+				if (request.Volunteer ||  (subCategory.MaxFeesEn >= serviceOffer.Fees && subCategory.MinFeesEn <= serviceOffer.Fees))
+				{
 					return true;
 				}
 			}

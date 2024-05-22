@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240521194128_intail")]
-    partial class intail
+    [Migration("20240522074415_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -253,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "510c74e7-2ab7-4586-9828-a620bae56376",
+                            ConcurrencyStamp = "24b04480-6c72-4ff9-9c81-bff34a3d385e",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAED34g/GKs6dFEpIuqhOscfVeggS++41JPCD4m//vKlIFeVLXbglu4ePux7QbTrmHow==",
-                            SecurityStamp = "73273db0-b4ce-46de-b2b5-fe6e7d43c89e",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOXygtoj07BV5+uhY/8eY1FpxJi8uRUy6/8mzbtM0bLGtWTY5M67zqSiY4xR+QOyFw==",
+                            SecurityStamp = "a5612dc6-c8e0-476f-a078-b913e097b9df",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -450,17 +450,33 @@ namespace ServicesApp.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionAr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MaxFees")
+                    b.Property<string>("DescriptionEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaxFeesAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxFeesEn")
                         .HasColumnType("int");
 
-                    b.Property<int>("MinFees")
+                    b.Property<string>("MinFeesAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MinFeesEn")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

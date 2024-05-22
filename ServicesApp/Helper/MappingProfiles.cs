@@ -7,6 +7,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Subcategory;
 using ServicesApp.Dto.User;
 using ServicesApp.Models;
+using System.Globalization;
 
 namespace ServicesApp.Helper
 {
@@ -29,7 +30,10 @@ namespace ServicesApp.Helper
 
 			CreateMap<Category, CategoryDto>();
 			CreateMap<CategoryDto, Category>();
-			CreateMap<Subcategory, SubcategoryDto>();
+			CreateMap<Subcategory, SubcategoryDto>()
+				.ForMember(dest => dest.MinFeesAr, opt => opt.MapFrom(src => ConvertIntToArabic(src.MinFeesEn)))
+				.ForMember(dest => dest.MaxFeesAr, opt => opt.MapFrom(src => ConvertIntToArabic(src.MaxFeesEn))
+				);
 			CreateMap<SubcategoryDto, Subcategory>();
 
 			CreateMap<Review, GetReviewDto>();
@@ -84,6 +88,11 @@ namespace ServicesApp.Helper
 		private string ConvertDateToString(DateOnly date)
 		{
 			return date.ToString("yyyy-M-d");
+		}
+
+		private string ConvertIntToArabic(int number)
+		{
+			return string.Join("", number.ToString().Select(x => CultureInfo.GetCultureInfo("ar-lb").NumberFormat.NativeDigits[int.Parse(x.ToString())]));
 		}
 	}
 }

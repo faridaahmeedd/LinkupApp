@@ -74,8 +74,8 @@ namespace ServicesApp.Migrations
                         {
                             Id = "5fe9bbcd-eb74-448e-9580-1c4bd31f7958",
                             ConcurrencyStamp = "4",
-                            Name = "MainAdmin",
-                            NormalizedName = "MainAdmin"
+                            Name = "SuperAdmin",
+                            NormalizedName = "SuperAdmin"
                         });
                 });
 
@@ -197,8 +197,10 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                    b.Property<bool>("Active")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -210,12 +212,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -230,9 +226,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -256,17 +249,15 @@ namespace ServicesApp.Migrations
                         new
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "5d9c4dc1-9ea5-4f41-b1d6-857f9d2b420a",
-                            Email = "MainAdmin@gmail.com",
+                            Active = true,
+                            ConcurrencyStamp = "133d49db-22d5-437d-889d-15ba2c9d1d3b",
+                            Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
-                            LockoutEnabled = true,
-                            NormalizedEmail = "MAINADMIN@GMAIL.COM",
-                            NormalizedUserName = "MAINADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEH2WVw40/l6V8VlKWz1nIq5h3OXhBXj/fivYWTi1Srjqdb2sW0qUf/pDl9jKw0v+WQ==",
-                            SecurityStamp = "ef1ec0f1-d2a1-47df-a8f1-d7561f346db7",
-                            TwoFactorEnabled = false,
-                            UserName = "MainAdmin"
+                            NormalizedEmail = "SUPERADMIN@GMAIL.COM",
+                            NormalizedUserName = "SUPERADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMb2KNwTCxRW4/ey/4vmYjyDL3V84kA5FVYv1O6LxgrNECTTBLToYEA8cawrHkTnfA==",
+                            SecurityStamp = "583ce101-63a2-4858-933a-6771301eceda",
+                            UserName = "SuperAdmin"
                         });
                 });
 
@@ -289,6 +280,68 @@ namespace ServicesApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReporterName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReporterRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestId");
+
+                    b.ToTable("Reports");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Rate")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReviewerRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestId");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>
@@ -348,12 +401,23 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SubcategoryId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Volunteer")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -560,6 +624,28 @@ namespace ServicesApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ServicesApp.Models.Report", b =>
+                {
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
+                        .WithMany("Reports")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Request");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Review", b =>
+                {
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
+                        .WithMany("Reviews")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Request");
+                });
+
             modelBuilder.Entity("ServicesApp.Models.ServiceOffer", b =>
                 {
                     b.HasOne("ServicesApp.Models.Provider", "Provider")
@@ -643,6 +729,10 @@ namespace ServicesApp.Migrations
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
                 {
                     b.Navigation("Offers");
+
+                    b.Navigation("Reports");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("TimeSlots");
                 });

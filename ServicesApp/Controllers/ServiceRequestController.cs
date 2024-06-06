@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.APIs;
 using ServicesApp.Core.Models;
+using ServicesApp.Helper;
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -14,16 +14,20 @@ namespace ServicesApp.Controllers
 		private readonly IServiceRequestRepository _serviceRepository;
 		private readonly ISubcategoryRepository _subcategoryRepository;
 		private readonly ICustomerRepository _customerRepository;
+		private readonly IProviderRepository _providerRepository;
+		private readonly IReviewRepository _reviewRepository;
 		private readonly IMapper _mapper;
 
 		public ServiceRequestController(IServiceRequestRepository serviceRepository,
 			ISubcategoryRepository subcategoryRepository, ICustomerRepository customerRepository,
-			IMapper mapper)
+			IProviderRepository providerRepository, IReviewRepository reviewRepository , IMapper mapper)
 		{
 			_serviceRepository = serviceRepository;
 			_subcategoryRepository = subcategoryRepository;
 			_customerRepository = customerRepository;
-            _mapper = mapper;
+			_providerRepository = providerRepository;
+			_reviewRepository = reviewRepository;
+			_mapper = mapper;
 		}
 
 		[HttpGet]
@@ -33,75 +37,16 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
-				var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServices());
+				var services = _mapper.Map<List<GetServiceRequestDto>>(_serviceRepository.GetServices());
 				return Ok(services);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
-
-		//[HttpGet("WithMaxFees")]
-		//public IActionResult GetServicesWithFees()
-		//{
-		//    try
-		//    {
-		//        if (!ModelState.IsValid)
-		//        {
-		//            return BadRequest(ApiResponse.NotValid);
-		//        }
-		//        var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees() );
-		//        return Ok(services);
-		//    }
-		//    catch
-		//    {
-		//        return StatusCode(500, ApiResponse.SomethingWrong);
-		//    }
-		//}
-
-		//[HttpGet("WithMaxFees/{CustomerId}")]
-		//public IActionResult GetServicesWithFees(string CustomerId)
-		//{
-		//	try
-		//	{
-		//		if (!ModelState.IsValid)
-		//		{
-		//			return BadRequest(ApiResponse.NotValid);
-		//		}
-		//		var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetServicesWithFees(CustomerId));
-		//		return Ok(services);
-		//	}
-		//	catch
-		//	{
-		//		return StatusCode(500, ApiResponse.SomethingWrong);
-		//	}
-		//}
-
-		//[HttpPut("UpdateMaxFees/{ServiceId}/{MaxFees}")]
-		//public IActionResult UpdateServiceMaxFees(int ServiceId, int MaxFees)
-		//{
-		//	try
-		//	{
-		//		if (!ModelState.IsValid)
-		//		{
-		//			return BadRequest(ApiResponse.NotValid);
-		//		}
-		//		if (!_serviceRepository.ServiceExist(ServiceId))
-		//		{
-		//			return NotFound(ApiResponse.RequestNotFound);
-		//		}
-		//		_serviceRepository.UpdateMaxFees(ServiceId, MaxFees);
-		//		return Ok(ApiResponse.SuccessUpdated);
-		//	}
-		//	catch
-		//	{
-		//		return StatusCode(500, ApiResponse.SomethingWrong);
-		//	}
-		//}
-
 
 		[HttpGet("{ServiceId}")]
 		public IActionResult GetService(int ServiceId)
@@ -110,18 +55,18 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_serviceRepository.ServiceExist(ServiceId))
 				{
-					return NotFound(ApiResponse.RequestNotFound);
+					return NotFound(ApiResponses.RequestNotFound);
 				}
-				var service = _mapper.Map<ServiceRequestDto>(_serviceRepository.GetService(ServiceId));
+				var service = _mapper.Map<GetServiceRequestDto>(_serviceRepository.GetService(ServiceId));
 				return Ok(service);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -136,15 +81,15 @@ namespace ServicesApp.Controllers
 				}
 				if (!_customerRepository.CustomerExist(CustomerId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				var services = _serviceRepository.GetServicesByCustomer(CustomerId);
-				var mapServices = _mapper.Map<List<ServiceRequestDto>>(services);
+				var mapServices = _mapper.Map<List<GetServiceRequestDto>>(services);
 				return Ok(mapServices);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -155,65 +100,65 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
-				var services = _mapper.Map<List<ServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
+				var services = _mapper.Map<List<GetServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
 				return Ok(services);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
-		[HttpGet("Complete/{ServiceId}")]
+		[HttpPut("Complete/{ServiceId}")]
         public IActionResult CompleteService(int ServiceId)
 		{
 			try
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_serviceRepository.ServiceExist(ServiceId))
 				{
-					return NotFound(ApiResponse.RequestNotFound);
+					return NotFound(ApiResponses.RequestNotFound);
 				}
 				_serviceRepository.CompleteService(ServiceId);
-				return Ok(ApiResponse.ServiceCompletedSuccess);
+				return Ok(ApiResponses.ServiceCompletedSuccess);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
         [HttpPost("{CustomerId}/{SubcategoryId}")]
-		public IActionResult CreateService(string CustomerId, int SubcategoryId, [FromBody] ServiceRequestDto serviceRequestDto)
+		public IActionResult CreateService(string CustomerId, int SubcategoryId, [FromBody] PostServiceRequestDto serviceRequestDto)
 		{
 			try
 			{
 				if (!ModelState.IsValid || serviceRequestDto == null)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
 
 				if (!_subcategoryRepository.SubcategoryExist(SubcategoryId))
 				{
-					return NotFound(ApiResponse.SubcategoryNotFound);
+					return NotFound(ApiResponses.SubcategoryNotFound);
 				}
 				serviceMap.Subcategory = _subcategoryRepository.GetSubcategory(SubcategoryId);
 
 				if (!_customerRepository.CustomerExist(CustomerId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
 				serviceMap.Customer = _customerRepository.GetCustomer(CustomerId);
-				if (!_customerRepository.CheckCustomerBalance(CustomerId))
-				{
-					return BadRequest(ApiResponse.PayFine);
-				}
+				//if (!_customerRepository.CheckCustomerBalance(CustomerId))
+				//{
+				//	return BadRequest(ApiResponse.PayBalance);
+				//}
 				_serviceRepository.CreateService(serviceMap);
 				return Ok(new
 				{
@@ -224,35 +169,35 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
 		[HttpPut("{ServiceId}")]
-		public IActionResult UpdateService(int ServiceId, [FromBody] ServiceRequestDto serviceRequestDto)
+		public IActionResult UpdateService(int ServiceId, [FromBody] PostServiceRequestDto serviceRequestDto)
 		{
 			try
 			{
 				if (!ModelState.IsValid || serviceRequestDto == null)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_serviceRepository.ServiceExist(ServiceId))
 				{
-					return NotFound(ApiResponse.RequestNotFound);
+					return NotFound(ApiResponses.RequestNotFound);
 				}
 				var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
 				serviceMap.Id = ServiceId;
-
+				
 				if (!_serviceRepository.UpdateService(serviceMap))
 				{
-					return BadRequest(ApiResponse.FailedToUpdate);
+					return BadRequest(ApiResponses.FailedToUpdate);
 				}
-				return Ok(ApiResponse.SuccessUpdated);
+				return Ok(ApiResponses.SuccessUpdated);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -264,78 +209,71 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_serviceRepository.ServiceExist(ServiceId))
 				{
-					return NotFound(ApiResponse.RequestNotFound);
+					return NotFound(ApiResponses.RequestNotFound);
 				}
-				_serviceRepository.DeleteService(ServiceId);
-				return Ok(ApiResponse.SuccessDeleted);
+				if(!_serviceRepository.DeleteService(ServiceId))
+				{
+					return NotFound(ApiResponses.FailedToDelete);
+				}
+				return Ok(ApiResponses.SuccessDeleted);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
         [HttpGet("ServiceUndeclinedOffers/{serviceId}")]
-        public IActionResult GetUndeclinedOffersOfService(int serviceId)
+        public async Task<IActionResult> GetUndeclinedOffersOfService(int serviceId)
         {
 			try
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_serviceRepository.ServiceExist(serviceId))
 				{
-					return NotFound(ApiResponse.RequestNotFound);
+					return NotFound(ApiResponses.RequestNotFound);
 				}
 				var offers = _serviceRepository.GetUndeclinedOffersOfService(serviceId);
-				var offersMap = _mapper.Map<List<ServiceOfferDto>>(offers);
-				return Ok(offersMap);
+				var offersMap = _mapper.Map<List<GetServiceOfferDto>>(offers);
+
+                foreach (var offer in offersMap)
+                {
+                    offer.ProviderAvgRating = await _reviewRepository.CalculateAvgRating(offer.ProviderId);
+                }
+                return Ok(offersMap);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
         [HttpGet("AcceptedOffer/{serviceId}")]
-        public IActionResult GetAcceptedOffer(int serviceId)
+        public async Task<IActionResult> GetAcceptedOffer(int serviceId)
         {
 			try
 			{
-				var acceptedOffer = _serviceRepository.AcceptedOffer(serviceId);
+				var acceptedOffer = _serviceRepository.GetAcceptedOffer(serviceId);
 				if (acceptedOffer != null)
 				{
-					var offerMap = _mapper.Map<ServiceOfferDto>(acceptedOffer);
-					return Ok(offerMap);
-				}
-				return NotFound(ApiResponse.OfferNotFound);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
-			}
-		}
+					var offerMap = _mapper.Map<GetServiceOfferDto>(acceptedOffer);
 
-		[HttpGet("AllServicesDetails")]
-		public IActionResult GetAllServicesDetails()
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponse.NotValid);
+                    offerMap.ProviderAvgRating = await _reviewRepository.CalculateAvgRating(offerMap.ProviderId);
+                    
+                    return Ok(offerMap);
 				}
-				var serviceDetails = _serviceRepository.GetAllServicesDetails();
-				return Ok(serviceDetails);
+				return NotFound(ApiResponses.OfferNotFound);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -346,48 +284,72 @@ namespace ServicesApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
                 }
                 if (!_serviceRepository.ServiceExist(ServiceId))
                 {
-                    return NotFound(ApiResponse.RequestNotFound);
+                    return NotFound(ApiResponses.RequestNotFound);
                 }
                 if (!_subcategoryRepository.SubcategoryExist(SubcategoryName))
                 {
-                    return NotFound(ApiResponse.SubcategoryNotFound);
+                    return NotFound(ApiResponses.SubcategoryNotFound);
                 }
 				if (!_serviceRepository.UpdateUnknownSubcategory(ServiceId, SubcategoryName))
 				{
-					return BadRequest(ApiResponse.NotAuthorized);
+					return BadRequest(ApiResponses.NotAuthorized);
 				}
-                return Ok(ApiResponse.SuccessUpdated);
+                return Ok(ApiResponses.SuccessUpdated);
             }
             catch
             {
-                return StatusCode(500, ApiResponse.SomethingWrong);
+                return StatusCode(500, ApiResponses.SomethingWrong);
             }
         }
+		
 
-		[HttpGet("ForCustomer/{CustomerId}")]
-		public IActionResult RequestsForCustomer(string CustomerId)
+		[HttpGet("CustomerCalendar/{CustomerId}")]
+		public IActionResult GetCalendarByCustomer(string CustomerId)
 		{
 			try
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ModelState);
 				}
 				if (!_customerRepository.CustomerExist(CustomerId))
 				{
-					return NotFound(ApiResponse.UserNotFound);
+					return NotFound(ApiResponses.UserNotFound);
 				}
-				var requests = _serviceRepository.ServiceDetailsForCustomer(CustomerId);
-				return Ok(requests);
+				var calendarDtos = _serviceRepository.GetCalendarDetails(CustomerId);
+				return Ok(calendarDtos);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
+
+		//[HttpGet("MatchedRequestsOfProvider/{ProviderId}")]
+		//public IActionResult GetMatchedRequestsOfProvider(string ProviderId)
+		//{
+		//	try
+		//	{
+		//		if (!ModelState.IsValid)
+		//		{
+		//			return BadRequest(ModelState);
+		//		}
+		//		if (! _providerRepository.ProviderExist(ProviderId))
+		//		{
+		//			return NotFound(ApiResponses.UserNotFound);
+		//		}
+		//		var services = _serviceRepository.GetMatchedRequestsOfProvider(ProviderId);
+		//		var mapServices = _mapper.Map<List<GetServiceRequestDto>>(services);
+		//		return Ok(mapServices);
+		//	}
+		//	catch
+		//	{
+		//		return StatusCode(500, ApiResponses.SomethingWrong);
+		//	}
+		//}
 	}
 }

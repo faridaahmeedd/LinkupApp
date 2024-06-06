@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,6 +6,7 @@ using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using ServicesApp.Repositories;
 using ServicesApp.Repository;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -27,6 +27,12 @@ builder.Services.AddScoped<IServiceRequestRepository, ServiceRequestRepository>(
 builder.Services.AddScoped<IServiceOfferRepository, ServiceOfferRepository>();
 builder.Services.AddScoped<ITimeSlotsRepository , TimeSlotRepositry>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IPayPalRepository, PayPalRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IMLRepository, MLRepository>();
+builder.Services.AddScoped<IPayMobRepository,PayMobRepository>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -81,6 +87,7 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader();
     });
 });
+
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
-﻿using ServicesApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ServicesApp.Data;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -103,7 +104,7 @@ namespace ServicesApp.Repository
 			var newTimeSlot = _context.TimeSlots.Where(t =>  t.Id == offer.TimeSlotId).FirstOrDefault();
 			TimeOnly toTime = newTimeSlot.FromTime.AddHours(offer.Duration.Hour);
 			toTime = toTime.AddMinutes(offer.Duration.Minute);
-			Console.WriteLine(toTime);
+
 			if (pendingOffers != null)
 			{
 				foreach(var item in pendingOffers)
@@ -124,6 +125,19 @@ namespace ServicesApp.Repository
 				}
 			}
 			return true;
+		}
+
+		public TimeSlot GetAcceptedTimeSlot(int serviceId)
+		{
+			var serviceRequest = _context.Requests.FirstOrDefault(sr => sr.Id == serviceId);
+
+			if (serviceRequest != null)
+			{
+				var acceptedOffer = _context.Offers.FirstOrDefault(o => o.Request.Id == serviceId && o.Status == "Accepted");
+				var acceptedTimeSlot = _context.TimeSlots.FirstOrDefault(o => o.Id == acceptedOffer.TimeSlotId);
+				return acceptedTimeSlot;
+			}
+			return null;
 		}
 
 		public bool Save()

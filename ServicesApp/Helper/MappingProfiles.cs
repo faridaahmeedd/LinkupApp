@@ -2,65 +2,61 @@
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Dto.Category;
+using ServicesApp.Dto.Reviews_Reports;
 using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Subcategory;
-using ServicesApp.Dto.Users;
+using ServicesApp.Dto.User;
 using ServicesApp.Models;
 
 namespace ServicesApp.Helper
 {
-    public class MappingProfiles : Profile
+	public class MappingProfiles : Profile
 	{
-        public MappingProfiles()
-        {
-            CreateMap<ServiceRequest, ServiceRequestDto>();
-			CreateMap<ServiceRequestDto, ServiceRequest>();
-            CreateMap<ServiceRequest, ServiceDetailsDto>();
-            CreateMap<ServiceDetailsDto, ServiceRequest>();
-			CreateMap<Customer, CustomerDto>();
-			CreateMap<CustomerDto, Customer>();
+		public MappingProfiles()
+		{
+			CreateMap<Customer, GetCustomerDto>();
+			CreateMap<PostCustomerDto, Customer>();
 			CreateMap<RegistrationDto, Customer>();
-			CreateMap<CustomerDto, RegistrationDto>();
-			CreateMap<Provider, ProviderDto>();
-			CreateMap<ProviderDto, Provider>();
+			CreateMap<GetCustomerDto, RegistrationDto>();
+			CreateMap<Provider, GetProviderDto>();
+			CreateMap<PostProviderDto, Provider>();
 			CreateMap<RegistrationDto, Provider>();
-			CreateMap<ProviderDto, RegistrationDto>();
+			CreateMap<GetProviderDto, RegistrationDto>();
 			CreateMap<RegistrationDto, Admin>();
 			CreateMap<Admin, RegistrationDto>();
-            CreateMap<AppUser, RegistrationDto>();
-            CreateMap<RegistrationDto, AppUser>();
-            CreateMap<Category, CategoryDto>();
-            CreateMap<CategoryDto, Category>();
+			CreateMap<AppUser, RegistrationDto>();
+			CreateMap<RegistrationDto, AppUser>();
+
+			CreateMap<Category, CategoryDto>();
+			CreateMap<CategoryDto, Category>();
 			CreateMap<Subcategory, SubcategoryDto>();
 			CreateMap<SubcategoryDto, Subcategory>();
-			CreateMap<ServiceOffer, ServiceOfferDto>()
-				.ForMember(
-					dest => dest.Duration,
-					opt => opt.MapFrom(src => ConvertTimeToString(src.Duration))
-				);
-			CreateMap<ServiceOfferDto, ServiceOffer>()
-				.ForMember(
-					dest => dest.Duration,
-					opt => opt.MapFrom(src => ConvertStringToTime(src.Duration))
-				);
+
+			CreateMap<Review, GetReviewDto>();
+			CreateMap<PostReviewDto, Review>();
+			CreateMap<Report, GetReportDto>();
+			CreateMap<PostReportDto, Report>();
+
+			CreateMap<ServiceRequest, GetServiceRequestDto>()
+				.ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Customer.Id))
+				.ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => $"{src.Customer.FName} {src.Customer.LName}"))
+				.ForMember(dest => dest.SubCategoryName, opt => opt.MapFrom(src => src.Subcategory.Name));
+			CreateMap<PostServiceRequestDto, ServiceRequest>();
+
+			CreateMap<ServiceOffer, GetServiceOfferDto>()
+				.ForMember(dest => dest.ProviderId, opt => opt.MapFrom(src => src.Provider.Id))
+				.ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => $"{src.Provider.FName} {src.Provider.LName}"))
+				.ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Request.Id))
+				.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => ConvertTimeToString(src.Duration)));
+			CreateMap<PostServiceOfferDto, ServiceOffer>()
+				.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => ConvertStringToTime(src.Duration)));
+
 			CreateMap<TimeSlot, TimeSlotDto>()
-				.ForMember(
-					dest => dest.Date,
-					opt => opt.MapFrom(src => ConvertDateToString(src.Date))
-				)
-				.ForMember(
-					dest => dest.FromTime,
-					opt => opt.MapFrom(src => ConvertTimeToString(src.FromTime))
-				);
+				.ForMember(dest => dest.Date, opt => opt.MapFrom(src => ConvertDateToString(src.Date)))
+				.ForMember(dest => dest.FromTime, opt => opt.MapFrom(src => ConvertTimeToString(src.FromTime)));
 			CreateMap<TimeSlotDto, TimeSlot>()
-				.ForMember(
-					dest => dest.Date,
-					opt => opt.MapFrom(src => ConvertStringToDate(src.Date))
-				)
-				.ForMember(
-					dest => dest.FromTime,
-					opt => opt.MapFrom(src => ConvertStringToTime(src.FromTime))
-				);
+				.ForMember(dest => dest.Date, opt => opt.MapFrom(src => ConvertStringToDate(src.Date)))
+				.ForMember(dest => dest.FromTime, opt => opt.MapFrom(src => ConvertStringToTime(src.FromTime)));
 		}
 
 

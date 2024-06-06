@@ -4,36 +4,41 @@ using ServicesApp.Data;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using System.Collections.Generic;
 
 namespace ServicesApp.Repository
 {
     public class ServiceRequestRepository : IServiceRequestRepository
 	{
 		private readonly DataContext _context;
+		private readonly ITimeSlotsRepository _timeSlotsRepository;
+		private readonly IMLRepository _MLRepository;
 
-		public ServiceRequestRepository(DataContext context)
+		public ServiceRequestRepository(DataContext context, ITimeSlotsRepository timeSlotsRepository, IMLRepository MLRepository)
 		{
-			this._context = context;
+			_context = context;
+			_timeSlotsRepository = timeSlotsRepository;
+			_MLRepository = MLRepository;
 		}
 
 		public ICollection<ServiceRequest> GetServices()
 		{
-			return _context.Requests.OrderBy(p => p.Id).ToList();
+			return _context.Requests.Include(p => p.Subcategory).Include(p => p.Customer).OrderBy(p => p.Id).ToList();
 		}
 
 		public ServiceRequest GetService(int id)
 		{
-			return _context.Requests.Where(p => p.Id == id).FirstOrDefault();
+			return _context.Requests.Include(p => p.Subcategory).Include(p => p.Customer).Where(p => p.Id == id).FirstOrDefault();
 		}
 
         public ICollection<ServiceRequest> GetServicesByCustomer(string customerId)
 		{
-			return _context.Requests.Where(p => p.Customer.Id == customerId).ToList();
+			return _context.Requests.Include(p => p.Subcategory).Include(p => p.Customer).Where(p => p.Customer.Id == customerId).ToList();
 		}
 
 		public ICollection<ServiceRequest> GetUncompletedServices()
         {
-			return _context.Requests.Where(p => p.Status == "Requested").ToList();
+			return _context.Requests.Include(p => p.Subcategory).Include(p => p.Customer).Where(p => p.Status == "Requested").ToList();
 		}
 
 		public bool ServiceExist(int id)
@@ -52,20 +57,26 @@ namespace ServicesApp.Repository
             var existingService = _context.Requests.Find(updatedService.Id);
             if (existingService != null)
             {
-                if(existingService.Status == "Requested")
+				existingService.PaymentStatus = updatedService.PaymentStatus;
+				if (existingService.Status == "Requested")
                 {
 					existingService.Description = updatedService.Description;
 					existingService.Image = updatedService.Image;
 					existingService.Location = updatedService.Location;
-					return Save();
+					existingService.PaymentMethod = updatedService.PaymentMethod;
 				}
-            }
+				return Save();
+			}
             return false;
         }
 
         public bool DeleteService(int id)
 		{
 			var service = _context.Requests.Include(c => c.Customer).Where(p => p.Id == id).FirstOrDefault();
+			if (service.Status == "Completed")
+			{
+				return false;
+			}
             if(service.Status == "Pending")
             {
 				var offer = _context.Offers.Include(c => c.Request).Where(p => p.Request.Id == id && p.Status == "Accepted").FirstOrDefault();
@@ -106,13 +117,13 @@ namespace ServicesApp.Repository
             return false;
         }
 
-		public ICollection<ServiceOffer> GetUndeclinedOffersOfService(int id )
+		public ICollection<ServiceOffer> GetUndeclinedOffersOfService(int id)
 		{
             var request = _context.Requests.Include(o => o.Offers).FirstOrDefault(o => o.Id == id);
            
             if (request != null)
             {
-                var Offers = request.Offers.Where(o => o.Status != "Declined").ToList();
+				var Offers = _context.Offers.Include(o => o.Provider).Where(o => o.Request.Id == id && o.Status != "Declined").ToList();
                 if (request.Offers != null)
                 {
                     return Offers;
@@ -121,7 +132,7 @@ namespace ServicesApp.Repository
             return null;
         }
 
-        public ServiceOffer AcceptedOffer(int serviceId)
+        public ServiceOffer GetAcceptedOffer(int serviceId)
         {
             var serviceRequest = _context.Requests.FirstOrDefault(sr => sr.Id == serviceId);
 
@@ -133,42 +144,6 @@ namespace ServicesApp.Repository
             return null;
         }
       
-        public ICollection<ServiceDetailsDto> GetAllServicesDetails()
-        {
-            var serviceDetails = _context.Requests
-                .Include(r => r.Subcategory)
-                .Include(r => r.Customer)
-                .Include(r => r.Offers)
-                .Include(r => r.TimeSlots)
-                .Select(r => new ServiceDetailsDto
-                {
-                    Id = r.Id,
-                    Description = r.Description,
-                    Status = r.Status,
-                    CustomerName = r.Customer.FName,
-                    CustomerId = r.Customer.Id,
-                    SubcategoryName = r.Subcategory.Name,
-					MinFees = r.Subcategory.MinFees,
-					MaxFees = r.Subcategory.MaxFees,
-                    TimeSlots = r.TimeSlots.Select(t => new TimeSlotDto
-                    {
-                        Id = t.Id,
-                        Date = t.Date.ToString(),
-                        FromTime = t.FromTime.ToString()
-                    }).ToList(),
-                    Offers = r.Offers.Select(t => new ServiceOfferDto
-                    {
-                        Fees = t.Fees,
-                        Duration = t.Duration.ToString(),
-                        TimeSlotId = t.TimeSlotId
-                    }).ToList()
-
-                })
-                .ToList();
-
-            return serviceDetails;
-        }
-        
         public bool UpdateUnknownSubcategory(int serviceId, string subcategoryName)
         {
             var service = _context.Requests.Include(c => c.Subcategory).Where(s => s.Id == serviceId).FirstOrDefault();
@@ -190,52 +165,41 @@ namespace ServicesApp.Repository
 			return saved > 0 ? true : false;
 		}
 
-		public ICollection<GetServiceRequestDto> ServiceDetailsForCustomer(string CustomerId)
+		public ICollection<GetCalendarDto> GetCalendarDetails(string CustomerId)
 		{
-			Console.WriteLine("testt");
-			
-			var requests = _context.Requests
-				.Include(o => o.Customer)
-                .Include(o => o.Subcategory)
-                .Include(o => o.Offers)
-                .ThenInclude(offer => offer.Provider)
-				.Where(p => p.Customer.Id == CustomerId)
-				.Select(o => new GetServiceRequestDto
+			var requests = _context.Requests.Include(p => p.Customer).Include(p => p.Subcategory).Where(p => p.Customer.Id == CustomerId).Where(p => p.Status != "Requested").ToList();
+			ICollection<GetCalendarDto> calendarDtos = new List<GetCalendarDto>();
+			foreach(var request in requests)
+			{
+				var acceptedTimeSlot = _timeSlotsRepository.GetAcceptedTimeSlot(request.Id);
+				var calendarDto = new GetCalendarDto
 				{
-					Id = o.Id,
-					Location = o.Location,
-					Description = o.Description,
-					Status = o.Status,
-					Image = o.Image,
-					SubCategoryName = o.Subcategory.Name,
-					ProviderName = o.Offers.FirstOrDefault().Provider.FName + " " + o.Offers.FirstOrDefault().Provider.LName,
-					ProviderMobileNumber = o.Offers.FirstOrDefault().Provider.MobileNumber ?? " "
-				})
-				.ToList();
-
-			Console.WriteLine(requests[0].Id);
-			return requests;
+					RequestId = request.Id,
+					OfferId = (GetAcceptedOffer(request.Id)).Id,
+					Date = acceptedTimeSlot.Date.ToString("yyyy-M-d"),
+					FromTime = acceptedTimeSlot.FromTime.ToString("HH:mm"),
+					ToTime = acceptedTimeSlot.ToTime.ToString("HH:mm"),
+					SubcategoryName = request.Subcategory?.Name 
+				};
+				calendarDtos.Add(calendarDto);
+			}
+			return calendarDtos;
 		}
 
-		//public ICollection<ServiceRequest> GetServicesWithFees()
+		//public ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string providerId)
 		//{
-		//    return _context.Requests.Where(p => p.MaxFees != 0).ToList();
-		//}
+		//	var requests = GetUncompletedServices();
+		//	var matchedRequests = new List<ServiceRequest>();
 
-		//public ICollection<ServiceRequest> GetServicesWithFees(string customerId)
-		//{
-		//	return _context.Requests.Where(p => p.Customer.Id == customerId && p.MaxFees != 0).ToList();
-		//}
-
-		//public bool UpdateMaxFees(int serviceId, int maxFees)
-		//{
-		//	var service = _context.Requests.Where(s => s.Id == serviceId).FirstOrDefault();
-		//	if (service != null)
+		//	foreach (var request in requests)
 		//	{
-		//		service.MaxFees = maxFees;
-		//		return Save();
+		//		bool isMatched = _MLRepository.MatchJobAndService(request.Id, providerId).Result;
+		//		if (isMatched)
+		//		{
+		//			matchedRequests.Add(request);
+		//		}
 		//	}
-		//	return false;
+		//	return matchedRequests;
 		//}
 	}
 }

@@ -13,17 +13,17 @@ namespace ServicesApp.Repository
 
 		public ServiceOfferRepository(DataContext context)
 		{
-			this._context = context;
+			_context = context;
 		}
 
 		public ICollection<ServiceOffer> GetOffers()
 		{
-			return _context.Offers.OrderBy(p => p.Id).ToList();
+			return _context.Offers.Include(p => p.Provider).Include(p => p.Request).OrderBy(p => p.Id).ToList();
 		}
 
 		public ServiceOffer GetOffer(int id)
 		{
-			return _context.Offers.Include(o => o.Request).Where(p => p.Id == id).FirstOrDefault();
+			return _context.Offers.Include(p => p.Provider).Include(p => p.Request).Include(o => o.Request).Where(p => p.Id == id).FirstOrDefault();
 		}
 
 		public bool OfferExist(int id)
@@ -42,8 +42,12 @@ namespace ServicesApp.Repository
 			var request = _context.Requests.Include(r => r.Subcategory).Where(r=> r.Id == serviceOffer.Request.Id).FirstOrDefault();
 			if (request != null)
 			{
+				if (request.Volunteer == true)
+				{
+					return true;
+				}
 				var subCategory = _context.Subcategories.Find(request.Subcategory.Id);
-				if (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees) {
+				if (request.Volunteer || (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees)) {
 					return true;
 				}
 			}
@@ -55,6 +59,10 @@ namespace ServicesApp.Repository
             var existingOffer = _context.Offers.Include(o => o.Request).FirstOrDefault(o => o.Id == id);
 			if (existingOffer != null)
 			{
+				if (IsOfferAccepted(existingOffer.Request.Id))
+				{
+					return false;
+				}
 				existingOffer.Status = "Accepted";
                 var service = _context.Requests.Find(existingOffer.Request.Id);
 				service.Status = "Pending";
@@ -63,6 +71,14 @@ namespace ServicesApp.Repository
 			}
 			return false;
 		}
+        public bool IsOfferAccepted(int requestId)
+        {
+            var acceptedOffer = _context.Offers
+                                    .Include(o => o.Request)
+                                    .FirstOrDefault(o => o.Request.Id == requestId && o.Status == "Accepted");
+
+            return acceptedOffer != null;
+        }
 
         public bool DeclineOffer(int offerId)
         {
@@ -99,6 +115,10 @@ namespace ServicesApp.Repository
 		public bool DeleteOffer(int id)
 		{
 			var offer = _context.Offers.Include(c => c.Provider).Include(c => c.Request).Where(p => p.Id == id).FirstOrDefault();
+			if(offer.Request.Status == "Completed")
+			{
+				return false;
+			}
 			if (offer.Status == "Accepted")
 			{
 				var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
@@ -121,14 +141,13 @@ namespace ServicesApp.Repository
 
 		public bool Save()
 		{
-			//sql code is generated here
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;
 		}
 
 		public ICollection<ServiceOffer> GetUnCompletedOffers(string providerId)
 		{
-			var offers = _context.Offers.Include(o => o.Request).Where(p => p.Provider.Id == providerId).ToList(); ;
+			var offers = _context.Offers.Include(p => p.Provider).Include(p => p.Request).Where(p => p.Provider.Id == providerId).ToList(); ;
 
 			if (offers != null)
 			{
@@ -140,7 +159,7 @@ namespace ServicesApp.Repository
 		}
         public ICollection<ServiceOffer> GetOfffersOfProvider(string providerId)
 		{
-            var offers = _context.Offers.Include(o=> o.Request).Where(p => p.Provider.Id == providerId).ToList(); 
+            var offers = _context.Offers.Include(p => p.Provider).Include(p => p.Request).Where(p => p.Provider.Id == providerId).ToList(); 
             return offers;
         }
 
@@ -160,23 +179,26 @@ namespace ServicesApp.Repository
             return false;
         }
 
-		public ICollection<GetServiceOfferDto> ServiceDetailsForProvider(string ProviderId)
+		public ICollection<GetCalendarDto> GetCalendarDetails(string ProviderId)
 		{
-			var offers = _context.Offers
-				.Include(o => o.Request.Customer)
-				.Where(p => p.Provider.Id == ProviderId)
-				.Select(o => new GetServiceOfferDto
+			var offers = _context.Offers.Include(p => p.Provider).Include(p => p.Request).Where(p => p.Provider.Id == ProviderId).Where(p => p.Status == "Accepted").ToList();
+			ICollection<GetCalendarDto> calendarDtos = new List<GetCalendarDto>();
+			foreach (var offer in offers)
+			{
+				var acceptedTimeSlot = _context.TimeSlots.Where(p => p.Id == offer.TimeSlotId).FirstOrDefault();
+				var request = _context.Requests.Include(p => p.Subcategory).Where(p => p.Id == offer.Request.Id).FirstOrDefault();
+				var calendarDto = new GetCalendarDto
 				{
-					Id = o.Id,
-					Duration = o.Duration.ToString("HH:mm"),
-					Fees = o.Fees,
-					TimeSlotId = o.TimeSlotId,
-					Status = o.Status,
-					CustomerName = o.Request.Customer.FName + " " + o.Request.Customer.LName,
-					CustomerMobileNumber = o.Request.Customer.MobileNumber
-				})
-				.ToList();
-			return offers;
+					RequestId = offer.Request.Id,
+					OfferId = offer.Id,
+					Date = acceptedTimeSlot.Date.ToString("yyyy-M-d"),
+					FromTime = acceptedTimeSlot.FromTime.ToString("HH:mm"),
+					ToTime = acceptedTimeSlot.ToTime.ToString("HH:mm"),
+					SubcategoryName = request.Subcategory?.Name
+				};
+				calendarDtos.Add(calendarDto);
+			}
+			return calendarDtos;
 		}
-	}
+    }
 }

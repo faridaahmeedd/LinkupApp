@@ -1,17 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Repository;
 using ServicesApp.Dto.Category;
-using ServicesApp.Core.Models;
 using AutoMapper;
-using ServicesApp.APIs;
-using ServicesApp.Dto.Subcategory;
+using ServicesApp.Helper;
 
 namespace ServicesApp.Controllers
 {
-	[Route("/api/[controller]")]
+    [Route("/api/[controller]")]
 	[ApiController]
 	public class CategoryController : ControllerBase
 	{
@@ -31,7 +27,7 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var categories = _categoryRepository.GetCategories();
 				var mapCategories = _mapper.Map<List<CategoryDto>>(categories);
@@ -39,22 +35,22 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
-		[HttpGet("{CategoryId:int}", Name ="GetCategoryById")]
+		[HttpGet("{CategoryId}")]
 		public IActionResult GetCategory(int CategoryId)
 		{
 			try
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_categoryRepository.CategoryExist(CategoryId))
 				{
-					return NotFound(ApiResponse.CategoryNotFound);
+					return NotFound(ApiResponses.CategoryNotFound);
 				}
 				var category = _categoryRepository.GetCategory(CategoryId);
 				var mapCategory = _mapper.Map<CategoryDto>(category);
@@ -62,7 +58,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -73,19 +69,19 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var category = _categoryRepository.GetCategory(CategoryName);
 				if (category == null)
 				{
-					return NotFound(ApiResponse.CategoryNotFound);
+					return NotFound(ApiResponses.CategoryNotFound);
 				}
 				var mapCategory = _mapper.Map<CategoryDto>(category);
 				return Ok(mapCategory);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -96,12 +92,12 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				var category = _categoryRepository.GetCategory(categoryCreate.Name);
 				if (category != null)
 				{
-					return BadRequest(ApiResponse.CategoryAlreadyExist);
+					return BadRequest(ApiResponses.CategoryAlreadyExist);
 				}
 				var mapCategory = _mapper.Map<Category>(categoryCreate);
 
@@ -115,7 +111,7 @@ namespace ServicesApp.Controllers
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -126,20 +122,20 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_categoryRepository.CategoryExist(categoryUpdate.Id))
 				{
-					return NotFound(ApiResponse.CategoryNotFound);
+					return NotFound(ApiResponses.CategoryNotFound);
 				}
 				var mapCategory = _mapper.Map<Category>(categoryUpdate);
 
 				_categoryRepository.UpdateCategory(mapCategory);
-				return Ok(ApiResponse.SuccessUpdated);
+				return Ok(ApiResponses.SuccessUpdated);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 
@@ -150,18 +146,18 @@ namespace ServicesApp.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return BadRequest(ApiResponse.NotValid);
+					return BadRequest(ApiResponses.NotValid);
 				}
 				if (!_categoryRepository.CategoryExist(CategoryId))
 				{
-					return NotFound(ApiResponse.CategoryNotFound);
+					return NotFound(ApiResponses.CategoryNotFound);
 				}
 				_categoryRepository.DeleteCategory(CategoryId);
-				return Ok(ApiResponse.SuccessDeleted);
+				return Ok(ApiResponses.SuccessDeleted);
 			}
 			catch
 			{
-				return StatusCode(500, ApiResponse.SomethingWrong);
+				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
 		}
 	}

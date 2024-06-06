@@ -32,6 +32,7 @@ namespace ServicesApp.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -39,11 +40,7 @@ namespace ServicesApp.Migrations
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -261,6 +258,9 @@ namespace ServicesApp.Migrations
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Volunteer = table.Column<bool>(type: "bit", nullable: false),
                     SubcategoryId = table.Column<int>(type: "int", nullable: true),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -312,6 +312,51 @@ namespace ServicesApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Reports",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReporterRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReporterName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reports_Requests_RequestId",
+                        column: x => x.RequestId,
+                        principalTable: "Requests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Rate = table.Column<int>(type: "int", nullable: true),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReviewerRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReviewerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Requests_RequestId",
+                        column: x => x.RequestId,
+                        principalTable: "Requests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TimeSlots",
                 columns: table => new
                 {
@@ -339,15 +384,15 @@ namespace ServicesApp.Migrations
                 values: new object[,]
                 {
                     { "43626702-ab6b-4481-89f0-769da1a485c2", "2", "Provider", "Provider" },
-                    { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "4", "MainAdmin", "MainAdmin" },
+                    { "5fe9bbcd-eb74-448e-9580-1c4bd31f7958", "4", "SuperAdmin", "SuperAdmin" },
                     { "6e83945a-31f7-4a85-9679-e5e12895df12", "1", "Customer", "Customer" },
                     { "fee70a81-e665-4566-afc0-5d0c84e3f4fe", "3", "Admin", "Admin" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", 0, "5d9c4dc1-9ea5-4f41-b1d6-857f9d2b420a", "MainAdmin@gmail.com", true, true, null, "MAINADMIN@GMAIL.COM", "MAINADMIN", "AQAAAAIAAYagAAAAEH2WVw40/l6V8VlKWz1nIq5h3OXhBXj/fivYWTi1Srjqdb2sW0qUf/pDl9jKw0v+WQ==", "ef1ec0f1-d2a1-47df-a8f1-d7561f346db7", false, "MainAdmin" });
+                columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "133d49db-22d5-437d-889d-15ba2c9d1d3b", "SuperAdmin@gmail.com", true, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEMb2KNwTCxRW4/ey/4vmYjyDL3V84kA5FVYv1O6LxgrNECTTBLToYEA8cawrHkTnfA==", "583ce101-63a2-4858-933a-6771301eceda", "SuperAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -404,6 +449,11 @@ namespace ServicesApp.Migrations
                 column: "RequestId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reports_RequestId",
+                table: "Reports",
+                column: "RequestId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Requests_CustomerId",
                 table: "Requests",
                 column: "CustomerId");
@@ -412,6 +462,11 @@ namespace ServicesApp.Migrations
                 name: "IX_Requests_SubcategoryId",
                 table: "Requests",
                 column: "SubcategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_RequestId",
+                table: "Reviews",
+                column: "RequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subcategories_CategoryId",
@@ -444,6 +499,12 @@ namespace ServicesApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "Offers");
+
+            migrationBuilder.DropTable(
+                name: "Reports");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "TimeSlots");

@@ -63,6 +63,7 @@ namespace ServicesApp.Repository
 					existingService.Description = updatedService.Description;
 					existingService.Image = updatedService.Image;
 					existingService.Location = updatedService.Location;
+					existingService.PaymentMethod = updatedService.PaymentMethod;
 				}
 				return Save();
 			}

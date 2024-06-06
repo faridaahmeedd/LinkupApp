@@ -59,8 +59,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("RegisterAdmin")]
-	// [Authorize(Roles = "
-	// ")]
+	// [Authorize(Roles = "")]
 	public async Task<IActionResult> RegisterAdmin([FromBody] RegistrationDto registerDto)
 	{
 		try
@@ -129,7 +128,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("ForgetPassword/{Mail}")]
-	public  async Task<IActionResult> ForgetPassword(string Mail)
+	public async Task<IActionResult> ForgetPassword(string Mail)
 	{
 		try
 		{
@@ -161,9 +160,9 @@ public class AuthController : ControllerBase
 		}
 	}
 
-    [HttpPut("ResetPassword")]
-    public async Task<IActionResult> ResetPassword([FromBody] RegistrationDto registrationDto)
-    {
+	[HttpPut("ResetPassword")]
+	public async Task<IActionResult> ResetPassword([FromBody] RegistrationDto registrationDto)
+	{
 		try
 		{
 			if (!ModelState.IsValid)
@@ -208,7 +207,7 @@ public class AuthController : ControllerBase
 			{
 				return NotFound(ApiResponses.UserNotFound);
 			}
-			if(await _authRepository.DeactivateUser(UserId))
+			if (await _authRepository.DeactivateUser(UserId))
 			{
 				return Ok(ApiResponses.UserDeactivated);
 			}

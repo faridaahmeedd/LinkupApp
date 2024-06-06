@@ -188,7 +188,7 @@ namespace ServicesApp.Controllers
 				}
 				var serviceMap = _mapper.Map<ServiceRequest>(serviceRequestDto);
 				serviceMap.Id = ServiceId;
-
+				
 				if (!_serviceRepository.UpdateService(serviceMap))
 				{
 					return BadRequest(ApiResponses.FailedToUpdate);

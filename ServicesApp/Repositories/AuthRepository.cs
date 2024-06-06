@@ -30,6 +30,7 @@ public class AuthRepository : IAuthRepository
 		_config = config;
 		_roleManager = roleManager;
 		_mapper = mapper;
+
 	}
 
 	public async Task<AppUser?> CheckUser(string email)
@@ -58,7 +59,7 @@ public class AuthRepository : IAuthRepository
 		if (appUser != null)
 		{
 			var role = await _userManager.GetRolesAsync(appUser);
-			if(role.Contains("Admin"))
+			if (role.Contains("Admin"))
 			{
 				return appUser;
 			}
@@ -74,33 +75,36 @@ public class AuthRepository : IAuthRepository
 		}
 		return false;
 	}
-	
-    public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
-    {
-        var userMap = _mapper.Map<AppUser>(registerDto);
-        if (role == "Customer")
-        {
-            userMap = _mapper.Map<Customer>(registerDto);
-        }
-        else if (role == "Provider")
-        {
-            userMap = _mapper.Map<Provider>(registerDto);
-        }
-        else
-        {
-            return IdentityResult.Failed();
-        }
-        userMap.Email = registerDto.Email;
-        userMap.SecurityStamp = Guid.NewGuid().ToString();
-        userMap.UserName = registerDto.Email;
-        var result = await _userManager.CreateAsync(userMap, registerDto.Password);
-        if (result.Succeeded)
-        {
-            await _userManager.AddToRoleAsync(userMap, role);
-            SendRegistrtationMail(userMap.Email);
-        }
-        return result;
-    }
+
+	public async Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role)
+	{
+		var userMap = _mapper.Map<AppUser>(registerDto);
+		if (role == "Customer")
+		{
+			userMap = _mapper.Map<Customer>(registerDto);
+		}
+		else if (role == "Provider")
+		{
+			userMap = _mapper.Map<Provider>(registerDto);
+		}
+		else
+		{
+			return IdentityResult.Failed();
+		}
+		userMap.Email = registerDto.Email;
+		userMap.SecurityStamp = Guid.NewGuid().ToString();
+		userMap.UserName = registerDto.Email;
+		var result = await _userManager.CreateAsync(userMap, registerDto.Password);
+		if (result.Succeeded)
+		{
+			await _userManager.AddToRoleAsync(userMap, role);
+			if (SendRegistrtationMail(userMap.Email))
+			{
+				return result;
+			}
+		}
+		return result;
+	}
 
 	public async Task<IdentityResult> CreateAdmin(RegistrationDto registerDto)
 	{
@@ -116,40 +120,45 @@ public class AuthRepository : IAuthRepository
 		return result;
 	}
 
-	public void SendRegistrtationMail(string recipientEmail)
+	public bool SendRegistrtationMail(string recipientEmail)
 	{
-        string senderEmail = "linkupp2024@gmail.com";
-        string senderPassword = "mbyo noyk dfbb fhlr";
-        LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-        LinkedImage.ContentId = "Logo";
-        LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-        string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
-        AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-        htmlContent, null, "text/html");
-        htmlView.LinkedResources.Add(LinkedImage);
-
-        MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-        {
-            Subject = "Welcome to Linkup",
-            IsBodyHtml = true,
-        };
-        mailMessage.AlternateViews.Add(htmlView);
-
-        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-        {
-            Port = 587,
-            Credentials = new NetworkCredential(senderEmail, senderPassword),
-            EnableSsl = true
-        };
+		string senderEmail = _config["Email:SENDER_EMAIL"];
+		string senderPassword = _config["Email:SENDER_PASSWORD"];
 		try
 		{
-			smtpClient.Send(mailMessage);
+
+			LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
+			LinkedImage.ContentId = "Logo";
+			LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
+			string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
+			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
+			htmlContent, null, "text/html");
+			htmlView.LinkedResources.Add(LinkedImage);
+
+			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+			{
+				Subject = "Welcome to Linkup",
+				IsBodyHtml = true,
+			};
+			mailMessage.AlternateViews.Add(htmlView);
+
+			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+			{
+				Port = 587,
+				Credentials = new NetworkCredential(senderEmail, senderPassword),
+				EnableSsl = true
+			})
+			{
+				smtpClient.Send(mailMessage);
+			}
+			return true;
 		}
 		catch (Exception ex)
 		{
 			Console.WriteLine($"Error: {ex.Message}");
+			return false;
 		}
-    }
+	}
 
 	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
 	{
@@ -164,7 +173,7 @@ public class AuthRepository : IAuthRepository
 			};
 			var roles = await _userManager.GetRolesAsync(appUser);
 			authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
+			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
 			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 			var expiration = DateTime.Now.AddMonths(5);
 
@@ -181,76 +190,92 @@ public class AuthRepository : IAuthRepository
 		return (null, DateTime.MinValue);
 	}
 
-    public async Task<string> ForgetPassword(string mail)
+
+	public async Task<string> ForgetPassword(string mail)
 	{
-        var user = await _userManager.FindByEmailAsync(mail);
-		if (user == null){
+		var user = await _userManager.FindByEmailAsync(mail);
+		if (user == null)
+		{
 			return string.Empty;
 		}
 
 		var resetCode = GenerateRandomCode();
-
-		string senderEmail = "linkupp2024@gmail.com";
-		string senderPassword = "mbyo noyk dfbb fhlr";
-		string recipientEmail = mail;
-		LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-		LinkedImage.ContentId = "Logo";
-		LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-		string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
-		htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
-		AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-	    htmlContent, null, "text/html");
-		htmlView.LinkedResources.Add(LinkedImage);
-
-		MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+		if (SendResetPasswordEmail(mail, resetCode))
 		{
-			Subject = "Linkup Reset Password",
-			IsBodyHtml = true, 
-        };
-		mailMessage.AlternateViews.Add(htmlView);
-		SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-        {
-            Port = 587,
-            Credentials = new NetworkCredential(senderEmail, senderPassword),
-            EnableSsl = true
-        };
-        try
-        {
-            smtpClient.Send(mailMessage);
-			smtpClient.Dispose();
-            return resetCode;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        return string.Empty;
+			return resetCode;
+		}
+		return resetCode;
 	}
 
-    public string GenerateRandomCode(int length = 6)
-    {
-        const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        Random random = new Random();
-        return new string(Enumerable.Repeat(chars, length)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
-    }
+	public bool SendResetPasswordEmail(string recipientEmail, string resetCode)
+	{
+		string senderEmail = _config["Email:SENDER_EMAIL"];
+		string senderPassword = _config["Email:SENDER_PASSWORD"];
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
+			htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
 
-    public async Task<bool> ResetPassword(string mail, string newPassword)
-    {
-        var user = await _userManager.FindByEmailAsync(mail);
-        if (user == null)
-        {
-            return false; 
-        }
-        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
-        if (result.Succeeded)
-        {
-            await _userManager.UpdateAsync(user);
-            return true; 
-        }
+			LinkedResource linkedImage = new LinkedResource(@"wwwroot\images\Logo.png")
+			{
+				ContentId = "Logo",
+				ContentType = new ContentType(MediaTypeNames.Image.Png)
+			};
+
+			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(htmlContent, null, "text/html");
+			htmlView.LinkedResources.Add(linkedImage);
+
+			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+			{
+				Subject = "Linkup Reset Password",
+				IsBodyHtml = true,
+			};
+			mailMessage.AlternateViews.Add(htmlView);
+
+			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+			{
+				Port = 587,
+				Credentials = new NetworkCredential(senderEmail, senderPassword),
+				EnableSsl = true
+			})
+			{
+				smtpClient.Send(mailMessage);
+			}
+
+			return true;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+
+
+	public string GenerateRandomCode(int length = 6)
+	{
+		const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		Random random = new Random();
+		return new string(Enumerable.Repeat(chars, length)
+			.Select(s => s[random.Next(s.Length)]).ToArray());
+	}
+
+	public async Task<bool> ResetPassword(string mail, string newPassword)
+	{
+		var user = await _userManager.FindByEmailAsync(mail);
+		if (user == null)
+		{
+			return false;
+		}
+		var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+		var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+		if (result.Succeeded)
+		{
+			await _userManager.UpdateAsync(user);
+			return true;
+		}
 		return false;
-    }
+	}
 
 	public async Task<bool> DeactivateUser(string userId)
 	{
@@ -258,54 +283,62 @@ public class AuthRepository : IAuthRepository
 		if (user != null)
 		{
 			var role = await _userManager.GetRolesAsync(user);
-			if (! role.Contains("SuperAdmin"))
+			if (!role.Contains("SuperAdmin"))
 			{
 				user.Active = false;
 				var result = await _userManager.UpdateAsync(user);
 
 				if (result.Succeeded)
 				{
-					SendMail(user.Email , "Linkup Deactivation", "InactiveMail");
-                    return true;
+					if (SendMail(user.Email, "Linkup Deactivation", "InactiveMail"))
+					{
+						return true;
+					}
+					return true;
 				}
 			}
 		}
-		
 		return false;
 	}
-    public void SendMail(string recipientEmail , string subject , string filename)
-	{
-        string senderEmail = "linkupp2024@gmail.com";
-        string senderPassword = "mbyo noyk dfbb fhlr";
-     
-        LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-        LinkedImage.ContentId = "Logo";
-        LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-        string htmlContent = File.ReadAllText($"Mails/{filename}.html");
-        AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-        htmlContent, null, "text/html");
-        htmlView.LinkedResources.Add(LinkedImage);
 
-        MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-        {
-            Subject = subject,
-            IsBodyHtml = true,
-        };
-        mailMessage.AlternateViews.Add(htmlView);
-        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-        {
-            Port = 587,
-            Credentials = new NetworkCredential(senderEmail, senderPassword),
-            EnableSsl = true
-        };
-        try
-        {
-            smtpClient.Send(mailMessage);
-            smtpClient.Dispose();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-    }
+	public bool SendMail(string recipientEmail, string subject, string filename)
+	{
+		string senderEmail = _config["Email:SENDER_EMAIL"];
+		string senderPassword = _config["Email:SENDER_PASSWORD"];
+
+		try
+		{
+			LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
+			LinkedImage.ContentId = "Logo";
+			LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
+			string htmlContent = File.ReadAllText($"Mails/{filename}.html");
+			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
+			htmlContent, null, "text/html");
+			htmlView.LinkedResources.Add(LinkedImage);
+
+			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
+			{
+				Subject = subject,
+				IsBodyHtml = true,
+			};
+			mailMessage.AlternateViews.Add(htmlView);
+
+
+			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
+			{
+				Port = 587,
+				Credentials = new NetworkCredential(senderEmail, senderPassword),
+				EnableSsl = true
+			})
+			{
+				smtpClient.Send(mailMessage);
+			}
+			return true;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
 }

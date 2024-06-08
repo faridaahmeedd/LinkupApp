@@ -53,8 +53,10 @@ namespace ServicesApp.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DescriptionEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DescriptionAr = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -231,10 +233,14 @@ namespace ServicesApp.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MinFees = table.Column<int>(type: "int", nullable: false),
-                    MaxFees = table.Column<int>(type: "int", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DescriptionEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DescriptionAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MinFeesEn = table.Column<int>(type: "int", nullable: false),
+                    MaxFeesEn = table.Column<int>(type: "int", nullable: false),
+                    MinFeesAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MaxFeesAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -392,7 +398,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "133d49db-22d5-437d-889d-15ba2c9d1d3b", "SuperAdmin@gmail.com", true, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEMb2KNwTCxRW4/ey/4vmYjyDL3V84kA5FVYv1O6LxgrNECTTBLToYEA8cawrHkTnfA==", "583ce101-63a2-4858-933a-6771301eceda", "SuperAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "24b04480-6c72-4ff9-9c81-bff34a3d385e", "SuperAdmin@gmail.com", true, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEOXygtoj07BV5+uhY/8eY1FpxJi8uRUy6/8mzbtM0bLGtWTY5M67zqSiY4xR+QOyFw==", "a5612dc6-c8e0-476f-a078-b913e097b9df", "SuperAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

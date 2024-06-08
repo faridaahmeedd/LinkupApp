@@ -6,6 +6,6 @@
         public string Location { get; set; }
 		public string PaymentMethod { get; set; }
 		public bool Volunteer { get; set; }
-		// public byte[]? Image { get; set; }
-	}
+        public byte[]? Image { get; set; }
+    }
 }

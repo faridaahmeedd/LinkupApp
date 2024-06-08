@@ -45,7 +45,7 @@ namespace ServicesApp.Repositories
 				var jsonObject = JObject.Parse(jsonResponse);
 				var predictedSubcategory = jsonObject["subcategory"].ToString();
 
-				if (predictedSubcategory == request.Subcategory.Name)
+				if (predictedSubcategory == request.Subcategory.NameAr || predictedSubcategory == request.Subcategory.NameEn)
 				{
 					return true;
 				}

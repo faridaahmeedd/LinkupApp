@@ -94,8 +94,10 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponses.NotValid);
 				}
-				var category = _categoryRepository.GetCategory(categoryCreate.Name);
-				if (category != null)
+				var categoryAr = _categoryRepository.GetCategory(categoryCreate.NameAr);
+                var categoryEn = _categoryRepository.GetCategory(categoryCreate.NameEn);
+
+                if (categoryAr != null || categoryEn !=null)
 				{
 					return BadRequest(ApiResponses.CategoryAlreadyExist);
 				}

@@ -3,8 +3,9 @@
     public class CategoryDto
     {
         public int Id { get; set; }
-        public required string Name { get; set; }
-        public required string Description { get; set; }
-        //public required int MinFees { get; set; }
+        public required string NameEn { get; set; }
+        public required string DescriptionEn { get; set; }
+        public required string NameAr { get; set; }
+        public required string DescriptionAr { get; set; }
     }
 }

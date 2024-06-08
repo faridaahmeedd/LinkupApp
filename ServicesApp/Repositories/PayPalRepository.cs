@@ -52,7 +52,7 @@ namespace ServicesApp.Repositories
 							new
 							{
 								name = "Linkup Service Fees",
-								sku = request.Subcategory.Name,
+								sku = request.Subcategory.NameEn,
 								price = (offer.Fees + request.Customer.Balance).ToString(),
 								currency = "USD",
 								quantity = 1

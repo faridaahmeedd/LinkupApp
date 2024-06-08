@@ -149,9 +149,15 @@ namespace ServicesApp.Repository
             var service = _context.Requests.Include(c => c.Subcategory).Where(s => s.Id == serviceId).FirstOrDefault();
             if (service != null)
             {
-                if (service.Subcategory.Name == "Unknown")
+                if (service.Subcategory.NameEn == "Unknown")
                 {
-                    var subcategory = _context.Subcategories.Where(c => c.Name == subcategoryName).FirstOrDefault();
+                    var subcategory = _context.Subcategories.Where(c => c.NameEn == subcategoryName).FirstOrDefault();
+                    service.Subcategory = subcategory;
+                    return Save();
+                }
+                if (service.Subcategory.NameAr == "غير محدد")
+                {
+                    var subcategory = _context.Subcategories.Where(c => c.NameAr == subcategoryName).FirstOrDefault();
                     service.Subcategory = subcategory;
                     return Save();
                 }
@@ -179,8 +185,10 @@ namespace ServicesApp.Repository
 					Date = acceptedTimeSlot.Date.ToString("yyyy-M-d"),
 					FromTime = acceptedTimeSlot.FromTime.ToString("HH:mm"),
 					ToTime = acceptedTimeSlot.ToTime.ToString("HH:mm"),
-					SubcategoryName = request.Subcategory?.Name 
-				};
+					SubcategoryNameEn = request.Subcategory?.NameEn,
+                    SubcategoryNameAr = request.Subcategory?.NameAr
+
+                };
 				calendarDtos.Add(calendarDto);
 			}
 			return calendarDtos;

@@ -30,7 +30,7 @@ namespace ServicesApp.Repository
 
 		public Subcategory GetSubcategory(string name)
 		{
-			return _context.Subcategories.Where(p => p.Name.Trim().ToUpper() == name.ToUpper()).FirstOrDefault();
+			return _context.Subcategories.Where(p => p.NameEn.Trim().ToUpper() == name.ToUpper() || p.NameAr == name).FirstOrDefault();
 		}
 
 		public bool SubcategoryExist(int id)
@@ -40,7 +40,7 @@ namespace ServicesApp.Repository
 
         public bool SubcategoryExist(string name)
         {
-            return _context.Subcategories.Any(p => p.Name == name);
+            return _context.Subcategories.Any(p => p.NameEn == name || p.NameAr == name);
         }
 
         public bool CreateSubcategory(Subcategory subcategory)

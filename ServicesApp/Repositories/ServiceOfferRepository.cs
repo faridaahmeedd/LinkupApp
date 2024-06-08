@@ -47,7 +47,8 @@ namespace ServicesApp.Repository
 					return true;
 				}
 				var subCategory = _context.Subcategories.Find(request.Subcategory.Id);
-				if (request.Volunteer || (subCategory.MaxFees >= serviceOffer.Fees && subCategory.MinFees <= serviceOffer.Fees)) {
+				if (request.Volunteer ||  (subCategory.MaxFeesEn >= serviceOffer.Fees && subCategory.MinFeesEn <= serviceOffer.Fees))
+				{
 					return true;
 				}
 			}
@@ -194,8 +195,10 @@ namespace ServicesApp.Repository
 					Date = acceptedTimeSlot.Date.ToString("yyyy-M-d"),
 					FromTime = acceptedTimeSlot.FromTime.ToString("HH:mm"),
 					ToTime = acceptedTimeSlot.ToTime.ToString("HH:mm"),
-					SubcategoryName = request.Subcategory?.Name
-				};
+					SubcategoryNameAr = request.Subcategory?.NameAr,
+                    SubcategoryNameEn = request.Subcategory?.NameEn
+
+                };
 				calendarDtos.Add(calendarDto);
 			}
 			return calendarDtos;

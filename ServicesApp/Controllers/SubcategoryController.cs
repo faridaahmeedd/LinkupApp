@@ -5,6 +5,8 @@ using AutoMapper;
 using ServicesApp.Dto.Subcategory;
 using System.Collections.Generic;
 using ServicesApp.Helper;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Globalization;
 
 namespace ServicesApp.Controllers
 {
@@ -80,6 +82,7 @@ namespace ServicesApp.Controllers
 				}
 				var subcategory = _subcategoryRepository.GetSubcategory(SubcategoryId);
 				var mapSubcategories = _mapper.Map<SubcategoryDto>(subcategory);
+
 				return Ok(mapSubcategories);
 			}
 			catch
@@ -89,7 +92,7 @@ namespace ServicesApp.Controllers
 		}
 
 		[HttpGet("{SubcategoryName:minlength(3)}")]
-		public IActionResult GetSubcategory(String SubcategoryName)
+		public IActionResult GetSubcategory(string SubcategoryName)
 		{
 			try
 			{
@@ -103,6 +106,7 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponses.SubcategoryNotFound);
 				}
 				var mapSubcategories = _mapper.Map<SubcategoryDto>(subcategory);
+
 				return Ok(mapSubcategories);
 			}
 			catch
@@ -120,8 +124,10 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponses.NotValid);
 				}
-				var subcategory = _subcategoryRepository.GetSubcategory(subcategoryCreate.Name);
-				if (subcategory != null)
+				var subcategoryEn = _subcategoryRepository.GetSubcategory(subcategoryCreate.NameEn);
+                var subcategoryAr = _subcategoryRepository.GetSubcategory(subcategoryCreate.NameAr);
+
+                if (subcategoryAr != null || subcategoryEn != null)
 				{
 					return BadRequest(ApiResponses.SubcategoryAlreadyExist);
 				}
@@ -129,9 +135,11 @@ namespace ServicesApp.Controllers
 				{
 					return NotFound(ApiResponses.CategoryNotFound);
 				}
+
 				var mapSubcategory = _mapper.Map<Subcategory>(subcategoryCreate);
 				mapSubcategory.Category = _categoryRepository.GetCategory(CategoryId);
 				_subcategoryRepository.CreateSubcategory(mapSubcategory);
+
 				return Ok(new
 				{
 					statusMsg = "success",

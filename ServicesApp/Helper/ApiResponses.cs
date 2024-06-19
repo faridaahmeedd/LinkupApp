@@ -172,35 +172,35 @@
             statusMsg = "fail",
             message = "Not authorized to do this action."
         };
-        public static readonly object PaymentError = new
-        {
-            statusMsg = "fail",
-            message = "Error occured while paying for the service."
-        };
         public static readonly object ReviewNotFound = new
         {
             statusMsg = "fail",
             message = "Review not Found."
         };
-        public static readonly object ReportNotFound = new
+		public static readonly object InvalidRating = new
+		{
+			statusMsg = "fail",
+			message = "The rating value is out of the expected range (0-5)."
+		};
+		public static readonly object ServiceAlreadyReviewed = new
+		{
+			statusMsg = "fail",
+			message = "This service has already been reviewed."
+		};
+		public static readonly object ReportNotFound = new
         {
             statusMsg = "fail",
             message = "Report not Found."
         };
-        public static readonly object PaidAlready = new
+		public static readonly object PaymentError = new
+		{
+			statusMsg = "fail",
+			message = "Error occured while paying for the service."
+		};
+		public static readonly object PaidAlready = new
         {
             statusMsg = "fail",
             message = "This service has already been paid."
-        };
-        public static readonly object RefundedAlready = new
-        {
-            statusMsg = "fail",
-            message = "This service has already been refunded."
-        };
-        public static readonly object RefundSuccess = new
-        {
-            statusMsg = "success",
-            message = "This service has been refunded successfully."
         };
         public static readonly object CannotCapture = new
         {
@@ -217,10 +217,15 @@
             statusMsg = "fail",
             message = "This service is not completed."
         };
-        public static readonly object ServiceAlreadyReviewed = new
-        {
-            statusMsg = "fail",
-            message = "This service has already been reviewed."
-        };
-    }
+		//public static readonly object RefundedAlready = new
+		//{
+		//	statusMsg = "fail",
+		//	message = "This service has already been refunded."
+		//};
+		//public static readonly object RefundSuccess = new
+		//{
+		//	statusMsg = "success",
+		//	message = "This service has been refunded successfully."
+		//};
+	}
 }

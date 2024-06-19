@@ -142,7 +142,11 @@ namespace ServicesApp.Controllers
                     return NotFound(ApiResponses.UserNotFound);
                 }
                 var rating = await _ReviewRepository.CalculateAvgRating(Id);
-                return Ok(rating);
+				if (rating < 0 || rating > 5)
+				{
+					return BadRequest(ApiResponses.InvalidRating);
+				}
+				return Ok(rating);
             }
             catch
             {
@@ -182,7 +186,7 @@ namespace ServicesApp.Controllers
                 mapReview.ReviewerRole = "Provider";
                 _ReviewRepository.CreateReview(mapReview);
                 
-                 await _ReviewRepository.Warning(mapReview.Request.Customer.Id);
+                await _ReviewRepository.Warning(mapReview.Request.Customer.Id);
 
                 return Ok(new
                 {

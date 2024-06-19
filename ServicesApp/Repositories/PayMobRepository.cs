@@ -41,9 +41,10 @@ namespace ServicesApp.Repositories
 		{
 			var request = _serviceRepository.GetService(ServiceId);
 			var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
-			var data = new
+            var fees = offer.Examination ? (200 + request.Customer.Balance) : (offer.Fees + request.Customer.Balance);
+            var data = new
 			{
-				amount = (100 * (offer.Fees + request.Customer.Balance)).ToString(),
+				amount = (100 *fees).ToString(),
 				currency = "EGP",
 				payment_methods = new[] { integrationID },
 				billing_data = new
@@ -80,13 +81,14 @@ namespace ServicesApp.Repositories
 		{
 			var request = _serviceRepository.GetService(ServiceId);
 			var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
+            var fees = offer.Examination ? (200 + request.Customer.Balance) : (offer.Fees + request.Customer.Balance);
 
-			string token = await auth();
+            string token = await auth();
 
 			var captureData = new
 			{
 				transaction_id = TransactionId,
-				amount_cents = (100 * (offer.Fees + request.Customer.Balance)).ToString(),
+				amount_cents = (100 * fees).ToString(),
 			};
 
 			var Captureresponse = await PostDataAndGetResponse("https://accept.paymob.com/api/acceptance/capture", captureData, token);

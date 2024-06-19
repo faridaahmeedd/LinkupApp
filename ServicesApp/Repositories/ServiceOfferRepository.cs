@@ -42,7 +42,7 @@ namespace ServicesApp.Repository
 			var request = _context.Requests.Include(r => r.Subcategory).Where(r=> r.Id == serviceOffer.Request.Id).FirstOrDefault();
 			if (request != null)
 			{
-				if (request.Volunteer == true)
+				if (request.Volunteer == true || serviceOffer.Examination)
 				{
 					return true;
 				}
@@ -107,6 +107,7 @@ namespace ServicesApp.Repository
 					existingOffer.Fees = updatedOffer.Fees;
 					existingOffer.TimeSlotId = updatedOffer.TimeSlotId;
 					existingOffer.Duration = updatedOffer.Duration;
+					existingOffer.Examination = updatedOffer.Examination;
 					return Save();
 				}
 			}

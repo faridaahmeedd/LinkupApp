@@ -29,7 +29,9 @@ namespace ServicesApp.Repositories
 			var request = _serviceRepository.GetService(ServiceId);
 			var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
 			var accessToken = await GetAccessToken();
-			var createPaymentJson = new
+			var fees = offer.Examination ? (200 + request.Customer.Balance).ToString() : (offer.Fees + request.Customer.Balance).ToString();
+			var feesWithoutBalance = offer.Examination ? (200 ).ToString() : (offer.Fees ).ToString();
+            var createPaymentJson = new
 			{
 				intent = "sale",
 				payer = new
@@ -53,7 +55,7 @@ namespace ServicesApp.Repositories
 							{
 								name = "Linkup Service Fees",
 								sku = request.Subcategory.NameEn,
-								price = (offer.Fees + request.Customer.Balance).ToString(),
+								price = fees,
 								currency = "USD",
 								quantity = 1
 							}
@@ -61,10 +63,10 @@ namespace ServicesApp.Repositories
 					},
 					amount = new
 					{
-						total = (offer.Fees + request.Customer.Balance).ToString(),
+						total = fees,
 						currency = "USD"
 					},
-					description = request.Customer.Balance != 0 ? $"Service Fees: {offer.Fees} , Balance: {request.Customer.Balance}" : $"Service Fees: {offer.Fees}",
+					description = request.Customer.Balance != 0 ? $"Service Fees: {feesWithoutBalance} , Balance: {request.Customer.Balance}" : $"Service Fees:   {feesWithoutBalance} "
 				}
 			}
 			};

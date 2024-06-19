@@ -12,5 +12,7 @@
         public double ProviderAvgRating { get; set; }
 
         public int RequestId { get; set; }
+        public required bool Examination { get; set; }
+
     }
 }

@@ -74,6 +74,40 @@ namespace ServicesApp.Tests.Controller
 		}
 
 		[Fact]
+		public void GetCategoryByName_CategoryExists_ReturnsOk()
+		{
+			// Arrange
+			var categoryName = "ExistingCategory";
+			var category = A.Fake<Category>();
+			var categoryDto = A.Fake<CategoryDto>();
+			A.CallTo(() => _categoryRepository.CategoryExist(categoryName)).Returns(true);
+			A.CallTo(() => _categoryRepository.GetCategory(categoryName)).Returns(category);
+			A.CallTo(() => _mapper.Map<CategoryDto>(category)).Returns(categoryDto);
+			var controller = new CategoryController(_categoryRepository, _mapper);
+
+			// Act
+			var result = controller.GetCategory(categoryName);
+
+			// Assert
+			result.Should().BeOfType<OkObjectResult>();
+		}
+
+		[Fact]
+		public void GetCategoryByName_CategoryDoesNotExist_ReturnsNotFound()
+		{
+			// Arrange
+			var categoryName = "NonExistingCategory";
+			A.CallTo(() => _categoryRepository.CategoryExist(categoryName)).Returns(false);
+			var controller = new CategoryController(_categoryRepository, _mapper);
+
+			// Act
+			var result = controller.GetCategory(categoryName);
+
+			// Assert
+			result.Should().BeOfType<NotFoundObjectResult>();
+		}
+
+		[Fact]
 		public void CreateCategory_CategoryDoesNotExist_ReturnsOk()
 		{
 			// Arrange

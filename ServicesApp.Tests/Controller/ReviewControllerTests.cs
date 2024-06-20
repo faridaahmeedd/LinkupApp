@@ -2,6 +2,7 @@
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using ServicesApp.Controllers;
 using ServicesApp.Core.Models;
 using ServicesApp.Dto.Reviews_Reports;
@@ -272,7 +273,7 @@ namespace ServicesApp.Tests.Controller
 			var _reviewController = new ReviewController(_reviewRepository, _mapper, _providerRepository, _customerRepository, _serviceRequestRepository);
 
 			// Act
-			var result = await _reviewController.CreateCustomerReview(requestId, reviewDto);
+			var result = await _reviewController.CreateCustomerReview(reviewDto, requestId);
 
 			// Assert
 			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -289,7 +290,7 @@ namespace ServicesApp.Tests.Controller
 			var _reviewController = new ReviewController(_reviewRepository, _mapper, _providerRepository, _customerRepository, _serviceRequestRepository);
 
 			// Act
-			var result = await _reviewController.CreateProviderReview(requestId, reviewDto);
+			var result = await _reviewController.CreateProviderReview(reviewDto, requestId);
 
 			// Assert
 			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -303,11 +304,12 @@ namespace ServicesApp.Tests.Controller
 			var requestId = 1; // Existing service ID but not completed
 			var reviewDto = A.Fake<PostReviewDto>();
 			A.CallTo(() => _serviceRequestRepository.ServiceExist(requestId)).Returns(true);
-			A.CallTo(() => _reviewRepository.CheckRequestOfReviewCompleted(requestId)).Returns(false);
+			A.CallTo(() => _serviceRequestRepository.CheckRequestCompleted(requestId)).Returns(false);
+			A.CallTo(() => _reviewRepository.IsProviderAlreadyReviewed(requestId)).Returns(false);
 			var _reviewController = new ReviewController(_reviewRepository, _mapper, _providerRepository, _customerRepository, _serviceRequestRepository);
 
 			// Act
-			var result = await _reviewController.CreateCustomerReview(requestId, reviewDto);
+			var result = await _reviewController.CreateCustomerReview(reviewDto, requestId);
 
 			// Assert
 			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -321,39 +323,104 @@ namespace ServicesApp.Tests.Controller
 			var requestId = 1; // Existing service ID but not completed
 			var reviewDto = A.Fake<PostReviewDto>();
 			A.CallTo(() => _serviceRequestRepository.ServiceExist(requestId)).Returns(true);
-			A.CallTo(() => _reviewRepository.CheckRequestOfReviewCompleted(requestId)).Returns(false);
+			A.CallTo(() => _serviceRequestRepository.CheckRequestCompleted(requestId)).Returns(false);
+			A.CallTo(() => _reviewRepository.IsCustomerAlreadyReviewed(requestId)).Returns(false);
 			var _reviewController = new ReviewController(_reviewRepository, _mapper, _providerRepository, _customerRepository, _serviceRequestRepository);
 
 			// Act
-			var result = await _reviewController.CreateProviderReview(requestId, reviewDto);
+			var result = await _reviewController.CreateProviderReview(reviewDto, requestId);
 
 			// Assert
 			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
 			Assert.Equal(400, badRequestResult.StatusCode);
 		}
 
-		//[Fact]
-		//public async Task CreateCustomerReview_ValidRequest_ReturnsOk()
-		//{
+		[Fact]
+		public async Task CreateCustomerReview_ServiceAlreadyReviewed_ReturnsBadRequest()
+		{
+			// Arrange
+			var requestId = 1;
+			var reviewDto = A.Fake<PostReviewDto>();
+			A.CallTo(() => _serviceRequestRepository.ServiceExist(requestId)).Returns(true);
+			A.CallTo(() => _serviceRequestRepository.CheckRequestCompleted(requestId)).Returns(true);
+			A.CallTo(() => _reviewRepository.IsProviderAlreadyReviewed(requestId)).Returns(true);
+			var _reviewController = new ReviewController(_reviewRepository, _mapper, _providerRepository, _customerRepository, _serviceRequestRepository);
 
-		//}
+			// Act
+			var result = await _reviewController.CreateCustomerReview(reviewDto, requestId);
 
-		//[Fact]
-		//public async Task CreateProviderReview_ValidRequest_ReturnsOk()
-		//{
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+		}
 
-		//}
+		[Fact]
+		public async Task CreateProviderReview_ServiceAlreadyReviewed_ReturnsBadRequest()
+		{
+			// Arrange
+			var requestId = 1; // Existing service ID but not completed
+			var reviewDto = A.Fake<PostReviewDto>();
+			A.CallTo(() => _serviceRequestRepository.ServiceExist(requestId)).Returns(true);
+			A.CallTo(() => _serviceRequestRepository.CheckRequestCompleted(requestId)).Returns(true);
+			A.CallTo(() => _reviewRepository.IsCustomerAlreadyReviewed(requestId)).Returns(true);
+			var _reviewController = new ReviewController(_reviewRepository, _mapper, _providerRepository, _customerRepository, _serviceRequestRepository);
 
-		//[Fact]
-		//public async Task CreateCustomerReview_ServiceAlreadyReviewed_ReturnsBadRequest()
-		//{
-			
-		//}
+			// Act
+			var result = await _reviewController.CreateProviderReview(reviewDto, requestId);
 
-		//[Fact]
-		//public async Task CreateProviderReview_ServiceAlreadyReviewed_ReturnsBadRequest()
-		//{
-			
-		//}
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+		}
+
+		[Fact]
+		public async Task CreateCustomerReview_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			var requestId = 1;
+			var reviewDto = A.Fake<PostReviewDto>();
+			var mappedReview = A.Fake<Review>();
+			var request = A.Fake<ServiceRequest>();
+
+			A.CallTo(() => _serviceRequestRepository.ServiceExist(requestId)).Returns(true);
+			A.CallTo(() => _serviceRequestRepository.CheckRequestCompleted(requestId)).Returns(true);
+			A.CallTo(() => _reviewRepository.IsProviderAlreadyReviewed(requestId)).Returns(false);
+			A.CallTo(() => _mapper.Map<Review>(reviewDto)).Returns(mappedReview);
+			A.CallTo(() => _serviceRequestRepository.GetService(requestId)).Returns(request);
+
+			var _reviewController = new ReviewController(_reviewRepository, _mapper, _providerRepository, _customerRepository, _serviceRequestRepository);
+
+			// Act
+			var result = await _reviewController.CreateCustomerReview(reviewDto, requestId);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(200, okResult.StatusCode);
+		}
+
+		[Fact]
+		public async Task CreateProviderReview_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			var requestId = 1;
+			var reviewDto = A.Fake<PostReviewDto>();
+			var mappedReview = A.Fake<Review>();
+			var request = A.Fake<ServiceRequest>();
+
+			A.CallTo(() => _serviceRequestRepository.ServiceExist(requestId)).Returns(true);
+			A.CallTo(() => _serviceRequestRepository.CheckRequestCompleted(requestId)).Returns(true);
+			A.CallTo(() => _reviewRepository.IsCustomerAlreadyReviewed(requestId)).Returns(false);
+			A.CallTo(() => _mapper.Map<Review>(reviewDto)).Returns(mappedReview);
+			A.CallTo(() => _serviceRequestRepository.GetService(requestId)).Returns(request);
+
+			var _reviewController = new ReviewController(_reviewRepository, _mapper, _providerRepository, _customerRepository, _serviceRequestRepository);
+
+			// Act
+			var result = await _reviewController.CreateProviderReview(reviewDto, requestId);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(200, okResult.StatusCode);
+		}
 	}
 }

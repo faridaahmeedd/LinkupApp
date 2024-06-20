@@ -3,6 +3,7 @@ using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using ServicesApp.Repository;
 using System.Linq;
 
 namespace ServicesApp.Repositories
@@ -10,11 +11,13 @@ namespace ServicesApp.Repositories
 	public class ReportRepository : IReportRepository
     {
         private readonly DataContext _context;
+		private readonly IServiceRequestRepository _serviceRequestRepository;
 
-        public ReportRepository(DataContext context)
+		public ReportRepository(DataContext context, IServiceRequestRepository serviceRequestRepository)
         {
             _context = context;
-        }
+			_serviceRequestRepository = serviceRequestRepository;
+		}
 
         public ICollection<Report> GetReports()
         {
@@ -61,13 +64,24 @@ namespace ServicesApp.Repositories
             return _context.Reports.Any(p => p.Id == id);
         }
 
-        public bool CreateReport(Report report)
-        {
-            _context.Add(report);
-            return Save();
-        }
+		public bool CreateCustomerReport(Report report)
+		{
+			var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(report.Request.Id);
+			report.ReporterName = acceptedOffer?.Provider?.FName + " " + acceptedOffer?.Provider?.LName;
+			report.ReporterRole = "Provider";
+			_context.Add(report);
+			return Save();
+		}
 
-        public bool Save()
+		public bool CreateProviderReport(Report report)
+		{
+			report.ReporterName = report.Request.Customer.FName + " " + report.Request.Customer.LName;
+			report.ReporterRole = "Customer";
+			_context.Add(report);
+			return Save();
+		}
+
+		public bool Save()
         {
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;

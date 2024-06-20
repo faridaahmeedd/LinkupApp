@@ -11,11 +11,12 @@ namespace ServicesApp.Interfaces
 		ICollection<Review> GetReviewsOfProvider(string providerId);
 		Review GetReview(int id);
 		bool ReviewExist(int id);
-		bool CreateReview(Review review);
+		bool IsCustomerAlreadyReviewed(int requestId);
+		bool IsProviderAlreadyReviewed(int requestId);
+		Task<bool> CreateCustomerReview(Review review);
+		Task<bool> CreateProviderReview(Review review);
 		Task<double> CalculateAvgRating(string Id);
 		Task<bool> Warning(string Id);
-
-        bool CheckRequestOfReviewCompleted(int RequestId);
         bool Save();
 	}
 }

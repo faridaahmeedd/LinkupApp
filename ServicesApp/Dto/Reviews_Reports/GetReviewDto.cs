@@ -6,5 +6,6 @@
 		public int Rate { get; set; }
 		public string? Comment { get; set; }
 		public required string ReviewerName { get; set; }
+		public required int RequestId { get; set; }
 	}
 }

@@ -120,6 +120,18 @@ public class AuthRepository : IAuthRepository
 		return result;
 	}
 
+	public bool CheckValidPassword(IEnumerable<IdentityError> errors)
+	{
+		foreach (var error in errors)
+		{
+			if (error.Code.StartsWith("Password"))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public bool SendRegistrtationMail(string recipientEmail)
 	{
 		string senderEmail = _config["Email:SENDER_EMAIL"];
@@ -250,7 +262,6 @@ public class AuthRepository : IAuthRepository
 			return false;
 		}
 	}
-
 
 	public string GenerateRandomCode(int length = 6)
 	{

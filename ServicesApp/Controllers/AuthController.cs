@@ -43,12 +43,9 @@ public class AuthController : ControllerBase
 					userId = appUser.Id
 				});
 			}
-			foreach (var error in res.Errors)
+			if(!_authRepository.CheckValidPassword(res.Errors))
 			{
-				if (error.Code.StartsWith("Password"))
-				{
-					return BadRequest(ApiResponses.InvalidPass);
-				}
+				return BadRequest(ApiResponses.InvalidPass);
 			}
 			return BadRequest(ApiResponses.NotValid);
 		}
@@ -84,12 +81,9 @@ public class AuthController : ControllerBase
 					userId = appUser.Id
 				});
 			}
-			foreach (var error in res.Errors)
+			if (!_authRepository.CheckValidPassword(res.Errors))
 			{
-				if (error.Code.StartsWith("Password"))
-				{
-					return BadRequest(ApiResponses.InvalidPass);
-				}
+				return BadRequest(ApiResponses.InvalidPass);
 			}
 			return BadRequest(ApiResponses.NotValid);
 		}
@@ -176,11 +170,7 @@ public class AuthController : ControllerBase
 			}
 			if (registrationDto.Password == registrationDto.ConfirmPassword)
 			{
-				Console.Write(registrationDto.Password);
-
-				var resetPassword = await _authRepository.ResetPassword(registrationDto.Email, registrationDto.Password);
-
-				if (resetPassword)
+				if (await _authRepository.ResetPassword(registrationDto.Email, registrationDto.Password))
 				{
 					return Ok(ApiResponses.PassChanged);
 				}

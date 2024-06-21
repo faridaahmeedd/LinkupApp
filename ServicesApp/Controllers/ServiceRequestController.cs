@@ -217,7 +217,7 @@ namespace ServicesApp.Controllers
 				}
 				if(!_serviceRepository.DeleteService(ServiceId))
 				{
-					return NotFound(ApiResponses.FailedToDelete);
+					return BadRequest(ApiResponses.FailedToDelete);
 				}
 				return Ok(ApiResponses.SuccessDeleted);
 			}

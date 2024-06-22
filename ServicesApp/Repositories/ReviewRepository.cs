@@ -64,7 +64,7 @@ namespace ServicesApp.Repositories
 
 		public Review GetReview(int id)
 		{
-			return _context.Reviews.Where(p => p.Id == id).FirstOrDefault();
+			return _context.Reviews.Include(p => p.Request).Where(p => p.Id == id).FirstOrDefault();
 		}
 
 		public bool ReviewExist(int id)

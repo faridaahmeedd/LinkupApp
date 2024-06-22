@@ -55,7 +55,7 @@ namespace ServicesApp.Repositories
 
         public Report GetReport(int id)
         {
-            return _context.Reports.Where(p => p.Id == id).FirstOrDefault();
+            return _context.Reports.Include(p => p.Request).Where(p => p.Id == id).FirstOrDefault();
         }
 
         public bool ReportExist(int id)

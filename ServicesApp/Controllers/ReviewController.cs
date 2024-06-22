@@ -7,6 +7,7 @@ using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using ServicesApp.Repositories;
 using ServicesApp.Helper;
+using System.Collections.Generic;
 
 namespace ServicesApp.Controllers
 {
@@ -63,8 +64,8 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponses.ReviewNotFound);
                 }
-                var Review = _ReviewRepository.GetReview(ReviewId);
-                var mapReview = _mapper.Map<GetReviewDto>(Review);
+                var review = _ReviewRepository.GetReview(ReviewId);
+                var mapReview = _mapper.Map<GetReviewDto>(review);
                 return Ok(mapReview);
             }
             catch
@@ -86,13 +87,9 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponses.UserNotFound);
                 }
-                var Review = _ReviewRepository.GetReviewsOfCustomer(CustomerId);
-                var mappedReviews = Review.Select(review =>
-                {
-                    var reviewDto = _mapper.Map<GetReviewDto>(review);
-                    return reviewDto;
-                }).ToList();
-                return Ok(mappedReviews);
+                var reviews = _ReviewRepository.GetReviewsOfCustomer(CustomerId);
+                var mappedReviews = _mapper.Map<List<GetReviewDto>>(reviews);
+				return Ok(mappedReviews);
             }
             catch
             {
@@ -113,13 +110,8 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponses.UserNotFound);
                 }
-                var Reviews = _ReviewRepository.GetReviewsOfProvider(ProviderId);
-                var mappedReviews = Reviews.Select(review =>
-                {
-                    var reviewDto = _mapper.Map<GetReviewDto>(review);
-                    return reviewDto;
-                }).ToList();
-
+                var reviews = _ReviewRepository.GetReviewsOfProvider(ProviderId);
+				var mappedReviews = _mapper.Map<List<GetReviewDto>>(reviews);
                 return Ok(mappedReviews);
             }
             catch

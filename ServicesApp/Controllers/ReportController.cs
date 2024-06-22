@@ -61,8 +61,8 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponses.ReportNotFound);
                 }
-                var Report = _ReportRepository.GetReport(ReportId);
-                var mapReport = _mapper.Map<GetReportDto>(Report);
+                var report = _ReportRepository.GetReport(ReportId);
+                var mapReport = _mapper.Map<GetReportDto>(report);
                 return Ok(mapReport);
             }
             catch
@@ -82,16 +82,12 @@ namespace ServicesApp.Controllers
                 }
                 if (!_customerRepository.CustomerExist(CustomerId))
                 {
-                    return NotFound(ApiResponses.ReportNotFound);
+                    return NotFound(ApiResponses.UserNotFound);
                 }
-                var Report = _ReportRepository.GetReportsOfCustomer(CustomerId);
-                var mappedReports = Report.Select(report =>
-                {
-                    var reportDto = _mapper.Map<GetReportDto>(report);
-                    return reportDto;
-                }).ToList();
+                var reports = _ReportRepository.GetReportsOfCustomer(CustomerId);
+				var mappedReports = _mapper.Map<List<GetReportDto>>(reports);
 
-                return Ok(mappedReports);
+				return Ok(mappedReports);
             }
             catch
             {
@@ -110,16 +106,12 @@ namespace ServicesApp.Controllers
                 }
                 if (!_providerRepository.ProviderExist(ProviderId))
                 {
-                    return NotFound(ApiResponses.ReportNotFound);
+                    return NotFound(ApiResponses.UserNotFound);
                 }
-                var Report = _ReportRepository.GetReportsOfProvider(ProviderId);
-                var mappedReports = Report.Select(report =>
-                {
-                    var reportDto = _mapper.Map<GetReportDto>(report);
-                    return reportDto;
-                }).ToList();
+                var reports = _ReportRepository.GetReportsOfProvider(ProviderId);
+				var mappedReports = _mapper.Map<List<GetReportDto>>(reports);
 
-                return Ok(mappedReports);
+				return Ok(mappedReports);
             }
             catch
             {

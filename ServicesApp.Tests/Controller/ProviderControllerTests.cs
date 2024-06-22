@@ -8,7 +8,6 @@ using ServicesApp.Controllers;
 using ServicesApp.Dto.User;
 using ServicesApp.Interfaces;
 using AutoMapper;
-using ServicesApp.Core.Models;
 using ServicesApp.Helper;
 using System;
 using ServicesApp.Models;

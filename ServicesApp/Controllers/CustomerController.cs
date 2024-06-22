@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using ServicesApp.Core.Models;
+using ServicesApp.Models;
 using ServicesApp.Interfaces;
 using ServicesApp.Dto.User;
 using ServicesApp.Helper;

@@ -142,6 +142,22 @@ namespace ServicesApp.Tests.Controller
 		}
 
 		[Fact]
+		public void CreateCategory_ModelStateIsInvalid_ReturnsBadRequest()
+		{
+			// Arrange
+			var categoryDto = A.Fake<CategoryDto>();
+			var controller = new CategoryController(_categoryRepository, _mapper);
+			controller.ModelState.AddModelError("key", "error message");       // Simulate an invalid model state
+
+
+			// Act
+			var result = controller.CreateCategory(categoryDto);
+
+			// Assert
+			result.Should().BeOfType<BadRequestObjectResult>();
+		}
+
+		[Fact]
 		public void UpdateCategory_CategoryExists_ReturnsOk()
 		{
 			// Arrange

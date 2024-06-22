@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Dto.Category;
 using ServicesApp.Dto.Reviews_Reports;

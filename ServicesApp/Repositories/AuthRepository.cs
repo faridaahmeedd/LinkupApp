@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Models;
 using System.Data;

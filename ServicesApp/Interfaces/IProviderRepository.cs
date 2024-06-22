@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using ServicesApp.Core.Models;
 using ServicesApp.Models;
 
 namespace ServicesApp.Interfaces

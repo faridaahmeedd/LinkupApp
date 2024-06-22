@@ -3,7 +3,6 @@ using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using ServicesApp.Controllers;
-using ServicesApp.Core.Models;
 using ServicesApp.Dto.Service;
 using ServicesApp.Helper;
 using ServicesApp.Interfaces;
@@ -309,6 +308,22 @@ namespace ServicesApp.Tests.Controller
 			// Assert
 			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
 			Assert.Equal(ApiResponses.RequestNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void DeleteService_FailedToDelete_ReturnsBadRequest()
+		{
+			// Arrange
+			var serviceId = 1;
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.DeleteService(serviceId)).Returns(false);
+
+			// Act
+			var result = _controller.DeleteService(serviceId);
+
+			// Assert
+			var okResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(ApiResponses.FailedToDelete, okResult.Value);
 		}
 
 		[Fact]

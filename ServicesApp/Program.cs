@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;

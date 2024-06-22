@@ -58,13 +58,9 @@ public class PayPalController : ControllerBase
 			var responseState = await _payPalRepsoitory.ExecutePayment(ServiceId, PaymentId, Token, PayerId);
 			if (responseState == "approved")
 			{
-				// Redirect to your success page
-				return Ok("http://localhost:7111/api/paypal/success-url");
+				return Ok("http://localhost:7111/api/paypal/success-url");    // Redirect to your success page
 			}
-			else
-			{
-				return BadRequest(ApiResponses.PaymentError);
-			}
+			return BadRequest(ApiResponses.PaymentError);
 		}
 		catch
 		{

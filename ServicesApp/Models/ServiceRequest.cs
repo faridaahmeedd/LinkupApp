@@ -1,4 +1,4 @@
-﻿using ServicesApp.Core.Models;
+﻿using ServicesApp.Models;
 
 namespace ServicesApp.Models
 {

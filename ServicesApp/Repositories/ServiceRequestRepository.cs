@@ -194,6 +194,16 @@ namespace ServicesApp.Repository
 			return calendarDtos;
 		}
 
+		public bool CheckRequestCompleted(int requestId)
+		{
+			var request = _context.Requests.FirstOrDefault(r => r.Id == requestId && r.Status == "Completed");
+			if (request != null)
+			{
+				return true;
+			}
+			return false;
+		}
+
 		//public ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string providerId)
 		//{
 		//	var requests = GetUncompletedServices();

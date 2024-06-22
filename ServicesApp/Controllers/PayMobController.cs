@@ -57,7 +57,11 @@ namespace ServicesApp.Controllers
         {
             try
             {
-                if (await _payMobRepository.Capture(TransactionId, ServiceId))
+				if (!_serviceRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponses.RequestNotFound);
+				}
+				if (await _payMobRepository.Capture(TransactionId, ServiceId))
                 {
                     return Ok(ApiResponses.CaptureSuccess);
                 }

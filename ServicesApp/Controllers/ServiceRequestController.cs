@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
-using ServicesApp.Core.Models;
 using ServicesApp.Helper;
 namespace ServicesApp.Controllers
 {
@@ -217,7 +216,7 @@ namespace ServicesApp.Controllers
 				}
 				if(!_serviceRepository.DeleteService(ServiceId))
 				{
-					return NotFound(ApiResponses.FailedToDelete);
+					return BadRequest(ApiResponses.FailedToDelete);
 				}
 				return Ok(ApiResponses.SuccessDeleted);
 			}

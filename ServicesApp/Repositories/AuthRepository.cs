@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Models;
 using System.Data;
@@ -118,6 +117,18 @@ public class AuthRepository : IAuthRepository
 			await _userManager.AddToRoleAsync(userMap, "Admin");
 		}
 		return result;
+	}
+
+	public bool CheckValidPassword(IEnumerable<IdentityError> errors)
+	{
+		foreach (var error in errors)
+		{
+			if (error.Code.StartsWith("Password"))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public bool SendRegistrtationMail(string recipientEmail)
@@ -250,7 +261,6 @@ public class AuthRepository : IAuthRepository
 			return false;
 		}
 	}
-
 
 	public string GenerateRandomCode(int length = 6)
 	{

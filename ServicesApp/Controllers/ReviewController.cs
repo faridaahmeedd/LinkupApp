@@ -170,7 +170,9 @@ namespace ServicesApp.Controllers
 
 				var mapReview = _mapper.Map<Review>(ReviewCreate);
 				mapReview.Request = _serviceRequestRepository.GetService(RequestId);
+               
                 await _ReviewRepository.CreateCustomerReview(mapReview);
+                mapReview.ReviewerRole = "Provider";
 
                 return Ok(new
                 {
@@ -210,6 +212,8 @@ namespace ServicesApp.Controllers
 				var mapReview = _mapper.Map<Review>(ReviewCreate);
 				mapReview.Request = _serviceRequestRepository.GetService(RequestId);
                 await _ReviewRepository.CreateProviderReview(mapReview);
+                mapReview.ReviewerRole = "Customer";
+
 
                 return Ok(new
                 {

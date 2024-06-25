@@ -11,7 +11,9 @@
 		public string Status { get; set; }
 		public string CustomerId { get; set; }
 		public string CustomerName { get; set; }
-		public string PaymentMethod { get; set; }
+        public string CustomerPhoneNumber { get; set; }
+
+        public string PaymentMethod { get; set; }
 		public string PaymentStatus { get; set; }
 		public bool Volunteer { get; set; }
 		public byte[]? Image { get; set; }

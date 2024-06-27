@@ -52,11 +52,11 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
-		public int? CreateRequestAfterExamination(int ServiceId)
+		public int CreateRequestAfterExamination(int ServiceId)
 		{
-			var existingService = _context.Requests.Find(ServiceId);
+            var existingService = GetService(ServiceId);
 
-			if (existingService != null)
+            if (existingService != null)
 			{
 				var newService = new ServiceRequest
 				{
@@ -71,9 +71,10 @@ namespace ServicesApp.Repository
 					Volunteer = existingService.Volunteer,
 				};
 				_context.Requests.Add(newService);
-				return newService.Id;
+                Save();
+                return newService.Id;
 			}
-			return null;
+			return 0;
 		}
 
 		public bool UpdateService(ServiceRequest updatedService)
@@ -97,16 +98,12 @@ namespace ServicesApp.Repository
 		public bool AddExaminationComment(int ServiceId, string Comment)
 		{
 			var existingService = _context.Requests.Find(ServiceId);
-			Console.WriteLine("----------------------------------------------------------------------");
-			Console.WriteLine(existingService.Id);
+			
 			if (existingService != null)
 			{
-				Console.WriteLine(Comment);
 				existingService.ExaminationComment = Comment;
-				Console.WriteLine(existingService.ExaminationComment);
 				return Save();
 			}
-			Console.WriteLine("FALSEEEE");
 			return false;
 		}
 

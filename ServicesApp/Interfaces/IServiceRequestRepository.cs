@@ -23,7 +23,7 @@ namespace ServicesApp.Interfaces
 		ICollection<GetCalendarDto> GetCalendarDetails(string CustomerId);
 		bool CheckRequestCompleted(int requestId);
 		bool AddExaminationComment(int ServiceId, string Comment);
-		int? CreateRequestAfterExamination(int ServiceId);
+		int CreateRequestAfterExamination(int ServiceId);
 		//ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
 		//bool CheckServiceMinFees(ServiceRequest service, int categoryId);
 		//bool UpdateMaxFees(int serviceId, int maxFees);

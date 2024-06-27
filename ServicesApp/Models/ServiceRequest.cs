@@ -19,5 +19,7 @@ namespace ServicesApp.Models
 		public ICollection<TimeSlot> TimeSlots { get; set; }
         public ICollection<Review> Reviews { get; set; }
         public ICollection<Report> Reports { get; set; }
+
+
     }
 }

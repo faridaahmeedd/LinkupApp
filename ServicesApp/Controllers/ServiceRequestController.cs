@@ -182,7 +182,7 @@ namespace ServicesApp.Controllers
 					return BadRequest(ApiResponses.NotValid);
 				}
 				int? newId = _serviceRepository.CreateRequestAfterExamination(ServiceId);
-				if(newId != null)
+				if(newId != 0)
 				{
 					return Ok(new
 					{
@@ -227,7 +227,7 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-		[HttpPut("{ServiceId}/{Comment}")]
+		[HttpPut("examonationComment/{ServiceId}/{Comment}")]
 		public IActionResult AddExaminationComment(int ServiceId, string Comment)
 		{
 			try

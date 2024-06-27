@@ -182,6 +182,15 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponses.NotValid);
 				}
+				if (!_serviceRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponses.RequestNotFound);
+				}
+				var acceptedOffer = _serviceRepository.GetAcceptedOffer(ServiceId);
+				if (acceptedOffer != null && acceptedOffer.Examination == false)
+				{
+					return BadRequest(ApiResponses.NotExamination);
+				}
 				int? newServiceId = _serviceRepository.CreateRequestAfterExamination(ServiceId);
 				if(newServiceId != null)
 				{
@@ -228,7 +237,7 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-		[HttpPut("{ServiceId}/{Comment}")]
+		[HttpPut("ExaminationComment/{ServiceId}/{Comment}")]
 		public IActionResult AddExaminationComment(int ServiceId, string Comment)
 		{
 			try
@@ -240,6 +249,11 @@ namespace ServicesApp.Controllers
 				if (!_serviceRepository.ServiceExist(ServiceId))
 				{
 					return NotFound(ApiResponses.RequestNotFound);
+				}
+				var acceptedOffer = _serviceRepository.GetAcceptedOffer(ServiceId);
+				if(acceptedOffer != null && acceptedOffer.Examination == false)
+				{
+					return BadRequest(ApiResponses.NotExamination);
 				}
 				if (!_serviceRepository.AddExaminationComment(ServiceId, Comment))
 				{
@@ -279,8 +293,8 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-        [HttpGet("ServiceUndeclinedOffers/{serviceId}")]
-        public async Task<IActionResult> GetUndeclinedOffersOfService(int serviceId)
+        [HttpGet("ServiceUndeclinedOffers/{ServiceId}")]
+        public async Task<IActionResult> GetUndeclinedOffersOfService(int ServiceId)
         {
 			try
 			{
@@ -288,11 +302,11 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponses.NotValid);
 				}
-				if (!_serviceRepository.ServiceExist(serviceId))
+				if (!_serviceRepository.ServiceExist(ServiceId))
 				{
 					return NotFound(ApiResponses.RequestNotFound);
 				}
-				var offers = _serviceRepository.GetUndeclinedOffersOfService(serviceId);
+				var offers = _serviceRepository.GetUndeclinedOffersOfService(ServiceId);
 				var offersMap = _mapper.Map<List<GetServiceOfferDto>>(offers);
 
                 foreach (var offer in offersMap)
@@ -307,12 +321,12 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-        [HttpGet("AcceptedOffer/{serviceId}")]
-        public async Task<IActionResult> GetAcceptedOffer(int serviceId)
+        [HttpGet("AcceptedOffer/{ServiceId}")]
+        public async Task<IActionResult> GetAcceptedOffer(int ServiceId)
         {
 			try
 			{
-				var acceptedOffer = _serviceRepository.GetAcceptedOffer(serviceId);
+				var acceptedOffer = _serviceRepository.GetAcceptedOffer(ServiceId);
 				if (acceptedOffer != null)
 				{
 					var offerMap = _mapper.Map<GetServiceOfferDto>(acceptedOffer);

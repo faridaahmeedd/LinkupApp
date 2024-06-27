@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class img : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -261,12 +261,12 @@ namespace ServicesApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Volunteer = table.Column<bool>(type: "bit", nullable: false),
+                    ExaminationComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SubcategoryId = table.Column<int>(type: "int", nullable: true),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -288,6 +288,26 @@ namespace ServicesApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Images",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Img = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ServiceRequestId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Images", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Images_Requests_ServiceRequestId",
+                        column: x => x.ServiceRequestId,
+                        principalTable: "Requests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Offers",
                 columns: table => new
                 {
@@ -298,7 +318,8 @@ namespace ServicesApp.Migrations
                     Duration = table.Column<TimeOnly>(type: "time", nullable: false),
                     ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RequestId = table.Column<int>(type: "int", nullable: false)
+                    RequestId = table.Column<int>(type: "int", nullable: false),
+                    Examination = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -398,7 +419,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "24b04480-6c72-4ff9-9c81-bff34a3d385e", "SuperAdmin@gmail.com", true, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEOXygtoj07BV5+uhY/8eY1FpxJi8uRUy6/8mzbtM0bLGtWTY5M67zqSiY4xR+QOyFw==", "a5612dc6-c8e0-476f-a078-b913e097b9df", "SuperAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "f586215c-61b0-405c-a014-f10f68d592e8", "SuperAdmin@gmail.com", true, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEMe0TUStH8v4mE1cKQaZzu4rK3eF7pnD9iFbNDYHdJzWn8GZY+cud+SOV8jtFTvYag==", "0ed19b51-7591-4e3f-a96a-f78a673755ac", "SuperAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -443,6 +464,11 @@ namespace ServicesApp.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Images_ServiceRequestId",
+                table: "Images",
+                column: "ServiceRequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Offers_ProviderId",
@@ -502,6 +528,9 @@ namespace ServicesApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "Offers");

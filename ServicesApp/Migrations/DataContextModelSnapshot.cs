@@ -250,13 +250,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "ebd7219a-966b-4555-a505-a8e8a3d07885",
+                            ConcurrencyStamp = "f586215c-61b0-405c-a014-f10f68d592e8",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELYSFwZzhhnrUV8uOWT6pys5KBqmo9wq27kNXIwDM2x1d1jn4JlFXr2sTamb9Q0cxA==",
-                            SecurityStamp = "4244dcc9-ff8d-4642-ab43-adf41535613d",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMe0TUStH8v4mE1cKQaZzu4rK3eF7pnD9iFbNDYHdJzWn8GZY+cud+SOV8jtFTvYag==",
+                            SecurityStamp = "0ed19b51-7591-4e3f-a96a-f78a673755ac",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -288,6 +288,27 @@ namespace ServicesApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("ServicesApp.Models.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Img")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("ServiceRequestId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceRequestId");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
@@ -408,9 +429,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("ExaminationComment")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
@@ -654,6 +672,17 @@ namespace ServicesApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ServicesApp.Models.Image", b =>
+                {
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "ServiceRequest")
+                        .WithMany("Image")
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceRequest");
+                });
+
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
                 {
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
@@ -758,6 +787,8 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
                 {
+                    b.Navigation("Image");
+
                     b.Navigation("Offers");
 
                     b.Navigation("Reports");

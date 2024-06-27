@@ -4,6 +4,7 @@ using ServicesApp.Dto.Service;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Helper;
+using ServicesApp.Repository;
 namespace ServicesApp.Controllers
 {
     [Route("/api/[controller]")]
@@ -378,6 +379,83 @@ namespace ServicesApp.Controllers
 			{
 				return StatusCode(500, ApiResponses.SomethingWrong);
 			}
+		}
+
+        [HttpPost("Images/{ServiceId}")]
+        public IActionResult AddImages(int ServiceId, [FromBody] ICollection<ImageDto> imageDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid || imageDto == null)
+                {
+                    return BadRequest(ApiResponses.NotValid);
+                }
+                    Console.WriteLine("-----test------ ");
+
+                if (!_serviceRepository.ServiceExist(ServiceId))
+                {
+                    return NotFound(ApiResponses.RequestNotFound);
+                }
+                Console.WriteLine("-----test22------ ");
+
+                List<Image> mapImage = new List<Image>();
+                foreach (var item in imageDto)
+                {
+                    var mapItem = _mapper.Map<Image>(item);
+                    Console.WriteLine("-mapItem-- ", mapItem);
+
+                    mapItem.ServiceRequest = _serviceRepository.GetService(ServiceId);
+                    mapImage.Add(mapItem);
+                    Console.WriteLine("-idd-- ",item.Id);
+
+                }
+                _serviceRepository.AddImage(mapImage);
+                return Ok(ApiResponses.SuccessCreated);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponses.SomethingWrong);
+            }
+        }
+        [HttpGet("getImage/{ServiceId}")]
+        public IActionResult GetImageOfService(int ServiceId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ApiResponses.NotValid);
+                }
+                if (!_serviceRepository.ServiceExist(ServiceId))
+                {
+                    return NotFound(ApiResponses.RequestNotFound);
+                }
+                var Image = _mapper.Map<List<ImageDto>>(_serviceRepository.GetImageOfService(ServiceId));
+                return Ok(Image);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponses.SomethingWrong);
+            }
+        }
+
+
+
+		[HttpDelete("Image/{ImageId}")]
+		
+		public IActionResult DeleteImage(int ImageId)
+		{	
+			
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponses.NotValid);
+			}
+
+			if (!_serviceRepository.DeleteImage(ImageId))
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+			return Ok(ApiResponses.SuccessDeleted);
 		}
 
 		//[HttpGet("MatchedRequestsOfProvider/{ProviderId}")]

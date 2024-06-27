@@ -217,6 +217,12 @@
             statusMsg = "fail",
             message = "This service is not completed."
         };
+		public static readonly object NotExamination = new
+		{
+			statusMsg = "fail",
+			message = "Not an examination visit."
+		};
+
 		//public static readonly object RefundedAlready = new
 		//{
 		//	statusMsg = "fail",

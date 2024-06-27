@@ -23,7 +23,7 @@ namespace ServicesApp.Interfaces
 		ICollection<GetCalendarDto> GetCalendarDetails(string CustomerId);
 		bool CheckRequestCompleted(int requestId);
 		bool AddExaminationComment(int ServiceId, string Comment);
-		int? CreateRequestAfterExamination(int ServiceId);
+		int CreateRequestAfterExamination(int ServiceId);
 		bool DeleteImage(int id);
 		bool AddImage(List<Image> images);
 		ICollection<Image> GetImageOfService(int ServiceId);

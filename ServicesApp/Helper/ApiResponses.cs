@@ -162,7 +162,12 @@
             statusMsg = "fail",
             message = "You can only add up to three time slots."
         };
-        public static readonly object FeesOutsideRange = new
+		public static readonly object ImagesExceededMax = new
+		{
+			statusMsg = "fail",
+			message = "You can only add up to five images."
+		};
+		public static readonly object FeesOutsideRange = new
         {
             statusMsg = "fail",
             message = "Offered fees is outside the category's specified range."

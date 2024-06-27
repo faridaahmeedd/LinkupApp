@@ -27,10 +27,6 @@ namespace ServicesApp.Helper
 			CreateMap<Admin, RegistrationDto>();
 			CreateMap<AppUser, RegistrationDto>();
 			CreateMap<RegistrationDto, AppUser>();
-            CreateMap<Image, ImageDto>();
-            CreateMap<ImageDto, Image>();
-
-
 
             CreateMap<Category, CategoryDto>();
 			CreateMap<CategoryDto, Category>();
@@ -61,6 +57,9 @@ namespace ServicesApp.Helper
 				.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => ConvertTimeToString(src.Duration)));
 			CreateMap<PostServiceOfferDto, ServiceOffer>()
 				.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => ConvertStringToTime(src.Duration)));
+
+			CreateMap<Image, ImageDto>();
+			CreateMap<ImageDto, Image>();
 
 			CreateMap<TimeSlot, TimeSlotDto>()
 				.ForMember(dest => dest.Date, opt => opt.MapFrom(src => ConvertDateToString(src.Date)))

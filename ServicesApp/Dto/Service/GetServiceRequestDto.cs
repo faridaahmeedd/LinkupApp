@@ -17,8 +17,5 @@ namespace ServicesApp.Dto.Service
 		public string PaymentStatus { get; set; }
 		public bool Volunteer { get; set; }
 		public string ExaminationComment { get; set; }
-        public ICollection<Image>? Image { get; set; }
-
-      
     }
 }

@@ -8,6 +8,6 @@ namespace ServicesApp.Dto.Service
         public string Location { get; set; }
 		public string PaymentMethod { get; set; }
 		public bool Volunteer { get; set; }
-        public ICollection<Image>? Image { get; set; }
+        //public ICollection<Image>? Image { get; set; }
     }
 }

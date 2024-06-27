@@ -250,13 +250,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "26d325a4-06b1-47ec-8816-4780f987ee4e",
+                            ConcurrencyStamp = "f586215c-61b0-405c-a014-f10f68d592e8",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKVEMmLB1xF38FCuRwD/pPXCbB+oVoyCBpJsM0wLtxoUtkjXdYcmbUyaPFsuYK/wew==",
-                            SecurityStamp = "2f210216-ffbd-459e-aeda-c0230cdb1950",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMe0TUStH8v4mE1cKQaZzu4rK3eF7pnD9iFbNDYHdJzWn8GZY+cud+SOV8jtFTvYag==",
+                            SecurityStamp = "0ed19b51-7591-4e3f-a96a-f78a673755ac",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -301,14 +301,14 @@ namespace ServicesApp.Migrations
                     b.Property<byte[]>("Img")
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<int?>("ServiceRequestId")
+                    b.Property<int>("ServiceRequestId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ServiceRequestId");
 
-                    b.ToTable("Image");
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
@@ -674,9 +674,13 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.Image", b =>
                 {
-                    b.HasOne("ServicesApp.Models.ServiceRequest", null)
+                    b.HasOne("ServicesApp.Models.ServiceRequest", "ServiceRequest")
                         .WithMany("Image")
-                        .HasForeignKey("ServiceRequestId");
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceRequest");
                 });
 
             modelBuilder.Entity("ServicesApp.Models.Report", b =>

@@ -24,10 +24,13 @@ namespace ServicesApp.Interfaces
 		bool CheckRequestCompleted(int requestId);
 		bool AddExaminationComment(int ServiceId, string Comment);
 		int? CreateRequestAfterExamination(int ServiceId);
-		//ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
-		//bool CheckServiceMinFees(ServiceRequest service, int categoryId);
-		//bool UpdateMaxFees(int serviceId, int maxFees);
-		//ICollection<ServiceRequest> GetServicesWithFees();
-		//ICollection<ServiceRequest> GetServicesWithFees(string customerId);
-	}
+		bool DeleteImage(int id);
+		bool AddImage(List<Image> images);
+		ICollection<Image> GetImageOfService(int ServiceId);
+        //ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
+        //bool CheckServiceMinFees(ServiceRequest service, int categoryId);
+        //bool UpdateMaxFees(int serviceId, int maxFees);
+        //ICollection<ServiceRequest> GetServicesWithFees();
+        //ICollection<ServiceRequest> GetServicesWithFees(string customerId);
+    }
 }

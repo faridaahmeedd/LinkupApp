@@ -27,8 +27,12 @@ namespace ServicesApp.Helper
 			CreateMap<Admin, RegistrationDto>();
 			CreateMap<AppUser, RegistrationDto>();
 			CreateMap<RegistrationDto, AppUser>();
+            CreateMap<Image, ImageDto>();
+            CreateMap<ImageDto, Image>();
 
-			CreateMap<Category, CategoryDto>();
+
+
+            CreateMap<Category, CategoryDto>();
 			CreateMap<CategoryDto, Category>();
 			CreateMap<Subcategory, SubcategoryDto>()
 				.ForMember(dest => dest.MinFeesAr, opt => opt.MapFrom(src => ConvertIntToArabic(src.MinFeesEn)))

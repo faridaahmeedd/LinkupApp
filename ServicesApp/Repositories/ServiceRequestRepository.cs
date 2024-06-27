@@ -51,8 +51,33 @@ namespace ServicesApp.Repository
             _context.Add(service);
 			return Save();
 		}
-       
-        public bool UpdateService(ServiceRequest updatedService)
+
+		public int CreateRequestAfterExamination(int ServiceId)
+		{
+            var existingService = GetService(ServiceId);
+
+            if (existingService != null)
+			{
+				var newService = new ServiceRequest
+				{
+					Description = existingService.ExaminationComment,
+					Image = existingService.Image,
+					Location = existingService.Location,
+					PaymentMethod = existingService.PaymentMethod,
+					PaymentStatus = "Pending",
+					Status = "Requested",
+					Customer = existingService.Customer,
+					Subcategory = existingService.Subcategory,
+					Volunteer = existingService.Volunteer,
+				};
+				_context.Requests.Add(newService);
+                Save();
+                return newService.Id;
+			}
+			return 0;
+		}
+
+		public bool UpdateService(ServiceRequest updatedService)
         {
             var existingService = _context.Requests.Find(updatedService.Id);
             if (existingService != null)
@@ -70,7 +95,19 @@ namespace ServicesApp.Repository
             return false;
         }
 
-        public bool DeleteService(int id)
+		public bool AddExaminationComment(int ServiceId, string Comment)
+		{
+			var existingService = _context.Requests.Find(ServiceId);
+			
+			if (existingService != null)
+			{
+				existingService.ExaminationComment = Comment;
+				return Save();
+			}
+			return false;
+		}
+
+		public bool DeleteService(int id)
 		{
 			var service = _context.Requests.Include(c => c.Customer).Where(p => p.Id == id).FirstOrDefault();
 			if (service.Status == "Completed")

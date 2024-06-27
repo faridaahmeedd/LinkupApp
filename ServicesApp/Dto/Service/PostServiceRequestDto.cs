@@ -1,4 +1,6 @@
-﻿namespace ServicesApp.Dto.Service
+﻿using ServicesApp.Models;
+
+namespace ServicesApp.Dto.Service
 {
     public class PostServiceRequestDto
     {
@@ -6,6 +8,6 @@
         public string Location { get; set; }
 		public string PaymentMethod { get; set; }
 		public bool Volunteer { get; set; }
-        public byte[]? Image { get; set; }
+        public ICollection<Image>? Image { get; set; }
     }
 }

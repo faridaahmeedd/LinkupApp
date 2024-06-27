@@ -172,6 +172,33 @@ namespace ServicesApp.Controllers
 			}
 		}
 
+		[HttpPost("AfterExamination/{ServiceId}")]
+		public IActionResult CreateRequestAfterExamination(int ServiceId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				int? newId = _serviceRepository.CreateRequestAfterExamination(ServiceId);
+				if(newId != null)
+				{
+					return Ok(new
+					{
+						statusMsg = "success",
+						message = "Service Created Successfully.",
+						serviceId = newId
+					});
+				}
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
 		[HttpPut("{ServiceId}")]
 		public IActionResult UpdateService(int ServiceId, [FromBody] PostServiceRequestDto serviceRequestDto)
 		{
@@ -189,6 +216,31 @@ namespace ServicesApp.Controllers
 				serviceMap.Id = ServiceId;
 				
 				if (!_serviceRepository.UpdateService(serviceMap))
+				{
+					return BadRequest(ApiResponses.FailedToUpdate);
+				}
+				return Ok(ApiResponses.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
+		[HttpPut("{ServiceId}/{Comment}")]
+		public IActionResult AddExaminationComment(int ServiceId, string Comment)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_serviceRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponses.RequestNotFound);
+				}
+				if (!_serviceRepository.AddExaminationComment(ServiceId, Comment))
 				{
 					return BadRequest(ApiResponses.FailedToUpdate);
 				}

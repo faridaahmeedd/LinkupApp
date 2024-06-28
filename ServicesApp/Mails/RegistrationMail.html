@@ -5,31 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f7f7f7;
             margin: 0;
             padding: 0;
         }
 
         .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
             padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
+
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+            .header img {
+                width: 150px;
+            }
 
         .heading {
             color: #209FA6;
             font-size: 24px;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         p {
             line-height: 1.6;
+            color: #333333;
+            font-size: 16px;
+            margin: 20px 0;
         }
 
         ol {
             margin-top: 0;
+            padding-left: 20px;
         }
 
+            ol li {
+                margin-bottom: 10px;
+                font-size: 16px;
+                color: #333333;
+            }
+
         a {
-            color: #0066cc;
+            color: #209FA6;
             text-decoration: none;
         }
 
@@ -37,33 +63,48 @@
                 text-decoration: underline;
             }
 
-        .social-links {
-            margin-top: 20px;
+        .otp {
+            text-align: center;
+            background-color: #209FA6;
+            color: #ffffff;
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 24px;
+            margin: 20px 0;
+            border-radius: 4px;
         }
 
-        .social-link {
-            display: inline-block;
-            margin-right: 10px;
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999999;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="header">
+            <img src="cid:Logo" alt="Linkup Logo">
+        </div>
         <h1 class="heading">Welcome to Linkup!</h1>
-        <p>We're excited to have you on board. Your registration was successful, and you are now part of our community.</p>
-
+        <p>We're excited to have you on board. Please use the following OTP to verify your email address:</p>
+        <div class="otp">{OtpPlaceholder}</div>
         <h2 class="heading">Getting Started:</h2>
         <ol>
-            <li>Now you can complete your profile. Add a profile picture and any additional details to personalize your account.</li>
-            <li>Explore our features.</li>
+            <li>Complete your profile by adding a profile picture and additional details to personalize your account.</li>
+            <li>Explore our features to get the most out of Linkup.</li>
         </ol>
-
-        <p>If you have any questions or encounter any issues, feel free to reach out to our support team at <a href="mailto:linkupp2024@gmail.com">linkupp2024@gmail.com</a></p>
-
+        <p>If you have any questions or encounter any issues, feel free to reach out to our support team at <a href="mailto:linkupp2024@gmail.com">linkupp2024@gmail.com</a>.</p>
         <p>Thank you for choosing Linkup! We hope you enjoy your experience.</p>
-
+        <p>
+            Best regards,
+            <br>
+            Linkup Team
+        </p>
+        <div class="footer">
+            <p>&copy; 2024 Linkup. All rights reserved.</p>
+        </div>
     </div>
-    <div style='text-align: left;'> <img src='cid:Logo' style=\"width: 20%;\" /> </div>
-
 </body>
 </html>

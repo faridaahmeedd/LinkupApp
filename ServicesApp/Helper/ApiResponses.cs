@@ -62,7 +62,17 @@
             statusMsg = "fail",
             message = "Can not Change Password."
         };
-        public static readonly object UserAlreadyExist = new
+		public static readonly object OtpVerified = new
+		{
+			statusMsg = "success",
+			message = "OTP verified successfully."
+		};
+		public static readonly object InvalidOtp = new
+		{
+			statusMsg = "fail",
+			message = "Invalid OTP."
+		};
+		public static readonly object UserAlreadyExist = new
         {
             statusMsg = "fail",
             message = "User Already Exists."

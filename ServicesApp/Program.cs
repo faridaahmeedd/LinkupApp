@@ -86,7 +86,7 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader();
     });
 });
-
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

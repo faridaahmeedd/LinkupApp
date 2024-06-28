@@ -156,7 +156,7 @@ namespace ServicesApp.Repositories
 			{
 				if (avgRating < 2.5)
 				{
-					_authRepository.SendMail(appUser.Email, "Warning", "Warning");
+					_authRepository.SendMail(appUser.Email, "Warning", "WarningMail");
 					return true;
 				}
 			}

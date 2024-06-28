@@ -12,6 +12,9 @@ using System.Text;
 using ServicesApp.Interfaces;
 using System.Net.Mime;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Caching.Memory;
+using System.Web.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 public class AuthRepository : IAuthRepository
 {
@@ -19,18 +22,20 @@ public class AuthRepository : IAuthRepository
 	private readonly IConfiguration _config;
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IMapper _mapper;
+	private readonly IMemoryCache _cache; // Add memory cache
 
 	public AuthRepository(
 		UserManager<AppUser> userManager,
 		IConfiguration config,
 		RoleManager<IdentityRole> roleManager,
-		IMapper mapper)
+		IMapper mapper,
+		IMemoryCache cache)
 	{
 		_userManager = userManager;
 		_config = config;
 		_roleManager = roleManager;
 		_mapper = mapper;
-
+		_cache = cache;
 	}
 
 	public async Task<AppUser?> CheckUser(string email)
@@ -98,12 +103,45 @@ public class AuthRepository : IAuthRepository
 		if (result.Succeeded)
 		{
 			await _userManager.AddToRoleAsync(userMap, role);
-			if (SendRegistrtationMail(userMap.Email))
+
+			string otp = GenerateOtp();
+			StoreOtp(userMap.Email, otp);
+
+			if (SendRegistrtationMail(userMap.Email, otp))
 			{
 				return result;
 			}
 		}
 		return result;
+	}
+
+	public string GenerateOtp()
+	{
+		Random random = new Random();
+		return random.Next(100000, 999999).ToString();  // Generate a 6-digit OTP
+	}
+
+	public void StoreOtp(string userEmail, string otp)
+	{
+		_cache.Set(userEmail, otp, TimeSpan.FromMinutes(10)); // Store OTP in cache for 10 minutes
+	}
+
+	public async Task<bool> VerifyOtp(string userEmail, string otp)
+	{
+		if (_cache.TryGetValue(userEmail, out string storedOtp))
+		{
+			if(storedOtp == otp)
+			{
+				var user = await CheckUser(userEmail);
+				if(user != null)
+				{
+					user.EmailConfirmed = true;
+					await _userManager.UpdateAsync(user);
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public async Task<IdentityResult> CreateAdmin(RegistrationDto registerDto)
@@ -132,17 +170,17 @@ public class AuthRepository : IAuthRepository
 		return true;
 	}
 
-	public bool SendRegistrtationMail(string recipientEmail)
+	public bool SendRegistrtationMail(string recipientEmail, string otp)
 	{
 		string senderEmail = _config["SMTP:From"];
 		string senderPassword = _config["SMTP:Password"];
 		try
 		{
-
 			LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
 			LinkedImage.ContentId = "Logo";
 			LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
 			string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
+			htmlContent = htmlContent.Replace("{OtpPlaceholder}", otp);
 			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
 			htmlContent, null, "text/html");
 			htmlView.LinkedResources.Add(LinkedImage);
@@ -301,7 +339,7 @@ public class AuthRepository : IAuthRepository
 
 				if (result.Succeeded)
 				{
-					if (await SendMail(user.Email, "Linkup Deactivation", "InactiveMail"))
+					if (await SendMail(user.Email, "Linkup Deactivation", "DeactivationMail"))
 					{
 						return true;
 					}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicesApp.Data;
 
@@ -11,9 +12,11 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240628200247_provider-document")]
+    partial class providerdocument
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "24df0f6c-e1ec-4a78-9d55-14e1ec5a8257",
+                            ConcurrencyStamp = "225fc93c-60c3-4e7f-a5a8-f115057cb644",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC2u3+i030pRvZtHgycfIYqzDrQ79QZ26GH3tWhESisY5nnrA/Z/A2LgGp2w6hQE3g==",
-                            SecurityStamp = "cca52069-71d1-4809-a271-7b7fae743b8f",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPJlz4JkRkPgX+gk1azf0E1BpfiRNbsxZmaYdSB7mQyxv+Goirz0QEkmZNoCyEuKHg==",
+                            SecurityStamp = "6cf447b1-d66d-4e60-bd1e-0b7ccdbe2689",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -593,6 +596,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Document")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("FName")
                         .HasColumnType("nvarchar(max)");

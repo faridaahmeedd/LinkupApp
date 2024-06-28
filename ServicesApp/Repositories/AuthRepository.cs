@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using ServicesApp.Interfaces;
 using System.Net.Mime;
+using Microsoft.Extensions.Options;
 
 public class AuthRepository : IAuthRepository
 {
@@ -133,8 +134,8 @@ public class AuthRepository : IAuthRepository
 
 	public bool SendRegistrtationMail(string recipientEmail)
 	{
-		string senderEmail = _config["Email:SENDER_EMAIL"];
-		string senderPassword = _config["Email:SENDER_PASSWORD"];
+		string senderEmail = _config["SMTP:From"];
+		string senderPassword = _config["SMTP:Password"];
 		try
 		{
 
@@ -220,8 +221,8 @@ public class AuthRepository : IAuthRepository
 
 	public bool SendResetPasswordEmail(string recipientEmail, string resetCode)
 	{
-		string senderEmail = _config["Email:SENDER_EMAIL"];
-		string senderPassword = _config["Email:SENDER_PASSWORD"];
+		string senderEmail = _config["SMTP:From"];
+		string senderPassword = _config["SMTP:Password"];
 		try
 		{
 			string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
@@ -300,7 +301,7 @@ public class AuthRepository : IAuthRepository
 
 				if (result.Succeeded)
 				{
-					if (SendMail(user.Email, "Linkup Deactivation", "InactiveMail"))
+					if (await SendMail(user.Email, "Linkup Deactivation", "InactiveMail"))
 					{
 						return true;
 					}
@@ -311,11 +312,10 @@ public class AuthRepository : IAuthRepository
 		return false;
 	}
 
-	public bool SendMail(string recipientEmail, string subject, string filename)
+	public async Task<bool> SendMail(string recipientEmail, string subject, string filename)
 	{
-		string senderEmail = _config["Email:SENDER_EMAIL"];
-		string senderPassword = _config["Email:SENDER_PASSWORD"];
-
+		string senderEmail = _config["SMTP:From"];
+		string senderPassword = _config["SMTP:Password"];
 		try
 		{
 			LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
@@ -326,6 +326,20 @@ public class AuthRepository : IAuthRepository
 			htmlContent, null, "text/html");
 			htmlView.LinkedResources.Add(LinkedImage);
 
+			//var smtpClient = new SmtpClient(_config["SMTP:Host"], 587)
+			//{
+			//	UseDefaultCredentials = false,
+			//	Credentials = new NetworkCredential(senderEmail, senderPassword),
+			//	EnableSsl = true
+			//};
+
+			//var mailMessage = new MailMessage
+			//{
+			//	From = new MailAddress(senderEmail),
+			//	Subject = subject,
+			//	IsBodyHtml = true
+			//};
+
 			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
 			{
 				Subject = subject,
@@ -333,15 +347,18 @@ public class AuthRepository : IAuthRepository
 			};
 			mailMessage.AlternateViews.Add(htmlView);
 
+			//await smtpClient.SendMailAsync(mailMessage);
+
 
 			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
 			{
+				UseDefaultCredentials = false,
 				Port = 587,
 				Credentials = new NetworkCredential(senderEmail, senderPassword),
 				EnableSsl = true
 			})
 			{
-				smtpClient.Send(mailMessage);
+				await smtpClient.SendMailAsync(mailMessage);
 			}
 			return true;
 		}
@@ -352,3 +369,4 @@ public class AuthRepository : IAuthRepository
 		}
 	}
 }
+

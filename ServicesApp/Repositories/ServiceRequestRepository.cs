@@ -97,11 +97,23 @@ namespace ServicesApp.Repository
 
 		public bool AddExaminationComment(int ServiceId, string Comment)
 		{
-			var existingService = _context.Requests.Find(ServiceId);
+			var existingService = GetService(ServiceId);
 			
 			if (existingService != null)
 			{
 				existingService.ExaminationComment = Comment;
+				return Save();
+			}
+			return false;
+		}
+
+		public bool AddEmergency(int ServiceId, string EmergencyType)
+		{
+			var existingService = GetService(ServiceId);
+
+			if (existingService != null)
+			{
+				existingService.Emergency = EmergencyType;
 				return Save();
 			}
 			return false;

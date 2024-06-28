@@ -17,5 +17,6 @@
         public byte[]? Image { get; set; }
         public required int Balance { get; set; }
         public required bool Active { get; set; }
-    }
+		public bool Approved { get; set; }
+	}
 }

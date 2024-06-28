@@ -18,7 +18,7 @@ namespace ServicesApp.Interfaces
 		string GenerateRandomCode(int length);
 		Task<bool> ResetPassword(string mail, string newPassword);
 		Task<bool> DeactivateUser(string userId);
-		bool SendMail(string recipientEmail, string subject, string filename);
+		Task<bool> SendMail(string recipientEmail, string subject, string filename);
 		bool SendResetPasswordEmail(string recipientEmail, string resetCode);
 		bool SendRegistrtationMail(string recipientEmail);
 	}

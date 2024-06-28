@@ -16,6 +16,7 @@
 		public bool Volunteer { get; set; }
 		public byte[]? Image { get; set; }
 		public string ExaminationComment { get; set; }
+		public string? Emergency { get; set; }
 		//public int MaxFees { get; set; }
 		//public int MinFees { get; set; }
 	}

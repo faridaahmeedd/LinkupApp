@@ -68,8 +68,28 @@ namespace ServicesApp.Repository
             var result = await _userManager.DeleteAsync(provider);
             return result.Succeeded;
         }
-		
-        public bool Save()
+
+		public async Task<bool> ApproveProvider(string userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user != null)
+			{
+				var role = await _userManager.GetRolesAsync(user);
+				if (role.Contains("Provider"))
+				{
+					user.Approved = true;
+					var result = await _userManager.UpdateAsync(user);
+
+					if (result.Succeeded)
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		public bool Save()
 		{
 			//sql code is generated here
 			var saved = _context.SaveChanges();

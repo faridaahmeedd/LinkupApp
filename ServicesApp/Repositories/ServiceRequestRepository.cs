@@ -138,7 +138,7 @@ namespace ServicesApp.Repository
 				// Check if the difference is greater than or equal to 24 hours
 				if (offerTime <= TimeAfter24)
                 {
-					service.Customer.Balance += (offer.Fees * 10)/100 ;
+					service.Customer.Balance += (offer.Fees * 50)/100 ;
 				}
             }
 			_context.Remove(service!);

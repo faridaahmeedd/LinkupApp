@@ -42,7 +42,12 @@
             statusMsg = "fail",
             message = "Invalid Email or Password."
         };
-        public static readonly object CanNotSentMail = new
+		public static readonly object EmailNotVerified = new
+		{
+			statusMsg = "fail",
+			message = "Email verification is required to login."
+		};
+		public static readonly object CanNotSentMail = new
         {
             statusMsg = "fail",
             message = "Can not send mail."

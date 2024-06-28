@@ -148,6 +148,7 @@ public class AuthRepository : IAuthRepository
 	{
 		var userMap = _mapper.Map<Admin>(registerDto);
 		userMap.Email = registerDto.Email;
+		userMap.EmailConfirmed = true;
 		userMap.SecurityStamp = Guid.NewGuid().ToString();
 		userMap.UserName = registerDto.Email;
 		var result = await _userManager.CreateAsync(userMap, registerDto.Password);

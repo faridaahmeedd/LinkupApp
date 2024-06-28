@@ -102,6 +102,11 @@ public class AuthController : ControllerBase
 			{
 				return BadRequest(ApiResponses.NotValid);
 			}
+			var appUser = await _authRepository.CheckUser(loginDto.Email);
+			if (appUser != null && !appUser.EmailConfirmed)
+			{
+				return BadRequest(ApiResponses.EmailNotVerified);
+			}
 			var (token, expiration) = await _authRepository.LoginUser(loginDto);
 			if (token != null)
 			{
@@ -183,7 +188,7 @@ public class AuthController : ControllerBase
 		}
 	}
 
-	[HttpPost("VerifyOtp/{Email}/{Otp}")]
+	[HttpPut("VerifyOtp/{Email}/{Otp}")]
 	public async Task<IActionResult> VerifyOtp(string Email, string Otp)
 	{
 		try

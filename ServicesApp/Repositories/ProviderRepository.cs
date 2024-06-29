@@ -113,8 +113,7 @@ namespace ServicesApp.Repository
 			{
 				return provider.Approved;
 			}
-			return false;
+			return true;
 		}
-
 	}
 }

@@ -14,6 +14,7 @@ namespace ServicesApp.Interfaces
 		Task<bool> DeleteProvider(string id);
 		bool CheckProviderBalance(string id);
 		Task<bool> ApproveProvider(string id);
+		bool CheckApprovedProvider(string id);
 		bool Save();
 	}
 }

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
 using System.Web.Helpers;
 using Microsoft.EntityFrameworkCore;
+using ServicesApp.Data;
 
 public class AuthRepository : IAuthRepository
 {
@@ -22,6 +23,7 @@ public class AuthRepository : IAuthRepository
 	private readonly IConfiguration _config;
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IMapper _mapper;
+	private readonly IProviderRepository _providerRepository;
 	private readonly IMemoryCache _cache; // Add memory cache
 
 	public AuthRepository(
@@ -29,12 +31,14 @@ public class AuthRepository : IAuthRepository
 		IConfiguration config,
 		RoleManager<IdentityRole> roleManager,
 		IMapper mapper,
+		IProviderRepository providerRepository,
 		IMemoryCache cache)
 	{
 		_userManager = userManager;
 		_config = config;
 		_roleManager = roleManager;
 		_mapper = mapper;
+		_providerRepository = providerRepository;
 		_cache = cache;
 	}
 
@@ -223,6 +227,10 @@ public class AuthRepository : IAuthRepository
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 			};
 			var roles = await _userManager.GetRolesAsync(appUser);
+			if(!_providerRepository.CheckApprovedProvider(appUser.Id))
+			{
+				return (null, DateTime.MinValue);
+			}
 			authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
 			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -240,7 +248,6 @@ public class AuthRepository : IAuthRepository
 		}
 		return (null, DateTime.MinValue);
 	}
-
 
 	public async Task<string> ForgetPassword(string mail)
 	{

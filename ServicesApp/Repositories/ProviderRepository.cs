@@ -105,5 +105,16 @@ namespace ServicesApp.Repository
             }
             return true;
         }
-    }
+
+		public bool CheckApprovedProvider(string id)
+		{
+			var provider = GetProvider(id);
+			if (provider != null)
+			{
+				return provider.Approved;
+			}
+			return false;
+		}
+
+	}
 }

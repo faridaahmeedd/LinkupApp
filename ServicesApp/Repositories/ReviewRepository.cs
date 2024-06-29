@@ -137,7 +137,6 @@ namespace ServicesApp.Repositories
 
 		public async Task<bool> Warning(string Id)
 		{
-
             var userReviews = GetReviewsOfProvider(Id);
             AppUser appUser = await _userManager.FindByIdAsync(Id);
             if (appUser != null)
@@ -156,7 +155,7 @@ namespace ServicesApp.Repositories
 			{
 				if (avgRating < 2.5)
 				{
-					_authRepository.SendMail(appUser.Email, "Warning", "WarningMail");
+					_authRepository.SendWarningEmail(appUser.Email);
 					return true;
 				}
 			}

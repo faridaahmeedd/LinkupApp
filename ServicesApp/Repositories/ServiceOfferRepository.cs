@@ -50,9 +50,9 @@ namespace ServicesApp.Repository
 					Fees = existingOffer.Fees,
 					Request = existingOffer.Request,
 					TimeSlotId = existingOffer.TimeSlotId,
-					AdminOffer = true,
 					Status = "Offered",
-					AdminOfferStatus = existingOffer.AdminOfferStatus,
+					AdminOffer = true,
+					AdminOfferStatus = null,
 				};
 				_context.Offers.Add(newOffer);
 				Save();
@@ -166,7 +166,7 @@ namespace ServicesApp.Repository
 			{
 				return false;
 			}
-			if (offer.Status == "Accepted")
+			if (offer.Status == "Accepted" && offer.Provider != null)
 			{
 				var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
 
@@ -181,8 +181,8 @@ namespace ServicesApp.Repository
 				}
 				offer.Request.Status = "Requested";
 				timeSlot.ToTime = TimeOnly.MinValue;
+				CreateAdminOffer(offer.Id);
 			}
-			CreateAdminOffer(offer.Id);
 			_context.Remove(offer);
 			return Save();
 		}

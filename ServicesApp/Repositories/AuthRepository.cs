@@ -24,7 +24,7 @@ public class AuthRepository : IAuthRepository
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IMapper _mapper;
 	private readonly IProviderRepository _providerRepository;
-	private readonly IMemoryCache _cache; // Add memory cache
+	private readonly IMemoryCache _cache; 
 
 	public AuthRepository(
 		UserManager<AppUser> userManager,
@@ -265,50 +265,6 @@ public class AuthRepository : IAuthRepository
 		return resetCode;
 	}
 
-	public bool SendResetPasswordEmail(string recipientEmail, string resetCode)
-	{
-		string senderEmail = _config["SMTP:From"];
-		string senderPassword = _config["SMTP:Password"];
-		try
-		{
-			string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
-			htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
-
-			LinkedResource linkedImage = new LinkedResource(@"wwwroot\images\Logo.png")
-			{
-				ContentId = "Logo",
-				ContentType = new ContentType(MediaTypeNames.Image.Png)
-			};
-
-			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(htmlContent, null, "text/html");
-			htmlView.LinkedResources.Add(linkedImage);
-
-			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-			{
-				Subject = "Linkup Reset Password",
-				IsBodyHtml = true,
-			};
-			mailMessage.AlternateViews.Add(htmlView);
-
-			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-			{
-				Port = 587,
-				Credentials = new NetworkCredential(senderEmail, senderPassword),
-				EnableSsl = true
-			})
-			{
-				smtpClient.Send(mailMessage);
-			}
-
-			return true;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error: {ex.Message}");
-			return false;
-		}
-	}
-
 	public string GenerateRandomCode(int length = 6)
 	{
 		const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -334,7 +290,7 @@ public class AuthRepository : IAuthRepository
 		return false;
 	}
 
-	public async Task<bool> DeactivateUser(string userId)
+	public async Task<bool> DeactivateUser(string userId, string reason)
 	{
 		var user = await _userManager.FindByIdAsync(userId);
 		if (user != null)
@@ -347,7 +303,7 @@ public class AuthRepository : IAuthRepository
 
 				if (result.Succeeded)
 				{
-					if (await SendMail(user.Email, "Linkup Deactivation", "DeactivationMail"))
+					if (SendDeactivationEmail(user.Email, reason))
 					{
 						return true;
 					}
@@ -358,33 +314,21 @@ public class AuthRepository : IAuthRepository
 		return false;
 	}
 
-	public async Task<bool> SendMail(string recipientEmail, string subject, string filename)
+	private async Task<bool> SendEmailAsync(string recipientEmail, string subject, string htmlContent)
 	{
 		string senderEmail = _config["SMTP:From"];
 		string senderPassword = _config["SMTP:Password"];
+
 		try
 		{
-			LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-			LinkedImage.ContentId = "Logo";
-			LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-			string htmlContent = File.ReadAllText($"Mails/{filename}.html");
-			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-			htmlContent, null, "text/html");
-			htmlView.LinkedResources.Add(LinkedImage);
+			LinkedResource linkedImage = new LinkedResource(@"wwwroot\images\Logo.png")
+			{
+				ContentId = "Logo",
+				ContentType = new ContentType(MediaTypeNames.Image.Png)
+			};
 
-			//var smtpClient = new SmtpClient(_config["SMTP:Host"], 587)
-			//{
-			//	UseDefaultCredentials = false,
-			//	Credentials = new NetworkCredential(senderEmail, senderPassword),
-			//	EnableSsl = true
-			//};
-
-			//var mailMessage = new MailMessage
-			//{
-			//	From = new MailAddress(senderEmail),
-			//	Subject = subject,
-			//	IsBodyHtml = true
-			//};
+			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(htmlContent, null, "text/html");
+			htmlView.LinkedResources.Add(linkedImage);
 
 			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
 			{
@@ -393,12 +337,8 @@ public class AuthRepository : IAuthRepository
 			};
 			mailMessage.AlternateViews.Add(htmlView);
 
-			//await smtpClient.SendMailAsync(mailMessage);
-
-
 			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
 			{
-				UseDefaultCredentials = false,
 				Port = 587,
 				Credentials = new NetworkCredential(senderEmail, senderPassword),
 				EnableSsl = true
@@ -406,6 +346,7 @@ public class AuthRepository : IAuthRepository
 			{
 				await smtpClient.SendMailAsync(mailMessage);
 			}
+
 			return true;
 		}
 		catch (Exception ex)
@@ -414,5 +355,68 @@ public class AuthRepository : IAuthRepository
 			return false;
 		}
 	}
-}
 
+
+	public bool SendRegistratationMail(string recipientEmail, string otp)
+	{
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
+			htmlContent = htmlContent.Replace("{OtpPlaceholder}", otp);
+
+			return SendEmailAsync(recipientEmail, "Welcome to Linkup", htmlContent).Result;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+
+	public bool SendResetPasswordEmail(string recipientEmail, string resetCode)
+	{
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
+			htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
+
+			return SendEmailAsync(recipientEmail, "Linkup Reset Password", htmlContent).Result;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+
+	public bool SendDeactivationEmail(string recipientEmail, string reason)
+	{
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/DeactivationMail.html");
+			htmlContent = htmlContent.Replace("{ReasonPlaceholder}", reason);
+
+			return SendEmailAsync(recipientEmail, "Linkup Deactivation", htmlContent).Result;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+
+	public bool SendWarningEmail(string recipientEmail)
+	{
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/WarningMail.html");
+
+			return SendEmailAsync(recipientEmail, "Linkup Warning", htmlContent).Result;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+}

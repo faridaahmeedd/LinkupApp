@@ -2,6 +2,7 @@
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Interfaces;
 using ServicesApp.Helper;
+using ServicesApp.Dto.User;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -217,7 +218,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPut("Deactivate/{UserId}")]
-	public async Task<IActionResult> DeactivateUser(string UserId, [FromBody] string Reason)
+	public async Task<IActionResult> DeactivateUser(string UserId, [FromBody] DeactivationDto DeactivateDto)
 	{
 		try
 		{
@@ -230,7 +231,7 @@ public class AuthController : ControllerBase
 			{
 				return NotFound(ApiResponses.UserNotFound);
 			}
-			if (await _authRepository.DeactivateUser(UserId, Reason))
+			if (await _authRepository.DeactivateUser(UserId, DeactivateDto.Reason))
 			{
 				return Ok(ApiResponses.UserDeactivated);
 			}

@@ -250,13 +250,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "24df0f6c-e1ec-4a78-9d55-14e1ec5a8257",
+                            ConcurrencyStamp = "e1c0701f-3d59-43dc-9700-b3338cfc8636",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC2u3+i030pRvZtHgycfIYqzDrQ79QZ26GH3tWhESisY5nnrA/Z/A2LgGp2w6hQE3g==",
-                            SecurityStamp = "cca52069-71d1-4809-a271-7b7fae743b8f",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKPlxKBEjVh6b0Ggvu4T2S/1tnSUKZOmfA61eVcevdea6/VFCDvCnyWfphNF0Upr5A==",
+                            SecurityStamp = "c85fb936-c0c9-4524-ba83-331f5cc90a67",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -610,6 +610,9 @@ namespace ServicesApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobileNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OfficialDocument")
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("Provider");

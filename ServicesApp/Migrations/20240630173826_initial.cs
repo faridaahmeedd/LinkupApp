@@ -214,7 +214,8 @@ namespace ServicesApp.Migrations
                     JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Balance = table.Column<int>(type: "int", nullable: false),
-                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Approved = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -267,6 +268,8 @@ namespace ServicesApp.Migrations
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Volunteer = table.Column<bool>(type: "bit", nullable: false),
+                    ExaminationComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Emergency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SubcategoryId = table.Column<int>(type: "int", nullable: true),
                     CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -298,7 +301,10 @@ namespace ServicesApp.Migrations
                     Duration = table.Column<TimeOnly>(type: "time", nullable: false),
                     ProviderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RequestId = table.Column<int>(type: "int", nullable: false)
+                    RequestId = table.Column<int>(type: "int", nullable: false),
+                    Examination = table.Column<bool>(type: "bit", nullable: false),
+                    AdminOffer = table.Column<bool>(type: "bit", nullable: false),
+                    AdminOfferStatus = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -398,7 +404,7 @@ namespace ServicesApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "Active", "ConcurrencyStamp", "Email", "EmailConfirmed", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "SecurityStamp", "UserName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "24b04480-6c72-4ff9-9c81-bff34a3d385e", "SuperAdmin@gmail.com", true, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEOXygtoj07BV5+uhY/8eY1FpxJi8uRUy6/8mzbtM0bLGtWTY5M67zqSiY4xR+QOyFw==", "a5612dc6-c8e0-476f-a078-b913e097b9df", "SuperAdmin" });
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", true, "9dbcff18-f698-42af-bf23-9e887f7cdcf4", "SuperAdmin@gmail.com", true, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEJF7yy2f40jyl1zWrjTRp2CHcqfmKdrND3hpCKrIMc72S4VI4Wv/XD7jZ1NNfsftSw==", "e3cc94d6-9c39-4d57-8e6c-54a16aee9127", "SuperAdmin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",

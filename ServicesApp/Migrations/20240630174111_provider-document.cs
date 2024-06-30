@@ -5,50 +5,38 @@
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class adminoffer : Migration
+    public partial class providerdocument : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "AdminOffer",
-                table: "Offers",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
-
             migrationBuilder.AddColumn<string>(
-                name: "AdminOfferStatus",
-                table: "Offers",
+                name: "OfficialDocument",
+                table: "Provider",
                 type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+                nullable: true);
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "8e445865-a24d-4543-a6c6-9443d048cdb9",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "d1085982-54c3-457f-962a-6896e9c893f5", "AQAAAAIAAYagAAAAEKe6S6e5v6Wi28wme3y9B7ibFexya2JqLsVhB0L3sIlS1tQoVa1u0hgSI05iWuOscQ==", "bc37b3ad-8064-49f1-b9f7-e031268750a2" });
+                values: new object[] { "e1c0701f-3d59-43dc-9700-b3338cfc8636", "AQAAAAIAAYagAAAAEKPlxKBEjVh6b0Ggvu4T2S/1tnSUKZOmfA61eVcevdea6/VFCDvCnyWfphNF0Upr5A==", "c85fb936-c0c9-4524-ba83-331f5cc90a67" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "AdminOffer",
-                table: "Offers");
-
-            migrationBuilder.DropColumn(
-                name: "AdminOfferStatus",
-                table: "Offers");
+                name: "OfficialDocument",
+                table: "Provider");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "8e445865-a24d-4543-a6c6-9443d048cdb9",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "419625f5-a958-4122-bd88-8cb01ba9c4c7", "AQAAAAIAAYagAAAAEJkRHP0uYBoos4C3CIobZJGYfpE+sq1y03cjW7ThQYn2AwiQmGaGF0gi1xXHWgBu3w==", "9f034bfd-1b23-410f-8198-ff7aad337096" });
+                values: new object[] { "9dbcff18-f698-42af-bf23-9e887f7cdcf4", "AQAAAAIAAYagAAAAEJF7yy2f40jyl1zWrjTRp2CHcqfmKdrND3hpCKrIMc72S4VI4Wv/XD7jZ1NNfsftSw==", "e3cc94d6-9c39-4d57-8e6c-54a16aee9127" });
         }
     }
 }

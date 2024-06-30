@@ -12,7 +12,7 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240628200247_provider-document")]
+    [Migration("20240630174111_provider-document")]
     partial class providerdocument
     {
         /// <inheritdoc />
@@ -253,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "225fc93c-60c3-4e7f-a5a8-f115057cb644",
+                            ConcurrencyStamp = "e1c0701f-3d59-43dc-9700-b3338cfc8636",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPJlz4JkRkPgX+gk1azf0E1BpfiRNbsxZmaYdSB7mQyxv+Goirz0QEkmZNoCyEuKHg==",
-                            SecurityStamp = "6cf447b1-d66d-4e60-bd1e-0b7ccdbe2689",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKPlxKBEjVh6b0Ggvu4T2S/1tnSUKZOmfA61eVcevdea6/VFCDvCnyWfphNF0Upr5A==",
+                            SecurityStamp = "c85fb936-c0c9-4524-ba83-331f5cc90a67",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -597,9 +597,6 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("Document")
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<string>("FName")
                         .HasColumnType("nvarchar(max)");
 
@@ -616,6 +613,9 @@ namespace ServicesApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobileNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OfficialDocument")
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("Provider");

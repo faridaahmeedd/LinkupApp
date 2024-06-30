@@ -51,6 +51,7 @@ namespace ServicesApp.Repository
 			existingProvider.Description = ProviderUpdate.Description;
 			existingProvider.MobileNumber = ProviderUpdate.MobileNumber;
 			existingProvider.Image	= ProviderUpdate.Image;
+			existingProvider.OfficialDocument = ProviderUpdate.OfficialDocument;
 			var result = await _userManager.UpdateAsync(existingProvider);
 			return result.Succeeded;
 		}

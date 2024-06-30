@@ -111,7 +111,7 @@ public class AuthRepository : IAuthRepository
 			string otp = GenerateOtp();
 			StoreOtp(userMap.Email, otp);
 
-			if (SendRegistrtationMail(userMap.Email, otp))
+			if (SendRegistratationMail(userMap.Email, otp))
 			{
 				return result;
 			}
@@ -173,46 +173,6 @@ public class AuthRepository : IAuthRepository
 			}
 		}
 		return true;
-	}
-
-	public bool SendRegistrtationMail(string recipientEmail, string otp)
-	{
-		string senderEmail = _config["SMTP:From"];
-		string senderPassword = _config["SMTP:Password"];
-		try
-		{
-			LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-			LinkedImage.ContentId = "Logo";
-			LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-			string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
-			htmlContent = htmlContent.Replace("{OtpPlaceholder}", otp);
-			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-			htmlContent, null, "text/html");
-			htmlView.LinkedResources.Add(LinkedImage);
-
-			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-			{
-				Subject = "Welcome to Linkup",
-				IsBodyHtml = true,
-			};
-			mailMessage.AlternateViews.Add(htmlView);
-
-			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-			{
-				Port = 587,
-				Credentials = new NetworkCredential(senderEmail, senderPassword),
-				EnableSsl = true
-			})
-			{
-				smtpClient.Send(mailMessage);
-			}
-			return true;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error: {ex.Message}");
-			return false;
-		}
 	}
 
 	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)

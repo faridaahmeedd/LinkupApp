@@ -37,6 +37,51 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
+		public int CreateAdminOffer(int offerId)
+		{
+			var existingOffer = GetOffer(offerId);
+
+			if (existingOffer != null)
+			{
+				var newOffer = new ServiceOffer
+				{
+					Duration = existingOffer.Duration,
+					Examination = existingOffer.Examination,
+					Fees = existingOffer.Fees,
+					Request = existingOffer.Request,
+					TimeSlotId = existingOffer.TimeSlotId,
+					Status = "Offered",
+					AdminOffer = true,
+					AdminOfferStatus = null,
+				};
+				_context.Offers.Add(newOffer);
+				Save();
+				return newOffer.Id;
+			}
+			return 0;
+		}
+
+		public bool AdminAssignProvider(int offerId, string providerId)
+		{
+			var existingOffer = GetOffer(offerId);
+			if (existingOffer != null && existingOffer.AdminOffer)
+			{
+				existingOffer.Provider = _context.Providers.Find(providerId);
+			}
+			return Save();
+		}
+
+		public bool ApproveAdminOffer(int offerId)
+		{
+			var existingOffer = GetOffer(offerId);
+			if (existingOffer != null && existingOffer.AdminOffer)
+			{
+				existingOffer.AdminOfferStatus = "Approved";
+				existingOffer.AdminOffer = false;
+			}
+			return Save();
+		}
+
 		public bool CheckFeesRange(ServiceOffer serviceOffer)
 		{
 			var request = _context.Requests.Include(r => r.Subcategory).Where(r=> r.Id == serviceOffer.Request.Id).FirstOrDefault();
@@ -121,7 +166,7 @@ namespace ServicesApp.Repository
 			{
 				return false;
 			}
-			if (offer.Status == "Accepted")
+			if (offer.Status == "Accepted" && offer.Provider != null)
 			{
 				var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
 
@@ -132,10 +177,11 @@ namespace ServicesApp.Repository
 				// Check if the difference is greater than or equal to 24 hours
 				if (offerTime <= TimeAfter24)
 				{
-					offer.Provider.Balance += (offer.Fees * 10) / 100;
+					offer.Provider.Balance += (offer.Fees * 50) / 100;
 				}
 				offer.Request.Status = "Requested";
 				timeSlot.ToTime = TimeOnly.MinValue;
+				CreateAdminOffer(offer.Id);
 			}
 			_context.Remove(offer);
 			return Save();

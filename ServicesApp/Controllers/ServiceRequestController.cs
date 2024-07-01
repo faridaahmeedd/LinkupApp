@@ -266,6 +266,31 @@ namespace ServicesApp.Controllers
 			}
 		}
 
+		[HttpPut("Emergency/{ServiceId}/{EmergencyType}")]
+		public IActionResult AddEmergency(int ServiceId, string EmergencyType)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_serviceRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponses.RequestNotFound);
+				}
+				if (!_serviceRepository.AddEmergency(ServiceId, EmergencyType))
+				{
+					return BadRequest(ApiResponses.FailedToUpdate);
+				}
+				return Ok(ApiResponses.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
 
 		[HttpDelete("{ServiceId}")]
 		public IActionResult DeleteService(int ServiceId)

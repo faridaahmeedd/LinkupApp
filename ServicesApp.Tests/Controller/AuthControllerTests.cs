@@ -346,10 +346,11 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var appUser = A.Fake<AppUser>();
+			var reason = "dummyReason";
 			_authController.ModelState.AddModelError("Error", "ModelState is invalid");
 
 			// Act
-			var result = await _authController.DeactivateUser(appUser.Id);
+			var result = await _authController.DeactivateUser(appUser.Id, reason);
 
 			// Assert
 			var actionResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -360,10 +361,11 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var appUser = A.Fake<AppUser>();
+			var reason = "dummyReason";
 			A.CallTo(() => _authRepository.CheckUserById(appUser.Id)).Returns(Task.FromResult<AppUser?>(null));
 
 			// Act
-			var result = await _authController.DeactivateUser(appUser.Id);
+			var result = await _authController.DeactivateUser(appUser.Id, reason);
 
 			// Assert
 			Assert.IsType<NotFoundObjectResult>(result);
@@ -374,11 +376,12 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var appUser = A.Fake<AppUser>();
+			var reason = "dummyReason";
 			A.CallTo(() => _authRepository.CheckUserById(appUser.Id)).Returns(Task.FromResult<AppUser?>(appUser));
-			A.CallTo(() => _authRepository.DeactivateUser(appUser.Id)).Returns(Task.FromResult(true));
+			A.CallTo(() => _authRepository.DeactivateUser(appUser.Id, reason)).Returns(Task.FromResult(true));
 
 			// Act
-			var result = await _authController.DeactivateUser(appUser.Id);
+			var result = await _authController.DeactivateUser(appUser.Id, reason);
 
 			// Assert
 			Assert.IsType<OkObjectResult>(result);
@@ -389,11 +392,12 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var appUser = A.Fake<AppUser>();
+			var reason = "dummyReason";
 			A.CallTo(() => _authRepository.CheckUserById(appUser.Id)).Returns(Task.FromResult<AppUser?>(appUser));
-			A.CallTo(() => _authRepository.DeactivateUser(appUser.Id)).Returns(Task.FromResult(false));
+			A.CallTo(() => _authRepository.DeactivateUser(appUser.Id, reason)).Returns(Task.FromResult(false));
 
 			// Act
-			var result = await _authController.DeactivateUser(appUser.Id);
+			var result = await _authController.DeactivateUser(appUser.Id, reason);
 
 			// Assert
 			var actionResult = Assert.IsType<ObjectResult>(result);

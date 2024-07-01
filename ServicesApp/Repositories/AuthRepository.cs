@@ -11,6 +11,11 @@ using System.Security.Claims;
 using System.Text;
 using ServicesApp.Interfaces;
 using System.Net.Mime;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Caching.Memory;
+using System.Web.Helpers;
+using Microsoft.EntityFrameworkCore;
+using ServicesApp.Data;
 
 public class AuthRepository : IAuthRepository
 {
@@ -18,18 +23,23 @@ public class AuthRepository : IAuthRepository
 	private readonly IConfiguration _config;
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IMapper _mapper;
+	private readonly IProviderRepository _providerRepository;
+	private readonly IMemoryCache _cache; 
 
 	public AuthRepository(
 		UserManager<AppUser> userManager,
 		IConfiguration config,
 		RoleManager<IdentityRole> roleManager,
-		IMapper mapper)
+		IMapper mapper,
+		IProviderRepository providerRepository,
+		IMemoryCache cache)
 	{
 		_userManager = userManager;
 		_config = config;
 		_roleManager = roleManager;
 		_mapper = mapper;
-
+		_providerRepository = providerRepository;
+		_cache = cache;
 	}
 
 	public async Task<AppUser?> CheckUser(string email)
@@ -97,7 +107,11 @@ public class AuthRepository : IAuthRepository
 		if (result.Succeeded)
 		{
 			await _userManager.AddToRoleAsync(userMap, role);
-			if (SendRegistrtationMail(userMap.Email))
+
+			string otp = GenerateOtp();
+			StoreOtp(userMap.Email, otp);
+
+			if (SendRegistratationMail(userMap.Email, otp))
 			{
 				return result;
 			}
@@ -105,10 +119,40 @@ public class AuthRepository : IAuthRepository
 		return result;
 	}
 
+	public string GenerateOtp()
+	{
+		Random random = new Random();
+		return random.Next(100000, 999999).ToString();  // Generate a 6-digit OTP
+	}
+
+	public void StoreOtp(string userEmail, string otp)
+	{
+		_cache.Set(userEmail, otp, TimeSpan.FromMinutes(10)); // Store OTP in cache for 10 minutes
+	}
+
+	public async Task<bool> VerifyOtp(string userEmail, string otp)
+	{
+		if (_cache.TryGetValue(userEmail, out string storedOtp))
+		{
+			if(storedOtp == otp)
+			{
+				var user = await CheckUser(userEmail);
+				if(user != null)
+				{
+					user.EmailConfirmed = true;
+					await _userManager.UpdateAsync(user);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public async Task<IdentityResult> CreateAdmin(RegistrationDto registerDto)
 	{
 		var userMap = _mapper.Map<Admin>(registerDto);
 		userMap.Email = registerDto.Email;
+		userMap.EmailConfirmed = true;
 		userMap.SecurityStamp = Guid.NewGuid().ToString();
 		userMap.UserName = registerDto.Email;
 		var result = await _userManager.CreateAsync(userMap, registerDto.Password);
@@ -131,46 +175,6 @@ public class AuthRepository : IAuthRepository
 		return true;
 	}
 
-	public bool SendRegistrtationMail(string recipientEmail)
-	{
-		string senderEmail = _config["Email:SENDER_EMAIL"];
-		string senderPassword = _config["Email:SENDER_PASSWORD"];
-		try
-		{
-
-			LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-			LinkedImage.ContentId = "Logo";
-			LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-			string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
-			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-			htmlContent, null, "text/html");
-			htmlView.LinkedResources.Add(LinkedImage);
-
-			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-			{
-				Subject = "Welcome to Linkup",
-				IsBodyHtml = true,
-			};
-			mailMessage.AlternateViews.Add(htmlView);
-
-			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-			{
-				Port = 587,
-				Credentials = new NetworkCredential(senderEmail, senderPassword),
-				EnableSsl = true
-			})
-			{
-				smtpClient.Send(mailMessage);
-			}
-			return true;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error: {ex.Message}");
-			return false;
-		}
-	}
-
 	public async Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto)
 	{
 		var appUser = await _userManager.FindByEmailAsync(loginDto.Email);
@@ -183,6 +187,10 @@ public class AuthRepository : IAuthRepository
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 			};
 			var roles = await _userManager.GetRolesAsync(appUser);
+			if(!_providerRepository.CheckApprovedProvider(appUser.Id))
+			{
+				return (null, DateTime.MinValue);
+			}
 			authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
 			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -201,7 +209,6 @@ public class AuthRepository : IAuthRepository
 		return (null, DateTime.MinValue);
 	}
 
-
 	public async Task<string> ForgetPassword(string mail)
 	{
 		var user = await _userManager.FindByEmailAsync(mail);
@@ -216,50 +223,6 @@ public class AuthRepository : IAuthRepository
 			return resetCode;
 		}
 		return resetCode;
-	}
-
-	public bool SendResetPasswordEmail(string recipientEmail, string resetCode)
-	{
-		string senderEmail = _config["Email:SENDER_EMAIL"];
-		string senderPassword = _config["Email:SENDER_PASSWORD"];
-		try
-		{
-			string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
-			htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
-
-			LinkedResource linkedImage = new LinkedResource(@"wwwroot\images\Logo.png")
-			{
-				ContentId = "Logo",
-				ContentType = new ContentType(MediaTypeNames.Image.Png)
-			};
-
-			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(htmlContent, null, "text/html");
-			htmlView.LinkedResources.Add(linkedImage);
-
-			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
-			{
-				Subject = "Linkup Reset Password",
-				IsBodyHtml = true,
-			};
-			mailMessage.AlternateViews.Add(htmlView);
-
-			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
-			{
-				Port = 587,
-				Credentials = new NetworkCredential(senderEmail, senderPassword),
-				EnableSsl = true
-			})
-			{
-				smtpClient.Send(mailMessage);
-			}
-
-			return true;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error: {ex.Message}");
-			return false;
-		}
 	}
 
 	public string GenerateRandomCode(int length = 6)
@@ -287,7 +250,7 @@ public class AuthRepository : IAuthRepository
 		return false;
 	}
 
-	public async Task<bool> DeactivateUser(string userId)
+	public async Task<bool> DeactivateUser(string userId, string reason)
 	{
 		var user = await _userManager.FindByIdAsync(userId);
 		if (user != null)
@@ -300,7 +263,7 @@ public class AuthRepository : IAuthRepository
 
 				if (result.Succeeded)
 				{
-					if (SendMail(user.Email, "Linkup Deactivation", "InactiveMail"))
+					if (SendDeactivationEmail(user.Email, reason))
 					{
 						return true;
 					}
@@ -311,20 +274,21 @@ public class AuthRepository : IAuthRepository
 		return false;
 	}
 
-	public bool SendMail(string recipientEmail, string subject, string filename)
+	private async Task<bool> SendEmailAsync(string recipientEmail, string subject, string htmlContent)
 	{
-		string senderEmail = _config["Email:SENDER_EMAIL"];
-		string senderPassword = _config["Email:SENDER_PASSWORD"];
+		string senderEmail = _config["SMTP:From"];
+		string senderPassword = _config["SMTP:Password"];
 
 		try
 		{
-			LinkedResource LinkedImage = new LinkedResource(@"wwwroot\images\Logo.png");
-			LinkedImage.ContentId = "Logo";
-			LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Png);
-			string htmlContent = File.ReadAllText($"Mails/{filename}.html");
-			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(
-			htmlContent, null, "text/html");
-			htmlView.LinkedResources.Add(LinkedImage);
+			LinkedResource linkedImage = new LinkedResource(@"wwwroot\images\Logo.png")
+			{
+				ContentId = "Logo",
+				ContentType = new ContentType(MediaTypeNames.Image.Png)
+			};
+
+			AlternateView htmlView = AlternateView.CreateAlternateViewFromString(htmlContent, null, "text/html");
+			htmlView.LinkedResources.Add(linkedImage);
 
 			MailMessage mailMessage = new MailMessage(senderEmail, recipientEmail)
 			{
@@ -333,7 +297,6 @@ public class AuthRepository : IAuthRepository
 			};
 			mailMessage.AlternateViews.Add(htmlView);
 
-
 			using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com")
 			{
 				Port = 587,
@@ -341,9 +304,74 @@ public class AuthRepository : IAuthRepository
 				EnableSsl = true
 			})
 			{
-				smtpClient.Send(mailMessage);
+				await smtpClient.SendMailAsync(mailMessage);
 			}
+
 			return true;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+
+
+	public bool SendRegistratationMail(string recipientEmail, string otp)
+	{
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
+			htmlContent = htmlContent.Replace("{OtpPlaceholder}", otp);
+
+			return SendEmailAsync(recipientEmail, "Welcome to Linkup", htmlContent).Result;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+
+	public bool SendResetPasswordEmail(string recipientEmail, string resetCode)
+	{
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
+			htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
+
+			return SendEmailAsync(recipientEmail, "Linkup Reset Password", htmlContent).Result;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+
+	public bool SendDeactivationEmail(string recipientEmail, string reason)
+	{
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/DeactivationMail.html");
+			htmlContent = htmlContent.Replace("{ReasonPlaceholder}", reason);
+
+			return SendEmailAsync(recipientEmail, "Linkup Deactivation", htmlContent).Result;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error: {ex.Message}");
+			return false;
+		}
+	}
+
+	public bool SendWarningEmail(string recipientEmail)
+	{
+		try
+		{
+			string htmlContent = File.ReadAllText("Mails/WarningMail.html");
+
+			return SendEmailAsync(recipientEmail, "Linkup Warning", htmlContent).Result;
 		}
 		catch (Exception ex)
 		{

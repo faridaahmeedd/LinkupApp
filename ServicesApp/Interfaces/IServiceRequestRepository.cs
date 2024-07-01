@@ -23,6 +23,7 @@ namespace ServicesApp.Interfaces
 		ICollection<GetCalendarDto> GetCalendarDetails(string CustomerId);
 		bool CheckRequestCompleted(int requestId);
 		bool AddExaminationComment(int ServiceId, string Comment);
+		bool AddEmergency(int ServiceId, string EmergencyType);
 		int CreateRequestAfterExamination(int ServiceId);
 		//ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
 		//bool CheckServiceMinFees(ServiceRequest service, int categoryId);

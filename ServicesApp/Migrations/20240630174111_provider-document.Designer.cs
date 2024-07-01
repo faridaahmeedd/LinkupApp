@@ -12,8 +12,8 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240627125758_examination")]
-    partial class examination
+    [Migration("20240630174111_provider-document")]
+    partial class providerdocument
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -253,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "ebd7219a-966b-4555-a505-a8e8a3d07885",
+                            ConcurrencyStamp = "e1c0701f-3d59-43dc-9700-b3338cfc8636",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELYSFwZzhhnrUV8uOWT6pys5KBqmo9wq27kNXIwDM2x1d1jn4JlFXr2sTamb9Q0cxA==",
-                            SecurityStamp = "4244dcc9-ff8d-4642-ab43-adf41535613d",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKPlxKBEjVh6b0Ggvu4T2S/1tnSUKZOmfA61eVcevdea6/VFCDvCnyWfphNF0Upr5A==",
+                            SecurityStamp = "c85fb936-c0c9-4524-ba83-331f5cc90a67",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -363,6 +363,12 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AdminOffer")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AdminOfferStatus")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<TimeOnly>("Duration")
                         .HasColumnType("time");
 
@@ -407,6 +413,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Emergency")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ExaminationComment")
@@ -570,6 +579,9 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("Approved")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Balance")
                         .HasColumnType("int");
 
@@ -601,6 +613,9 @@ namespace ServicesApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobileNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OfficialDocument")
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("Provider");

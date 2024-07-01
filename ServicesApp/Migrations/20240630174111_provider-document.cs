@@ -5,14 +5,14 @@
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class examination : Migration
+    public partial class providerdocument : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "ExaminationComment",
-                table: "Requests",
+                name: "OfficialDocument",
+                table: "Provider",
                 type: "nvarchar(max)",
                 nullable: true);
 
@@ -21,22 +21,22 @@ namespace ServicesApp.Migrations
                 keyColumn: "Id",
                 keyValue: "8e445865-a24d-4543-a6c6-9443d048cdb9",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "ebd7219a-966b-4555-a505-a8e8a3d07885", "AQAAAAIAAYagAAAAELYSFwZzhhnrUV8uOWT6pys5KBqmo9wq27kNXIwDM2x1d1jn4JlFXr2sTamb9Q0cxA==", "4244dcc9-ff8d-4642-ab43-adf41535613d" });
+                values: new object[] { "e1c0701f-3d59-43dc-9700-b3338cfc8636", "AQAAAAIAAYagAAAAEKPlxKBEjVh6b0Ggvu4T2S/1tnSUKZOmfA61eVcevdea6/VFCDvCnyWfphNF0Upr5A==", "c85fb936-c0c9-4524-ba83-331f5cc90a67" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ExaminationComment",
-                table: "Requests");
+                name: "OfficialDocument",
+                table: "Provider");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "8e445865-a24d-4543-a6c6-9443d048cdb9",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "ca9080ad-bf39-4283-bd18-589a65d09df4", "AQAAAAIAAYagAAAAEA+i4vBFZFSYhlSR+yL6Arr//LQqXufQKgZ7nZ5kHZUVR8WtBvFwdNNDc75XbMQubg==", "aae82e29-a47d-4433-8232-61145c1e9d24" });
+                values: new object[] { "9dbcff18-f698-42af-bf23-9e887f7cdcf4", "AQAAAAIAAYagAAAAEJF7yy2f40jyl1zWrjTRp2CHcqfmKdrND3hpCKrIMc72S4VI4Wv/XD7jZ1NNfsftSw==", "e3cc94d6-9c39-4d57-8e6c-54a16aee9127" });
         }
     }
 }

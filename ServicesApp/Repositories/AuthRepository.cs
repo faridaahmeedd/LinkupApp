@@ -228,6 +228,7 @@ public class AuthRepository : IAuthRepository
 	public async Task<(string Token, DateTime Expiration)> LoginGoogleUser(GoogleJsonWebSignature.Payload payload)
 	{
 		var appUser = await _userManager.FindByEmailAsync(payload.Email);
+		Console.WriteLine("-------------------------------", payload.Email);
 		if (appUser != null && appUser.Active)
 		{
 			var authClaims = new List<Claim>

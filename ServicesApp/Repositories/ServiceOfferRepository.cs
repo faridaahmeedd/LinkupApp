@@ -37,30 +37,6 @@ namespace ServicesApp.Repository
 			return Save();
 		}
 
-		public int CreateAdminOffer(int offerId)
-		{
-			var existingOffer = GetOffer(offerId);
-
-			if (existingOffer != null)
-			{
-				var newOffer = new ServiceOffer
-				{
-					Duration = existingOffer.Duration,
-					Examination = existingOffer.Examination,
-					Fees = existingOffer.Fees,
-					Request = existingOffer.Request,
-					TimeSlotId = existingOffer.TimeSlotId,
-					Status = "Offered",
-					AdminOffer = true,
-					AdminOfferStatus = null,
-				};
-				_context.Offers.Add(newOffer);
-				Save();
-				return newOffer.Id;
-			}
-			return 0;
-		}
-
 		public bool AdminAssignProvider(int offerId, string providerId)
 		{
 			var existingOffer = GetOffer(offerId);
@@ -117,6 +93,7 @@ namespace ServicesApp.Repository
 			}
 			return false;
 		}
+
         public bool IsOfferAccepted(int requestId)
         {
             var acceptedOffer = _context.Offers
@@ -179,9 +156,14 @@ namespace ServicesApp.Repository
 				{
 					offer.Provider.Balance += (offer.Fees * 50) / 100;
 				}
-				offer.Request.Status = "Requested";
+				//offer.Request.Status = "Requested";
 				timeSlot.ToTime = TimeOnly.MinValue;
-				CreateAdminOffer(offer.Id);
+
+				//offer.Status = "Offered";
+				offer.AdminOffer = true;
+				offer.AdminOfferStatus = null;
+				offer.Provider = null;
+				return Save();
 			}
 			_context.Remove(offer);
 			return Save();

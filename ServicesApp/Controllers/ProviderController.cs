@@ -92,6 +92,28 @@ namespace ServicesApp.Controllers
 			}
 		}
 
+		[HttpPut("Approve/{ProviderId}")]
+		public async Task<IActionResult> ApproveProvider(string ProviderId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponses.UserNotFound);
+				}
+				await _providerRepository.ApproveProvider(ProviderId);
+				return Ok(ApiResponses.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
 
 		[HttpDelete("{ProviderId}")]
 		public async Task<IActionResult> DeleteProvider(string ProviderId)

@@ -172,6 +172,42 @@ namespace ServicesApp.Controllers
 			}
 		}
 
+		[HttpPost("AfterExamination/{ServiceId}")]
+		public IActionResult CreateRequestAfterExamination(int ServiceId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_serviceRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponses.RequestNotFound);
+				}
+				var acceptedOffer = _serviceRepository.GetAcceptedOffer(ServiceId);
+				if (acceptedOffer != null && acceptedOffer.Examination == false)
+				{
+					return BadRequest(ApiResponses.NotExamination);
+				}
+				int? newId = _serviceRepository.CreateRequestAfterExamination(ServiceId);
+				if(newId != 0)
+				{
+					return Ok(new
+					{
+						statusMsg = "success",
+						message = "Service Created Successfully.",
+						serviceId = newId
+					});
+				}
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
 		[HttpPut("{ServiceId}")]
 		public IActionResult UpdateService(int ServiceId, [FromBody] PostServiceRequestDto serviceRequestDto)
 		{
@@ -189,6 +225,61 @@ namespace ServicesApp.Controllers
 				serviceMap.Id = ServiceId;
 				
 				if (!_serviceRepository.UpdateService(serviceMap))
+				{
+					return BadRequest(ApiResponses.FailedToUpdate);
+				}
+				return Ok(ApiResponses.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
+		[HttpPut("ExaminationComment/{ServiceId}/{Comment}")]
+		public IActionResult AddExaminationComment(int ServiceId, string Comment)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_serviceRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponses.RequestNotFound);
+				}
+				var acceptedOffer = _serviceRepository.GetAcceptedOffer(ServiceId);
+				if (acceptedOffer != null && acceptedOffer.Examination == false)
+				{
+					return BadRequest(ApiResponses.NotExamination);
+				}
+				if (!_serviceRepository.AddExaminationComment(ServiceId, Comment))
+				{
+					return BadRequest(ApiResponses.FailedToUpdate);
+				}
+				return Ok(ApiResponses.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
+		[HttpPut("Emergency/{ServiceId}/{EmergencyType}")]
+		public IActionResult AddEmergency(int ServiceId, string EmergencyType)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_serviceRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponses.RequestNotFound);
+				}
+				if (!_serviceRepository.AddEmergency(ServiceId, EmergencyType))
 				{
 					return BadRequest(ApiResponses.FailedToUpdate);
 				}
@@ -226,8 +317,8 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-        [HttpGet("ServiceUndeclinedOffers/{serviceId}")]
-        public async Task<IActionResult> GetUndeclinedOffersOfService(int serviceId)
+        [HttpGet("ServiceUndeclinedOffers/{ServiceId}")]
+        public async Task<IActionResult> GetUndeclinedOffersOfService(int ServiceId)
         {
 			try
 			{
@@ -235,11 +326,11 @@ namespace ServicesApp.Controllers
 				{
 					return BadRequest(ApiResponses.NotValid);
 				}
-				if (!_serviceRepository.ServiceExist(serviceId))
+				if (!_serviceRepository.ServiceExist(ServiceId))
 				{
 					return NotFound(ApiResponses.RequestNotFound);
 				}
-				var offers = _serviceRepository.GetUndeclinedOffersOfService(serviceId);
+				var offers = _serviceRepository.GetUndeclinedOffersOfService(ServiceId);
 				var offersMap = _mapper.Map<List<GetServiceOfferDto>>(offers);
 
                 foreach (var offer in offersMap)
@@ -254,12 +345,12 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-        [HttpGet("AcceptedOffer/{serviceId}")]
-        public async Task<IActionResult> GetAcceptedOffer(int serviceId)
+        [HttpGet("AcceptedOffer/{ServiceId}")]
+        public async Task<IActionResult> GetAcceptedOffer(int ServiceId)
         {
 			try
 			{
-				var acceptedOffer = _serviceRepository.GetAcceptedOffer(serviceId);
+				var acceptedOffer = _serviceRepository.GetAcceptedOffer(ServiceId);
 				if (acceptedOffer != null)
 				{
 					var offerMap = _mapper.Map<GetServiceOfferDto>(acceptedOffer);

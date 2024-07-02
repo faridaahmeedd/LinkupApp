@@ -5,39 +5,38 @@
 namespace ServicesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class providerdocument : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "Examination",
-                table: "Offers",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
+            migrationBuilder.AddColumn<string>(
+                name: "OfficialDocument",
+                table: "Provider",
+                type: "nvarchar(max)",
+                nullable: true);
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "8e445865-a24d-4543-a6c6-9443d048cdb9",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "ca9080ad-bf39-4283-bd18-589a65d09df4", "AQAAAAIAAYagAAAAEA+i4vBFZFSYhlSR+yL6Arr//LQqXufQKgZ7nZ5kHZUVR8WtBvFwdNNDc75XbMQubg==", "aae82e29-a47d-4433-8232-61145c1e9d24" });
+                values: new object[] { "e1c0701f-3d59-43dc-9700-b3338cfc8636", "AQAAAAIAAYagAAAAEKPlxKBEjVh6b0Ggvu4T2S/1tnSUKZOmfA61eVcevdea6/VFCDvCnyWfphNF0Upr5A==", "c85fb936-c0c9-4524-ba83-331f5cc90a67" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Examination",
-                table: "Offers");
+                name: "OfficialDocument",
+                table: "Provider");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "8e445865-a24d-4543-a6c6-9443d048cdb9",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "24b04480-6c72-4ff9-9c81-bff34a3d385e", "AQAAAAIAAYagAAAAEOXygtoj07BV5+uhY/8eY1FpxJi8uRUy6/8mzbtM0bLGtWTY5M67zqSiY4xR+QOyFw==", "a5612dc6-c8e0-476f-a078-b913e097b9df" });
+                values: new object[] { "9dbcff18-f698-42af-bf23-9e887f7cdcf4", "AQAAAAIAAYagAAAAEJF7yy2f40jyl1zWrjTRp2CHcqfmKdrND3hpCKrIMc72S4VI4Wv/XD7jZ1NNfsftSw==", "e3cc94d6-9c39-4d57-8e6c-54a16aee9127" });
         }
     }
 }

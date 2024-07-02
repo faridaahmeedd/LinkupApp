@@ -43,15 +43,16 @@ namespace ServicesApp.Helper
 
 			CreateMap<ServiceRequest, GetServiceRequestDto>()
 				.ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Customer.Id))
-				.ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => $"{src.Customer.FName} {src.Customer.LName}"))
+                .ForMember(dest => dest.CustomerPhoneNumber, opt => opt.MapFrom(src => src.Customer.MobileNumber ))
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => $"{src.Customer.FName} {src.Customer.LName}"))
 				.ForMember(dest => dest.SubCategoryNameAr, opt => opt.MapFrom(src => src.Subcategory.NameAr))
                 .ForMember(dest => dest.SubCategoryNameEn, opt => opt.MapFrom(src => src.Subcategory.NameEn)
                 );
 			CreateMap<PostServiceRequestDto, ServiceRequest>();
 
 			CreateMap<ServiceOffer, GetServiceOfferDto>()
-				.ForMember(dest => dest.ProviderId, opt => opt.MapFrom(src => src.Provider.Id))
-				.ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => $"{src.Provider.FName} {src.Provider.LName}"))
+				.ForMember(dest => dest.ProviderId, opt => opt.MapFrom(src => src.Provider != null ? src.Provider.Id : ""))
+				.ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => src.Provider != null ? $"{src.Provider.FName} {src.Provider.LName}" : "Unknown"))
 				.ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Request.Id))
 				.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => ConvertTimeToString(src.Duration)));
 			CreateMap<PostServiceOfferDto, ServiceOffer>()

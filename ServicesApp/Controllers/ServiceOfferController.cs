@@ -203,6 +203,60 @@ namespace ServicesApp.Controllers
 			}
 		}
 
+		[HttpPut("AssignProvider/{OfferId}/{ProviderId}")]
+		public IActionResult AssignProvider(int OfferId, string ProviderId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_offerRepository.OfferExist(OfferId))
+				{
+					return NotFound(ApiResponses.OfferNotFound);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponses.UserNotFound);
+				}
+				if (!_offerRepository.AdminAssignProvider(OfferId, ProviderId))
+				{
+					return StatusCode(500, ApiResponses.FailedToUpdate);
+				}
+				return Ok(ApiResponses.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
+		[HttpPut("ApproveAdminOffer/{OfferId}")]
+		public IActionResult ApproveAdminOffer(int OfferId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_offerRepository.OfferExist(OfferId))
+				{
+					return NotFound(ApiResponses.OfferNotFound);
+				}
+				if (!_offerRepository.ApproveAdminOffer(OfferId))
+				{
+					return StatusCode(500, ApiResponses.FailedToUpdate);
+				}
+				return Ok(ApiResponses.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
 		[HttpPut("Decline/{OfferId}")]
 		public IActionResult DeclineOffer(int OfferId)
 		{

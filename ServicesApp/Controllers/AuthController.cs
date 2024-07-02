@@ -4,6 +4,7 @@ using ServicesApp.Interfaces;
 using ServicesApp.Helper;
 using Google.Apis.Auth;
 using Azure.Core;
+using ServicesApp.Dto.User;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -103,6 +104,11 @@ public class AuthController : ControllerBase
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ApiResponses.NotValid);
+			}
+			var appUser = await _authRepository.CheckUser(loginDto.Email);
+			if (appUser != null && !appUser.EmailConfirmed)
+			{
+				return BadRequest(ApiResponses.EmailNotVerified);
 			}
 			var (token, expiration) = await _authRepository.LoginUser(loginDto);
 			if (token != null)
@@ -218,8 +224,36 @@ public class AuthController : ControllerBase
 		}
 	}
 
+	[HttpPut("VerifyOtp/{Email}/{Otp}")]
+	public async Task<IActionResult> VerifyOtp(string Email, string Otp)
+	{
+		try
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			var user = await _authRepository.CheckUser(Email);
+			if (user == null)
+			{
+				return NotFound(ApiResponses.UserNotFound);
+			}
+
+			var isValidOtp = await _authRepository.VerifyOtp(Email, Otp);
+			if (!isValidOtp)
+			{
+				return Unauthorized(ApiResponses.InvalidOtp);
+			}
+			return Ok(ApiResponses.OtpVerified);
+		}
+		catch
+		{
+			return StatusCode(500, ApiResponses.SomethingWrong);
+		}
+	}
+
 	[HttpPut("Deactivate/{UserId}")]
-	public async Task<IActionResult> DeactivateUser(string UserId)
+	public async Task<IActionResult> DeactivateUser(string UserId, [FromBody] DeactivationDto DeactivateDto)
 	{
 		try
 		{
@@ -232,7 +266,7 @@ public class AuthController : ControllerBase
 			{
 				return NotFound(ApiResponses.UserNotFound);
 			}
-			if (await _authRepository.DeactivateUser(UserId))
+			if (await _authRepository.DeactivateUser(UserId, DeactivateDto.Reason))
 			{
 				return Ok(ApiResponses.UserDeactivated);
 			}

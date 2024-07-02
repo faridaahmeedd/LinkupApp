@@ -11,14 +11,13 @@ namespace ServicesApp.Interfaces
 		Task<AppUser?> CheckAdmin(string email);
 		Task<bool> CheckRole(string role);
 		Task<IdentityResult> CreateUser(RegistrationDto registerDto, string role);
-		string GenerateOtp();
+		string GenerateCode();
 		void StoreOtp(string userEmail, string otp);
 		Task<bool> VerifyOtp(string userEmail, string otp);
 		Task<IdentityResult> CreateAdmin(RegistrationDto registerDto);
 		Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto);
 		bool CheckValidPassword(IEnumerable<IdentityError> errors);
 		Task<string> ForgetPassword(string mail);
-		string GenerateRandomCode(int length);
 		Task<bool> ResetPassword(string mail, string newPassword);
 		Task<bool> DeactivateUser(string userId, string reason);
 		bool SendRegistratationMail(string recipientEmail, string otp);

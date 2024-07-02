@@ -108,7 +108,7 @@ public class AuthRepository : IAuthRepository
 		{
 			await _userManager.AddToRoleAsync(userMap, role);
 
-			string otp = GenerateOtp();
+			string otp = GenerateCode();
 			StoreOtp(userMap.Email, otp);
 
 			if (SendRegistratationMail(userMap.Email, otp))
@@ -119,7 +119,7 @@ public class AuthRepository : IAuthRepository
 		return result;
 	}
 
-	public string GenerateOtp()
+	public string GenerateCode()
 	{
 		Random random = new Random();
 		return random.Next(100000, 999999).ToString();  // Generate a 6-digit OTP
@@ -217,20 +217,12 @@ public class AuthRepository : IAuthRepository
 			return string.Empty;
 		}
 
-		var resetCode = GenerateRandomCode();
+		var resetCode = GenerateCode();
 		if (SendResetPasswordEmail(mail, resetCode))
 		{
 			return resetCode;
 		}
 		return resetCode;
-	}
-
-	public string GenerateRandomCode(int length = 6)
-	{
-		const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-		Random random = new Random();
-		return new string(Enumerable.Repeat(chars, length)
-			.Select(s => s[random.Next(s.Length)]).ToArray());
 	}
 
 	public async Task<bool> ResetPassword(string mail, string newPassword)

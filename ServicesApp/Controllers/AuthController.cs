@@ -2,6 +2,8 @@
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Interfaces;
 using ServicesApp.Helper;
+using Google.Apis.Auth;
+using Azure.Core;
 using ServicesApp.Dto.User;
 
 [Route("api/[controller]")]
@@ -57,7 +59,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("RegisterAdmin")]
-	// [Authorize(Roles = "")]
+	// [Authorize(Roles = "SuperAdmin")]
 	public async Task<IActionResult> RegisterAdmin([FromBody] RegistrationDto registerDto)
 	{
 		try
@@ -109,6 +111,39 @@ public class AuthController : ControllerBase
 				return BadRequest(ApiResponses.EmailNotVerified);
 			}
 			var (token, expiration) = await _authRepository.LoginUser(loginDto);
+			if (token != null)
+			{
+				return Ok(new
+				{
+					statusMsg = "success",
+					message = "Logged in Successfully.",
+					Token = token,
+					Expiration = expiration,
+				});
+			}
+			return Unauthorized(ApiResponses.Unauthorized);
+		}
+		catch
+		{
+			return StatusCode(500, ApiResponses.SomethingWrong);
+		}
+	}
+
+	[HttpPost("GoogleLogin/{Token}")]
+	public async Task<IActionResult> GoogleLogin(string Token)
+	{
+		try
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponses.NotValid);
+			}
+			var payload = await _authRepository.VerifyGoogleToken(Token);
+			if (payload == null)
+			{
+				return Unauthorized(ApiResponses.Unauthorized);
+			}
+			var (token, expiration) = await _authRepository.LoginGoogleUser(payload);
 			if (token != null)
 			{
 				return Ok(new

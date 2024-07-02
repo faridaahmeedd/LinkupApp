@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Google.Apis.Auth;
+using Microsoft.AspNetCore.Identity;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Models;
 
@@ -16,6 +17,8 @@ namespace ServicesApp.Interfaces
 		Task<bool> VerifyOtp(string userEmail, string otp);
 		Task<IdentityResult> CreateAdmin(RegistrationDto registerDto);
 		Task<(string Token, DateTime Expiration)> LoginUser(LoginDto loginDto);
+		Task<(string Token, DateTime Expiration)> LoginGoogleUser(GoogleJsonWebSignature.Payload payload);
+		Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(string idToken);
 		bool CheckValidPassword(IEnumerable<IdentityError> errors);
 		Task<string> ForgetPassword(string mail);
 		Task<bool> ResetPassword(string mail, string newPassword);

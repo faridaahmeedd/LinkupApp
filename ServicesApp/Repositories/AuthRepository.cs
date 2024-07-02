@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using ServicesApp.Interfaces;
 using System.Net.Mime;
+using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
 using System.Web.Helpers;
@@ -208,6 +209,63 @@ public class AuthRepository : IAuthRepository
 		}
 		return (null, DateTime.MinValue);
 	}
+
+	public async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(string idToken)
+	{
+		try
+		{
+			var settings = new GoogleJsonWebSignature.ValidationSettings()
+			{
+				Audience = new List<string> { _config["Google:ClientId"] }
+			};
+			var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+			return payload;
+		}
+		catch (InvalidJwtException ex)
+		{
+			Console.WriteLine("Invalid JWT exception: " + ex.Message);
+			return null;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("Exception occurred during token validation: " + ex.Message);
+			return null;
+		}
+	}
+
+	public async Task<(string Token, DateTime Expiration)> LoginGoogleUser(GoogleJsonWebSignature.Payload payload)
+	{
+		var appUser = await _userManager.FindByEmailAsync(payload.Email);
+		if (appUser != null && appUser.Active)
+		{
+			var authClaims = new List<Claim>
+			{
+				new Claim(ClaimTypes.Email, appUser.Email),
+				new Claim(ClaimTypes.NameIdentifier, appUser.Id),
+				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			};
+
+			var roles = await _userManager.GetRolesAsync(appUser);
+			authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
+			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+			var expiration = DateTime.Now.AddMonths(5);
+
+			var jwtToken = new JwtSecurityToken(
+				issuer: _config["JWT:ValidIssuer"],
+				audience: _config["JWT:ValidAudience"],
+				claims: authClaims,
+				expires: expiration,
+				signingCredentials: signingCredentials
+			);
+
+			var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+			return (token, expiration);
+		}
+		return (null, DateTime.MinValue);
+	}
+
 
 	public async Task<string> ForgetPassword(string mail)
 	{

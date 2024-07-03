@@ -108,7 +108,7 @@ public class AuthController : ControllerBase
 			var appUser = await _authRepository.CheckUser(loginDto.Email);
 			if (appUser != null && !appUser.EmailConfirmed)
 			{
-				return BadRequest(ApiResponses.EmailNotVerified);
+				return Unauthorized(ApiResponses.EmailNotVerified);
 			}
 			var (token, expiration) = await _authRepository.LoginUser(loginDto);
 			if (token != null)

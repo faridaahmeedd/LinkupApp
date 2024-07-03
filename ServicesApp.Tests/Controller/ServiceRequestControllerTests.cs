@@ -478,5 +478,236 @@ namespace ServicesApp.Tests.Controller
 			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
 			Assert.Equal(ApiResponses.UserNotFound, notFoundResult.Value);
 		}
+
+		[Fact]
+		public void CreateRequestAfterExamination_InvalidModelState_ReturnsBadRequest()
+		{
+			// Arrange
+			var serviceId = 1;
+			_controller.ModelState.AddModelError("Error", "Model error");
+
+			// Act
+			var result = _controller.CreateRequestAfterExamination(serviceId);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.NotValid, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void CreateRequestAfterExamination_ServiceNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			var serviceId = 1;
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(false);
+
+			// Act
+			var result = _controller.CreateRequestAfterExamination(serviceId);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(404, notFoundResult.StatusCode);
+			Assert.Equal(ApiResponses.RequestNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void CreateRequestAfterExamination_NotExamination_ReturnsBadRequest()
+		{
+			// Arrange
+			var serviceId = 1;
+			var acceptedOffer = A.Fake<ServiceOffer>();
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.GetAcceptedOffer(serviceId)).Returns(acceptedOffer);
+
+			// Act
+			var result = _controller.CreateRequestAfterExamination(serviceId);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.NotExamination, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void CreateRequestAfterExamination_Exception_ReturnsStatusCode500()
+		{
+			// Arrange
+			var serviceId = 1;
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Throws(new Exception());
+
+			// Act
+			var result = _controller.CreateRequestAfterExamination(serviceId);
+
+			// Assert
+			var statusCodeResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, statusCodeResult.StatusCode);
+			Assert.Equal(ApiResponses.SomethingWrong, statusCodeResult.Value);
+		}
+
+		[Fact]
+		public void AddExaminationComment_InvalidModelState_ReturnsBadRequest()
+		{
+			// Arrange
+			var serviceId = 1;
+			var comment = "Test comment";
+			_controller.ModelState.AddModelError("Error", "Model error");
+
+			// Act
+			var result = _controller.AddExaminationComment(serviceId, comment);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.NotValid, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void AddExaminationComment_ServiceNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			var serviceId = 1;
+			var comment = "Test comment";
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(false);
+
+			// Act
+			var result = _controller.AddExaminationComment(serviceId, comment);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(404, notFoundResult.StatusCode);
+			Assert.Equal(ApiResponses.RequestNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void AddExaminationComment_NotExamination_ReturnsBadRequest()
+		{
+			// Arrange
+			var serviceId = 1;
+			var comment = "Test comment";
+			var acceptedOffer = A.Fake<ServiceOffer>();
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.GetAcceptedOffer(serviceId)).Returns(acceptedOffer);
+
+			// Act
+			var result = _controller.AddExaminationComment(serviceId, comment);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.NotExamination, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void AddExaminationComment_FailedToUpdate_ReturnsBadRequest()
+		{
+			// Arrange
+			var serviceId = 1;
+			var comment = "Test comment";
+			ServiceOffer acceptedOffer = A.Fake<ServiceOffer>();
+			acceptedOffer.Examination = true;
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.GetAcceptedOffer(serviceId)).Returns(acceptedOffer);
+			A.CallTo(() => _serviceRepository.AddExaminationComment(serviceId, comment)).Returns(false);
+
+			// Act
+			var result = _controller.AddExaminationComment(serviceId, comment);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.FailedToUpdate, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void AddExaminationComment_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			var serviceId = 1;
+			var comment = "Test comment";
+			ServiceOffer acceptedOffer = A.Fake<ServiceOffer>();
+			acceptedOffer.Examination = true;
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.GetAcceptedOffer(serviceId)).Returns(acceptedOffer);
+			A.CallTo(() => _serviceRepository.AddExaminationComment(serviceId, comment)).Returns(true);
+
+			// Act
+			var result = _controller.AddExaminationComment(serviceId, comment);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(ApiResponses.SuccessUpdated, okResult.Value);
+		}
+
+		[Fact]
+		public void AddEmergency_InvalidModelState_ReturnsBadRequest()
+		{
+			// Arrange
+			var serviceId = 1;
+			var emergencyType = "Fire";
+			_controller.ModelState.AddModelError("Error", "Model error");
+
+			// Act
+			var result = _controller.AddEmergency(serviceId, emergencyType);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.NotValid, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void AddEmergency_ServiceNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			var serviceId = 1;
+			var emergencyType = "Fire";
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(false);
+
+			// Act
+			var result = _controller.AddEmergency(serviceId, emergencyType);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(404, notFoundResult.StatusCode);
+			Assert.Equal(ApiResponses.RequestNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void AddEmergency_FailedToUpdate_ReturnsBadRequest()
+		{
+			// Arrange
+			var serviceId = 1;
+			var emergencyType = "Fire";
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.AddEmergency(serviceId, emergencyType)).Returns(false);
+
+			// Act
+			var result = _controller.AddEmergency(serviceId, emergencyType);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.FailedToUpdate, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void AddEmergency_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			var serviceId = 1;
+			var emergencyType = "Fire";
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.AddEmergency(serviceId, emergencyType)).Returns(true);
+
+			// Act
+			var result = _controller.AddEmergency(serviceId, emergencyType);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(ApiResponses.SuccessUpdated, okResult.Value);
+		}
 	}
 }

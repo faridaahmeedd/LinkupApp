@@ -192,5 +192,55 @@ namespace ServicesApp.Tests.Controller
 			result.Should().BeOfType<BadRequestObjectResult>();
 			A.CallTo(() => _providerRepository.DeleteProvider(providerId)).MustNotHaveHappened();
 		}
+
+
+		[Fact]
+		public async Task ApproveProvider_InvalidModelState_ReturnsBadRequest()
+		{
+			// Arrange
+			var providerId = "providerId";
+			_providerController.ModelState.AddModelError("Error", "Model error");
+
+			// Act
+			var result = await _providerController.ApproveProvider(providerId);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.NotValid, badRequestResult.Value);
+		}
+
+		[Fact]
+		public async Task ApproveProvider_ProviderNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			var providerId = "nonExistentProviderId";
+			A.CallTo(() => _providerRepository.ProviderExist(providerId)).Returns(false);
+
+			// Act
+			var result = await _providerController.ApproveProvider(providerId);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(404, notFoundResult.StatusCode);
+			Assert.Equal(ApiResponses.UserNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public async Task ApproveProvider_ValidProvider_ReturnsOk()
+		{
+			// Arrange
+			var providerId = "validProviderId";
+			A.CallTo(() => _providerRepository.ProviderExist(providerId)).Returns(true);
+			A.CallTo(() => _providerRepository.ApproveProvider(providerId)).Returns(Task.FromResult<bool>(true));
+
+			// Act
+			var result = await _providerController.ApproveProvider(providerId);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(ApiResponses.SuccessUpdated, okResult.Value);
+		}
 	}
 }

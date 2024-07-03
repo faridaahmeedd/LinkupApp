@@ -440,5 +440,162 @@ namespace ServicesApp.Tests.Controller
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal(ApiResponses.UserNotFound, notFoundResult.Value);
         }
-    }
+
+		[Fact]
+		public void AssignProvider_InvalidModelState_ReturnsBadRequest()
+		{
+			// Arrange
+			var offerId = 1;
+			var providerId = "providerId";
+			_controller.ModelState.AddModelError("Error", "Model error");
+
+			// Act
+			var result = _controller.AssignProvider(offerId, providerId);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal(ApiResponses.NotValid, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void AssignProvider_OfferNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			var offerId = 1;
+			var providerId = "providerId";
+			A.CallTo(() => _offerRepository.OfferExist(offerId)).Returns(false);
+
+			// Act
+			var result = _controller.AssignProvider(offerId, providerId);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(404, notFoundResult.StatusCode);
+			Assert.Equal(ApiResponses.OfferNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void AssignProvider_ProviderNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			var offerId = 1;
+			var providerId = "providerId";
+			A.CallTo(() => _offerRepository.OfferExist(offerId)).Returns(true);
+			A.CallTo(() => _providerRepository.ProviderExist(providerId)).Returns(false);
+
+			// Act
+			var result = _controller.AssignProvider(offerId, providerId);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(404, notFoundResult.StatusCode);
+			Assert.Equal(ApiResponses.UserNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void AssignProvider_FailedToUpdate_ReturnsStatusCode500()
+		{
+			// Arrange
+			var offerId = 1;
+			var providerId = "providerId";
+			A.CallTo(() => _offerRepository.OfferExist(offerId)).Returns(true);
+			A.CallTo(() => _providerRepository.ProviderExist(providerId)).Returns(true);
+			A.CallTo(() => _offerRepository.AdminAssignProvider(offerId, providerId)).Returns(false);
+
+			// Act
+			var result = _controller.AssignProvider(offerId, providerId);
+
+			// Assert
+			var statusCodeResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, statusCodeResult.StatusCode);
+			Assert.Equal(ApiResponses.FailedToUpdate, statusCodeResult.Value);
+		}
+
+		[Fact]
+		public void AssignProvider_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			var offerId = 1;
+			var providerId = "providerId";
+			A.CallTo(() => _offerRepository.OfferExist(offerId)).Returns(true);
+			A.CallTo(() => _providerRepository.ProviderExist(providerId)).Returns(true);
+			A.CallTo(() => _offerRepository.AdminAssignProvider(offerId, providerId)).Returns(true);
+
+			// Act
+			var result = _controller.AssignProvider(offerId, providerId);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(ApiResponses.SuccessUpdated, okResult.Value);
+		}
+
+		[Fact]
+		public void AssignProvider_Exception_ReturnsStatusCode500()
+		{
+			// Arrange
+			var offerId = 1;
+			var providerId = "providerId";
+			A.CallTo(() => _offerRepository.OfferExist(offerId)).Throws(new Exception());
+
+			// Act
+			var result = _controller.AssignProvider(offerId, providerId);
+
+			// Assert
+			var statusCodeResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, statusCodeResult.StatusCode);
+			Assert.Equal(ApiResponses.SomethingWrong, statusCodeResult.Value);
+		}
+
+		[Fact]
+		public void ApproveAdminOffer_OfferNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			var offerId = 1;
+			A.CallTo(() => _offerRepository.OfferExist(offerId)).Returns(false);
+
+			// Act
+			var result = _controller.ApproveAdminOffer(offerId);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(404, notFoundResult.StatusCode);
+			Assert.Equal(ApiResponses.OfferNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void ApproveAdminOffer_FailedToUpdate_ReturnsStatusCode500()
+		{
+			// Arrange
+			var offerId = 1;
+			A.CallTo(() => _offerRepository.OfferExist(offerId)).Returns(true);
+			A.CallTo(() => _offerRepository.ApproveAdminOffer(offerId)).Returns(false);
+
+			// Act
+			var result = _controller.ApproveAdminOffer(offerId);
+
+			// Assert
+			var statusCodeResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, statusCodeResult.StatusCode);
+			Assert.Equal(ApiResponses.FailedToUpdate, statusCodeResult.Value);
+		}
+
+		[Fact]
+		public void ApproveAdminOffer_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			var offerId = 1;
+			A.CallTo(() => _offerRepository.OfferExist(offerId)).Returns(true);
+			A.CallTo(() => _offerRepository.ApproveAdminOffer(offerId)).Returns(true);
+
+			// Act
+			var result = _controller.ApproveAdminOffer(offerId);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(ApiResponses.SuccessUpdated, okResult.Value);
+		}
+	}
 }

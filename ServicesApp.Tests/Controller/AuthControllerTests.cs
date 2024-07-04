@@ -1,9 +1,11 @@
 ﻿using FakeItEasy;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using ServicesApp.Controllers;
 using ServicesApp.Dto.Authentication;
+using ServicesApp.Dto.User;
 using ServicesApp.Helper;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -19,11 +21,13 @@ namespace ServicesApp.Tests.Controller
 	public class AuthControllerTests
 	{
 		private readonly IAuthRepository _authRepository;
+		private readonly IProviderRepository _providerRepository;
 		private readonly AuthController _authController;
 
 		public AuthControllerTests()
 		{
 			_authRepository = A.Fake<IAuthRepository>();
+			_providerRepository = A.Fake<IProviderRepository>();
 			_authController = new AuthController(_authRepository);
 		}
 
@@ -196,11 +200,12 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var loginDto = A.Fake<LoginDto>();
-			var appUser = A.Fake<AppUser>();
-			appUser.Id = Guid.NewGuid().ToString();
-			var token = "dummy_token";
-			var expiration = DateTime.UtcNow.AddDays(1);
-			A.CallTo(() => _authRepository.LoginUser(loginDto)).Returns(Task.FromResult((token, expiration)));
+			AppUser appUser = A.Fake<AppUser>();
+			appUser.EmailConfirmed = true;
+			var generatedToken = "generatedJwtToken";
+			var expiration = DateTime.UtcNow.AddMinutes(30);
+			A.CallTo(() => _authRepository.CheckUser(loginDto.Email)).Returns(Task.FromResult<AppUser?>(appUser));
+			A.CallTo(() => _authRepository.LoginUser(loginDto)).Returns(Task.FromResult((generatedToken, expiration)));
 
 			// Act
 			var result = await _authController.Login(loginDto);
@@ -209,16 +214,35 @@ namespace ServicesApp.Tests.Controller
 			var actionResult = Assert.IsType<OkObjectResult>(result);
 			var responseObject = JObject.FromObject(actionResult.Value);
 			Assert.Equal("success", responseObject["statusMsg"]?.ToString());
-			Assert.Equal(token, responseObject["Token"]?.ToString());
+			Assert.Equal("Logged in Successfully.", responseObject["message"]?.ToString());
+			Assert.Equal(generatedToken, responseObject["Token"]?.ToString());
 			Assert.Equal(expiration.ToString(), responseObject["Expiration"]?.ToString());
 		}
 
 		[Fact]
-		public async Task Login_InvalidCredentials_ReturnsBadRequest()
+		public async Task Login_InvalidCredentials_ReturnsUnauthorized()
+		{
+			// Arrange
+			var loginDto = A.Fake<LoginDto>();
+			AppUser appUser = A.Fake<AppUser>();
+			appUser.EmailConfirmed = true;
+			A.CallTo(() => _providerRepository.CheckApprovedProvider(appUser.Id)).Returns(true);
+			A.CallTo(() => _authRepository.LoginUser(loginDto)).Returns(Task.FromResult<(string, DateTime)>((null, default)));
+
+			// Act
+			var result = await _authController.Login(loginDto);
+
+			// Assert
+			var actionResult = Assert.IsType<UnauthorizedObjectResult>(result);
+		}
+
+		[Fact]
+		public async Task Login_EmailNotConfirmed_ReturnsUnauthorized()
 		{
 			// Arrange
 			var loginDto = A.Fake<LoginDto>();
 			var appUser = A.Fake<AppUser>();
+			A.CallTo(() => _providerRepository.CheckApprovedProvider(appUser.Id)).Returns(false);
 			A.CallTo(() => _authRepository.LoginUser(loginDto)).Returns(Task.FromResult<(string, DateTime)>((null, default)));
 
 			// Act
@@ -346,10 +370,12 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var appUser = A.Fake<AppUser>();
+			var deactivationDto = A.Fake<DeactivationDto>();
+			var reason = "dummyReason";
 			_authController.ModelState.AddModelError("Error", "ModelState is invalid");
 
 			// Act
-			var result = await _authController.DeactivateUser(appUser.Id);
+			var result = await _authController.DeactivateUser(appUser.Id, deactivationDto);
 
 			// Assert
 			var actionResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -360,10 +386,11 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var appUser = A.Fake<AppUser>();
+			var deactivationDto = A.Fake<DeactivationDto>();
 			A.CallTo(() => _authRepository.CheckUserById(appUser.Id)).Returns(Task.FromResult<AppUser?>(null));
 
 			// Act
-			var result = await _authController.DeactivateUser(appUser.Id);
+			var result = await _authController.DeactivateUser(appUser.Id, deactivationDto);
 
 			// Assert
 			Assert.IsType<NotFoundObjectResult>(result);
@@ -374,11 +401,12 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var appUser = A.Fake<AppUser>();
+			var deactivationDto = A.Fake<DeactivationDto>();
 			A.CallTo(() => _authRepository.CheckUserById(appUser.Id)).Returns(Task.FromResult<AppUser?>(appUser));
-			A.CallTo(() => _authRepository.DeactivateUser(appUser.Id)).Returns(Task.FromResult(true));
+			A.CallTo(() => _authRepository.DeactivateUser(appUser.Id, deactivationDto.Reason)).Returns(Task.FromResult(true));
 
 			// Act
-			var result = await _authController.DeactivateUser(appUser.Id);
+			var result = await _authController.DeactivateUser(appUser.Id, deactivationDto);
 
 			// Assert
 			Assert.IsType<OkObjectResult>(result);
@@ -389,17 +417,158 @@ namespace ServicesApp.Tests.Controller
 		{
 			// Arrange
 			var appUser = A.Fake<AppUser>();
+			var deactivationDto = A.Fake<DeactivationDto>();
 			A.CallTo(() => _authRepository.CheckUserById(appUser.Id)).Returns(Task.FromResult<AppUser?>(appUser));
-			A.CallTo(() => _authRepository.DeactivateUser(appUser.Id)).Returns(Task.FromResult(false));
+			A.CallTo(() => _authRepository.DeactivateUser(appUser.Id, deactivationDto.Reason)).Returns(Task.FromResult(false));
 
 			// Act
-			var result = await _authController.DeactivateUser(appUser.Id);
+			var result = await _authController.DeactivateUser(appUser.Id, deactivationDto);
 
 			// Assert
 			var actionResult = Assert.IsType<ObjectResult>(result);
 			var responseObject = JObject.FromObject(actionResult.Value);
 			Assert.Equal(500, actionResult.StatusCode);
 			Assert.Equal("fail", responseObject["statusMsg"]?.ToString());
+		}
+
+		[Fact]
+		public async Task VerifyOtp_InvalidModelState_ReturnsBadRequest()
+		{
+			// Arrange
+			_authController.ModelState.AddModelError("Error", "Model error");
+
+			// Act
+			var result = await _authController.VerifyOtp("test@example.com", "123456");
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(400, badRequestResult.StatusCode);
+		}
+
+		[Fact]
+		public async Task VerifyOtp_UserNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			var appUser = A.Fake<AppUser>();
+			A.CallTo(() => _authRepository.CheckUser(appUser.Email)).Returns(Task.FromResult<AppUser?>(null));
+
+			// Act
+			var result = await _authController.VerifyOtp(appUser.Email, "123456");
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(404, notFoundResult.StatusCode);
+			Assert.Equal(ApiResponses.UserNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public async Task VerifyOtp_InvalidOtp_ReturnsUnauthorized()
+		{
+			// Arrange
+			var appUser = A.Fake<AppUser>();
+			var otp = "123456";
+			A.CallTo(() => _authRepository.CheckUser(appUser.Email)).Returns(Task.FromResult<AppUser?>(appUser));
+			A.CallTo(() => _authRepository.VerifyOtp(appUser.Email, otp)).Returns(Task.FromResult<bool>(false));
+
+			// Act
+			var result = await _authController.VerifyOtp(appUser.Email, otp);
+
+			// Assert
+			var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+			Assert.Equal(401, unauthorizedResult.StatusCode);
+			Assert.Equal(ApiResponses.InvalidOtp, unauthorizedResult.Value);
+		}
+
+		[Fact]
+		public async Task VerifyOtp_ValidOtp_ReturnsOk()
+		{
+			// Arrange
+			var appUser = A.Fake<AppUser>();
+			var otp = "123456";
+			A.CallTo(() => _authRepository.CheckUser(appUser.Email)).Returns(Task.FromResult<AppUser?>(appUser));
+			A.CallTo(() => _authRepository.VerifyOtp(appUser.Email, otp)).Returns(Task.FromResult<bool>(true));
+
+			// Act
+			var result = await _authController.VerifyOtp(appUser.Email, otp);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(ApiResponses.OtpVerified, okResult.Value);
+		}
+
+
+		[Fact]
+		public async Task GoogleLogin_InvalidToken_ReturnsUnauthorized()
+		{
+			// Arrange
+			var token = "invalidToken";
+			A.CallTo(() => _authRepository.VerifyGoogleToken(token)).Returns(Task.FromResult<GoogleJsonWebSignature.Payload?>(null));
+
+			// Act
+			var result = await _authController.GoogleLogin(token);
+
+			// Assert
+			var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+			Assert.Equal(401, unauthorizedResult.StatusCode);
+			Assert.Equal(ApiResponses.Unauthorized, unauthorizedResult.Value);
+		}
+
+		[Fact]
+		public async Task GoogleLogin_ValidToken_LoginFails_ReturnsUnauthorized()
+		{
+			// Arrange
+			var token = "validToken";
+			var payload = new GoogleJsonWebSignature.Payload();
+			A.CallTo(() => _authRepository.VerifyGoogleToken(token)).Returns(Task.FromResult(payload));
+			A.CallTo(() => _authRepository.LoginGoogleUser(payload)).Returns(Task.FromResult<(string, DateTime)>(default));
+
+			// Act
+			var result = await _authController.GoogleLogin(token);
+
+			// Assert
+			var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+			Assert.Equal(401, unauthorizedResult.StatusCode);
+			Assert.Equal(ApiResponses.Unauthorized, unauthorizedResult.Value);
+		}
+
+		[Fact]
+		public async Task GoogleLogin_ValidToken_LoginSucceeds_ReturnsOk()
+		{
+			// Arrange
+			var token = "validToken";
+			var payload = new GoogleJsonWebSignature.Payload();
+			var generatedToken = "generatedJwtToken";
+			var expiration = DateTime.UtcNow.AddMinutes(30);
+			A.CallTo(() => _authRepository.VerifyGoogleToken(token)).Returns(Task.FromResult(payload));
+			A.CallTo(() => _authRepository.LoginGoogleUser(payload)).Returns(Task.FromResult((generatedToken, expiration)));
+
+			// Act
+			var result = await _authController.GoogleLogin(token);
+
+			// Assert
+			var actionResult = Assert.IsType<OkObjectResult>(result);
+			var responseObject = JObject.FromObject(actionResult.Value);
+			Assert.Equal("success", responseObject["statusMsg"]?.ToString());
+			Assert.Equal("Logged in Successfully.", responseObject["message"]?.ToString());
+			Assert.Equal(generatedToken, responseObject["Token"]?.ToString());
+			Assert.Equal(expiration.ToString(), responseObject["Expiration"]?.ToString());
+		}
+
+		[Fact]
+		public async Task GoogleLogin_Exception_ReturnsStatusCode500()
+		{
+			// Arrange
+			var token = "someToken";
+			A.CallTo(() => _authRepository.VerifyGoogleToken(token)).ThrowsAsync(new System.Exception());
+
+			// Act
+			var result = await _authController.GoogleLogin(token);
+
+			// Assert
+			var statusCodeResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, statusCodeResult.StatusCode);
+			Assert.Equal(ApiResponses.SomethingWrong, statusCodeResult.Value);
 		}
 	}
 }

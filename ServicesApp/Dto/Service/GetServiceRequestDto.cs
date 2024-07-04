@@ -1,4 +1,4 @@
-﻿using ServicesApp.Models;
+using ServicesApp.Models;
 
 namespace ServicesApp.Dto.Service
 {
@@ -17,5 +17,8 @@ namespace ServicesApp.Dto.Service
 		public string PaymentStatus { get; set; }
 		public bool Volunteer { get; set; }
 		public string ExaminationComment { get; set; }
-    }
+		public string? Emergency { get; set; }
+		//public int MaxFees { get; set; }
+		//public int MinFees { get; set; }
+	}
 }

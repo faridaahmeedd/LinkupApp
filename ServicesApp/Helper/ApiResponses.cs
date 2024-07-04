@@ -42,7 +42,12 @@
             statusMsg = "fail",
             message = "Invalid Email or Password."
         };
-        public static readonly object CanNotSentMail = new
+		public static readonly object EmailNotVerified = new
+		{
+			statusMsg = "fail",
+			message = "Email verification is required to login."
+		};
+		public static readonly object CanNotSentMail = new
         {
             statusMsg = "fail",
             message = "Can not send mail."
@@ -62,7 +67,17 @@
             statusMsg = "fail",
             message = "Can not Change Password."
         };
-        public static readonly object UserAlreadyExist = new
+		public static readonly object OtpVerified = new
+		{
+			statusMsg = "success",
+			message = "OTP verified successfully."
+		};
+		public static readonly object InvalidOtp = new
+		{
+			statusMsg = "fail",
+			message = "Invalid OTP."
+		};
+		public static readonly object UserAlreadyExist = new
         {
             statusMsg = "fail",
             message = "User Already Exists."

@@ -51,8 +51,8 @@ namespace ServicesApp.Helper
 			CreateMap<PostServiceRequestDto, ServiceRequest>();
 
 			CreateMap<ServiceOffer, GetServiceOfferDto>()
-				.ForMember(dest => dest.ProviderId, opt => opt.MapFrom(src => src.Provider.Id))
-				.ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => $"{src.Provider.FName} {src.Provider.LName}"))
+				.ForMember(dest => dest.ProviderId, opt => opt.MapFrom(src => src.Provider != null ? src.Provider.Id : ""))
+				.ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => src.Provider != null ? $"{src.Provider.FName} {src.Provider.LName}" : "Unknown"))
 				.ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Request.Id))
 				.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => ConvertTimeToString(src.Duration)));
 			CreateMap<PostServiceOfferDto, ServiceOffer>()

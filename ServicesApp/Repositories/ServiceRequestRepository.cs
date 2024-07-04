@@ -95,11 +95,23 @@ namespace ServicesApp.Repository
 
 		public bool AddExaminationComment(int ServiceId, string Comment)
 		{
-			var existingService = _context.Requests.Find(ServiceId);
+			var existingService = GetService(ServiceId);
 			
 			if (existingService != null)
 			{
 				existingService.ExaminationComment = Comment;
+				return Save();
+			}
+			return false;
+		}
+
+		public bool AddEmergency(int ServiceId, string EmergencyType)
+		{
+			var existingService = GetService(ServiceId);
+
+			if (existingService != null)
+			{
+				existingService.Emergency = EmergencyType;
 				return Save();
 			}
 			return false;
@@ -124,7 +136,7 @@ namespace ServicesApp.Repository
 				// Check if the difference is greater than or equal to 24 hours
 				if (offerTime <= TimeAfter24)
                 {
-					service.Customer.Balance += (offer.Fees * 10)/100 ;
+					service.Customer.Balance += (offer.Fees * 50)/100 ;
 				}
             }
 			_context.Remove(service!);

@@ -251,11 +251,36 @@ namespace ServicesApp.Controllers
 					return NotFound(ApiResponses.RequestNotFound);
 				}
 				var acceptedOffer = _serviceRepository.GetAcceptedOffer(ServiceId);
-				if(acceptedOffer != null && acceptedOffer.Examination == false)
+				if (acceptedOffer != null && acceptedOffer.Examination == false)
 				{
 					return BadRequest(ApiResponses.NotExamination);
 				}
 				if (!_serviceRepository.AddExaminationComment(ServiceId, Comment))
+				{
+					return BadRequest(ApiResponses.FailedToUpdate);
+				}
+				return Ok(ApiResponses.SuccessUpdated);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
+		[HttpPut("Emergency/{ServiceId}/{EmergencyType}")]
+		public IActionResult AddEmergency(int ServiceId, string EmergencyType)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				if (!_serviceRepository.ServiceExist(ServiceId))
+				{
+					return NotFound(ApiResponses.RequestNotFound);
+				}
+				if (!_serviceRepository.AddEmergency(ServiceId, EmergencyType))
 				{
 					return BadRequest(ApiResponses.FailedToUpdate);
 				}

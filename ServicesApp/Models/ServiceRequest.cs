@@ -12,6 +12,7 @@ namespace ServicesApp.Models
 		public string PaymentStatus { get; set; } = "Pending";  // Pending Paid
 		public bool Volunteer { get; set; } = false;
 		public string? ExaminationComment { get; set; }
+		public string? Emergency { get; set; } = null;
 		public Subcategory? Subcategory { get; set; }
         public Customer? Customer { get; set; }
 		public ICollection<Image>? Images { get; set; }

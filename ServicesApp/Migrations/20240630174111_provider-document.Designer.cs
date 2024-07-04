@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicesApp.Data;
 
@@ -11,9 +12,11 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240630174111_provider-document")]
+    partial class providerdocument
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -290,27 +293,6 @@ namespace ServicesApp.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("ServicesApp.Models.Image", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<byte[]>("Img")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<int>("ServiceRequestId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServiceRequestId");
-
-                    b.ToTable("Images");
-                });
-
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
                 {
                     b.Property<int>("Id")
@@ -438,6 +420,9 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("ExaminationComment")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
@@ -687,17 +672,6 @@ namespace ServicesApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ServicesApp.Models.Image", b =>
-                {
-                    b.HasOne("ServicesApp.Models.ServiceRequest", "ServiceRequest")
-                        .WithMany("Image")
-                        .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ServiceRequest");
-                });
-
             modelBuilder.Entity("ServicesApp.Models.Report", b =>
                 {
                     b.HasOne("ServicesApp.Models.ServiceRequest", "Request")
@@ -802,8 +776,6 @@ namespace ServicesApp.Migrations
 
             modelBuilder.Entity("ServicesApp.Models.ServiceRequest", b =>
                 {
-                    b.Navigation("Image");
-
                     b.Navigation("Offers");
 
                     b.Navigation("Reports");

@@ -2,6 +2,9 @@
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Interfaces;
 using ServicesApp.Helper;
+using Google.Apis.Auth;
+using Azure.Core;
+using ServicesApp.Dto.User;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -43,12 +46,9 @@ public class AuthController : ControllerBase
 					userId = appUser.Id
 				});
 			}
-			foreach (var error in res.Errors)
+			if(!_authRepository.CheckValidPassword(res.Errors))
 			{
-				if (error.Code.StartsWith("Password"))
-				{
-					return BadRequest(ApiResponses.InvalidPass);
-				}
+				return BadRequest(ApiResponses.InvalidPass);
 			}
 			return BadRequest(ApiResponses.NotValid);
 		}
@@ -59,7 +59,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("RegisterAdmin")]
-	// [Authorize(Roles = "")]
+	// [Authorize(Roles = "SuperAdmin")]
 	public async Task<IActionResult> RegisterAdmin([FromBody] RegistrationDto registerDto)
 	{
 		try
@@ -84,12 +84,9 @@ public class AuthController : ControllerBase
 					userId = appUser.Id
 				});
 			}
-			foreach (var error in res.Errors)
+			if (!_authRepository.CheckValidPassword(res.Errors))
 			{
-				if (error.Code.StartsWith("Password"))
-				{
-					return BadRequest(ApiResponses.InvalidPass);
-				}
+				return BadRequest(ApiResponses.InvalidPass);
 			}
 			return BadRequest(ApiResponses.NotValid);
 		}
@@ -108,7 +105,45 @@ public class AuthController : ControllerBase
 			{
 				return BadRequest(ApiResponses.NotValid);
 			}
+			var appUser = await _authRepository.CheckUser(loginDto.Email);
+			if (appUser != null && !appUser.EmailConfirmed)
+			{
+				return Unauthorized(ApiResponses.EmailNotVerified);
+			}
 			var (token, expiration) = await _authRepository.LoginUser(loginDto);
+			if (token != null)
+			{
+				return Ok(new
+				{
+					statusMsg = "success",
+					message = "Logged in Successfully.",
+					Token = token,
+					Expiration = expiration,
+				});
+			}
+			return Unauthorized(ApiResponses.Unauthorized);
+		}
+		catch
+		{
+			return StatusCode(500, ApiResponses.SomethingWrong);
+		}
+	}
+
+	[HttpPost("GoogleLogin/{Token}")]
+	public async Task<IActionResult> GoogleLogin(string Token)
+	{
+		try
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ApiResponses.NotValid);
+			}
+			var payload = await _authRepository.VerifyGoogleToken(Token);
+			if (payload == null)
+			{
+				return Unauthorized(ApiResponses.Unauthorized);
+			}
+			var (token, expiration) = await _authRepository.LoginGoogleUser(payload);
 			if (token != null)
 			{
 				return Ok(new
@@ -176,11 +211,7 @@ public class AuthController : ControllerBase
 			}
 			if (registrationDto.Password == registrationDto.ConfirmPassword)
 			{
-				Console.Write(registrationDto.Password);
-
-				var resetPassword = await _authRepository.ResetPassword(registrationDto.Email, registrationDto.Password);
-
-				if (resetPassword)
+				if (await _authRepository.ResetPassword(registrationDto.Email, registrationDto.Password))
 				{
 					return Ok(ApiResponses.PassChanged);
 				}
@@ -193,8 +224,36 @@ public class AuthController : ControllerBase
 		}
 	}
 
+	[HttpPut("VerifyOtp/{Email}/{Otp}")]
+	public async Task<IActionResult> VerifyOtp(string Email, string Otp)
+	{
+		try
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			var user = await _authRepository.CheckUser(Email);
+			if (user == null)
+			{
+				return NotFound(ApiResponses.UserNotFound);
+			}
+
+			var isValidOtp = await _authRepository.VerifyOtp(Email, Otp);
+			if (!isValidOtp)
+			{
+				return Unauthorized(ApiResponses.InvalidOtp);
+			}
+			return Ok(ApiResponses.OtpVerified);
+		}
+		catch
+		{
+			return StatusCode(500, ApiResponses.SomethingWrong);
+		}
+	}
+
 	[HttpPut("Deactivate/{UserId}")]
-	public async Task<IActionResult> DeactivateUser(string UserId)
+	public async Task<IActionResult> DeactivateUser(string UserId, [FromBody] DeactivationDto DeactivateDto)
 	{
 		try
 		{
@@ -207,7 +266,7 @@ public class AuthController : ControllerBase
 			{
 				return NotFound(ApiResponses.UserNotFound);
 			}
-			if (await _authRepository.DeactivateUser(UserId))
+			if (await _authRepository.DeactivateUser(UserId, DeactivateDto.Reason))
 			{
 				return Ok(ApiResponses.UserDeactivated);
 			}

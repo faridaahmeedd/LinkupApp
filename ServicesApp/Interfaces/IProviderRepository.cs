@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using ServicesApp.Core.Models;
 using ServicesApp.Models;
+using System.Threading.Tasks;
 
 namespace ServicesApp.Interfaces
 {
@@ -13,6 +13,8 @@ namespace ServicesApp.Interfaces
 		Task<bool> UpdateProvider(Provider ProviderUpdate);
 		Task<bool> DeleteProvider(string id);
 		bool CheckProviderBalance(string id);
-        bool Save();
+		Task<bool> ApproveProvider(string id);
+		bool CheckApprovedProvider(string id);
+		bool Save();
 	}
 }

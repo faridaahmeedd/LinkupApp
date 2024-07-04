@@ -72,7 +72,7 @@ namespace ServicesApp.Controllers
 					return BadRequest(ApiResponses.NotValid);
 				}
 				var category = _categoryRepository.GetCategory(CategoryName);
-				if (category == null)
+				if (!_categoryRepository.CategoryExist(CategoryName))
 				{
 					return NotFound(ApiResponses.CategoryNotFound);
 				}

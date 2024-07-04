@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ServicesApp.Core.Models;
 using ServicesApp.Models;
 using System.Collections.Generic;
 using System.Net.Mail;
@@ -24,9 +23,11 @@ namespace ServicesApp.Data
         public DbSet<Provider> Providers { get; set; }
 		public DbSet<Review> Reviews { get; set; }
 		public DbSet<Report> Reports { get; set; }
-		//public DbSet<Admin> Admins { get; set; }
+        public DbSet<Image> Images { get; set; }
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //public DbSet<Admin> Admins { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 
             base.OnModelCreating(modelBuilder);
@@ -53,6 +54,7 @@ namespace ServicesApp.Data
                 .HasMany(p => p.Offers)
                 .WithOne(o => o.Provider)
                 .OnDelete(DeleteBehavior.SetNull);
+         
             modelBuilder
                 .Entity<Subcategory>()
                 .HasMany(p => p.Services)

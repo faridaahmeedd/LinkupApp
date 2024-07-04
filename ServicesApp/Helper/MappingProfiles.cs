@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using ServicesApp.Core.Models;
 using ServicesApp.Dto.Authentication;
 using ServicesApp.Dto.Category;
 using ServicesApp.Dto.Reviews_Reports;
 using ServicesApp.Dto.Service;
 using ServicesApp.Dto.Subcategory;
 using ServicesApp.Dto.User;
+using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using System.Globalization;
 
@@ -28,7 +28,7 @@ namespace ServicesApp.Helper
 			CreateMap<AppUser, RegistrationDto>();
 			CreateMap<RegistrationDto, AppUser>();
 
-			CreateMap<Category, CategoryDto>();
+            CreateMap<Category, CategoryDto>();
 			CreateMap<CategoryDto, Category>();
 			CreateMap<Subcategory, SubcategoryDto>()
 				.ForMember(dest => dest.MinFeesAr, opt => opt.MapFrom(src => ConvertIntToArabic(src.MinFeesEn)))
@@ -43,19 +43,23 @@ namespace ServicesApp.Helper
 
 			CreateMap<ServiceRequest, GetServiceRequestDto>()
 				.ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Customer.Id))
-				.ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => $"{src.Customer.FName} {src.Customer.LName}"))
+                .ForMember(dest => dest.CustomerPhoneNumber, opt => opt.MapFrom(src => src.Customer.MobileNumber ))
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => $"{src.Customer.FName} {src.Customer.LName}"))
 				.ForMember(dest => dest.SubCategoryNameAr, opt => opt.MapFrom(src => src.Subcategory.NameAr))
                 .ForMember(dest => dest.SubCategoryNameEn, opt => opt.MapFrom(src => src.Subcategory.NameEn)
                 );
 			CreateMap<PostServiceRequestDto, ServiceRequest>();
 
 			CreateMap<ServiceOffer, GetServiceOfferDto>()
-				.ForMember(dest => dest.ProviderId, opt => opt.MapFrom(src => src.Provider.Id))
-				.ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => $"{src.Provider.FName} {src.Provider.LName}"))
+				.ForMember(dest => dest.ProviderId, opt => opt.MapFrom(src => src.Provider != null ? src.Provider.Id : ""))
+				.ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => src.Provider != null ? $"{src.Provider.FName} {src.Provider.LName}" : "Unknown"))
 				.ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Request.Id))
 				.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => ConvertTimeToString(src.Duration)));
 			CreateMap<PostServiceOfferDto, ServiceOffer>()
 				.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => ConvertStringToTime(src.Duration)));
+
+			CreateMap<Image, ImageDto>();
+			CreateMap<ImageDto, Image>();
 
 			CreateMap<TimeSlot, TimeSlotDto>()
 				.ForMember(dest => dest.Date, opt => opt.MapFrom(src => ConvertDateToString(src.Date)))

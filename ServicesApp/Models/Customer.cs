@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace ServicesApp.Core.Models
+namespace ServicesApp.Models
 {
 	[Table("Customer")]
 	public class Customer : AppUser

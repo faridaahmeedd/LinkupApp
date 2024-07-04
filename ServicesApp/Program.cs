@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
@@ -78,6 +77,10 @@ builder.Services.AddAuthentication(options =>{
 		ValidateAudience = true,
 		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
 	};
+}).AddGoogle(googleOptions =>
+{
+	googleOptions.ClientId = builder.Configuration["Google:ClientId"];
+	googleOptions.ClientSecret = builder.Configuration["Google:ClientSecret"];
 });
 builder.Services.AddCors(options =>
 {
@@ -87,7 +90,7 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader();
     });
 });
-
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

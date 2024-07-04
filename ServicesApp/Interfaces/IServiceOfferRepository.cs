@@ -10,6 +10,8 @@ namespace ServicesApp.Interfaces
 		ServiceOffer GetOffer(int id);
 		bool OfferExist(int id);
 		bool CreateOffer(ServiceOffer offer);
+		bool AdminAssignProvider(int offerId, string providerId);
+		bool ApproveAdminOffer(int offerId);
 		bool UpdateOffer(ServiceOffer updatedOffer);
 		bool DeleteOffer(int id);
 		bool AcceptOffer(int id);

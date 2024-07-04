@@ -11,7 +11,8 @@ namespace ServicesApp.Interfaces
 		ICollection<Report> GetReportsOfProvider(string providerId);
 		Report GetReport(int id);
 		bool ReportExist(int id);
-		bool CreateReport(Report report);
+		bool CreateCustomerReport(Report report);
+		bool CreateProviderReport(Report report);
 		bool Save();
 	}
 }

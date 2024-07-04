@@ -10,7 +10,9 @@
 		public string ProviderId { get; set; }
 		public string ProviderName { get; set; }
         public double ProviderAvgRating { get; set; }
-
         public int RequestId { get; set; }
-    }
+        public required bool Examination { get; set; }
+		public bool AdminOffer { get; set; } = false;
+		public string? AdminOfferStatus { get; set; }  // approved declined
+	}
 }

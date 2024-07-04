@@ -1,4 +1,6 @@
-﻿namespace ServicesApp.Dto.Service
+using ServicesApp.Models;
+
+namespace ServicesApp.Dto.Service
 {
 	public class GetServiceRequestDto
 	{
@@ -14,7 +16,6 @@
         public string PaymentMethod { get; set; }
 		public string PaymentStatus { get; set; }
 		public bool Volunteer { get; set; }
-		public byte[]? Image { get; set; }
 		public string ExaminationComment { get; set; }
 		public string? Emergency { get; set; }
 		//public int MaxFees { get; set; }

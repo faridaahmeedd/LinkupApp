@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicesApp.Data;
 
@@ -11,9 +12,11 @@ using ServicesApp.Data;
 namespace ServicesApp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240627161526_img")]
+    partial class img
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,13 +253,13 @@ namespace ServicesApp.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             Active = true,
-                            ConcurrencyStamp = "e1c0701f-3d59-43dc-9700-b3338cfc8636",
+                            ConcurrencyStamp = "f586215c-61b0-405c-a014-f10f68d592e8",
                             Email = "SuperAdmin@gmail.com",
                             EmailConfirmed = true,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKPlxKBEjVh6b0Ggvu4T2S/1tnSUKZOmfA61eVcevdea6/VFCDvCnyWfphNF0Upr5A==",
-                            SecurityStamp = "c85fb936-c0c9-4524-ba83-331f5cc90a67",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMe0TUStH8v4mE1cKQaZzu4rK3eF7pnD9iFbNDYHdJzWn8GZY+cud+SOV8jtFTvYag==",
+                            SecurityStamp = "0ed19b51-7591-4e3f-a96a-f78a673755ac",
                             UserName = "SuperAdmin"
                         });
                 });
@@ -381,12 +384,6 @@ namespace ServicesApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("AdminOffer")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("AdminOfferStatus")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<TimeOnly>("Duration")
                         .HasColumnType("time");
 
@@ -431,9 +428,6 @@ namespace ServicesApp.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Emergency")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ExaminationComment")
@@ -594,9 +588,6 @@ namespace ServicesApp.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Approved")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Balance")
                         .HasColumnType("int");
 
@@ -628,9 +619,6 @@ namespace ServicesApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobileNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OfficialDocument")
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("Provider");

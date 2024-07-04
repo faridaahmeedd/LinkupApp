@@ -25,10 +25,12 @@ namespace ServicesApp.Interfaces
 		bool AddExaminationComment(int ServiceId, string Comment);
 		bool AddEmergency(int ServiceId, string EmergencyType);
 		int CreateRequestAfterExamination(int ServiceId);
-		//ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
-		//bool CheckServiceMinFees(ServiceRequest service, int categoryId);
-		//bool UpdateMaxFees(int serviceId, int maxFees);
-		//ICollection<ServiceRequest> GetServicesWithFees();
-		//ICollection<ServiceRequest> GetServicesWithFees(string customerId);
-	}
+		ICollection<Image> GetImagesOfService(int ServiceId);
+		bool AddImages(List<Image> images);
+		bool DeleteImage(int id);
+        //ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
+        //bool CheckServiceMinFees(ServiceRequest service, int categoryId);
+        //bool UpdateMaxFees(int serviceId, int maxFees);
+        //ICollection<ServiceRequest> GetServicesWithFees(string customerId);
+    }
 }

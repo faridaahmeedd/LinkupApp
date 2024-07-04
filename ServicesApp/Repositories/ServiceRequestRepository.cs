@@ -61,7 +61,6 @@ namespace ServicesApp.Repository
 				var newService = new ServiceRequest
 				{
 					Description = existingService.ExaminationComment,
-					Image = existingService.Image,
 					Location = existingService.Location,
 					PaymentMethod = existingService.PaymentMethod,
 					PaymentStatus = "Pending",
@@ -86,7 +85,6 @@ namespace ServicesApp.Repository
 				if (existingService.Status == "Requested")
                 {
 					existingService.Description = updatedService.Description;
-					existingService.Image = updatedService.Image;
 					existingService.Location = updatedService.Location;
 					existingService.PaymentMethod = updatedService.PaymentMethod;
 				}
@@ -252,6 +250,31 @@ namespace ServicesApp.Repository
 			}
 			return false;
 		}
+
+        public ICollection<Image> GetImagesOfService(int ServiceId) 
+        {
+            return _context.Images.Where(p => p.ServiceRequest.Id == ServiceId).ToList();
+        }
+
+        public bool AddImages(List<Image> images)
+        {
+            foreach (var item in images)
+            {
+                _context.Add(item);
+            }
+            return Save();
+        }
+
+        public bool DeleteImage(int id)
+        {
+            var image = _context.Images.Find(id);
+            if (image != null)
+            {
+                _context.Images.Remove(image);
+                return Save();
+            }
+            return false; 
+        }
 
 		//public ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string providerId)
 		//{

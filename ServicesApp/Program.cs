@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ServicesApp.Data;
+using ServicesApp.EmailSetting;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Repositories;
 using ServicesApp.Repository;
+using ServicesApp.Setting;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -91,6 +93,9 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddMemoryCache();
+builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("SMTP"));
+builder.Services.Configure<GoogleSetting>(builder.Configuration.GetSection("Google"));
+
 
 var app = builder.Build();
 

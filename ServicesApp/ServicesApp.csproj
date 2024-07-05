@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Mails\DeactivationMail.html" />
+    <None Include="wwwroot\Mails\RegistrationMail.html" />
+    <None Include="wwwroot\Mails\ResetPassMail.html" />
+    <None Include="wwwroot\Mails\WarningMail.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Google.Apis.Auth" Version="1.68.0" />

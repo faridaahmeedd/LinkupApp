@@ -17,6 +17,8 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Web.Helpers;
 using Microsoft.EntityFrameworkCore;
 using ServicesApp.Data;
+using ServicesApp.EmailSetting;
+using ServicesApp.Setting;
 
 public class AuthRepository : IAuthRepository
 {
@@ -25,15 +27,19 @@ public class AuthRepository : IAuthRepository
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IMapper _mapper;
 	private readonly IProviderRepository _providerRepository;
-	private readonly IMemoryCache _cache; 
+	private readonly IMemoryCache _cache;
+	private readonly EmailSetting _emailSetting;
+    private readonly GoogleSetting _googleSetting ;
 
-	public AuthRepository(
+
+    public AuthRepository(
 		UserManager<AppUser> userManager,
 		IConfiguration config,
 		RoleManager<IdentityRole> roleManager,
 		IMapper mapper,
 		IProviderRepository providerRepository,
-		IMemoryCache cache)
+		IMemoryCache cache,
+		IOptions<EmailSetting> emailSetting , IOptions<GoogleSetting> googleSetting)
 	{
 		_userManager = userManager;
 		_config = config;
@@ -41,6 +47,8 @@ public class AuthRepository : IAuthRepository
 		_mapper = mapper;
 		_providerRepository = providerRepository;
 		_cache = cache;
+		_emailSetting = emailSetting.Value;
+		_googleSetting = googleSetting.Value;
 	}
 
 	public async Task<AppUser?> CheckUser(string email)
@@ -216,7 +224,7 @@ public class AuthRepository : IAuthRepository
 		{
 			var settings = new GoogleJsonWebSignature.ValidationSettings()
 			{
-				Audience = new List<string> { _config["Google:ClientId"] }
+				Audience = new List<string> { _googleSetting.ClientId }
 			};
 			var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
 			return payload;
@@ -326,8 +334,8 @@ public class AuthRepository : IAuthRepository
 
 	private async Task<bool> SendEmailAsync(string recipientEmail, string subject, string htmlContent)
 	{
-		string senderEmail = _config["SMTP:From"];
-		string senderPassword = _config["SMTP:Password"];
+		string senderEmail = _emailSetting.from;
+		string senderPassword = _emailSetting.Password;
 
 		try
 		{
@@ -371,7 +379,7 @@ public class AuthRepository : IAuthRepository
 	{
 		try
 		{
-			string htmlContent = File.ReadAllText("Mails/RegistrationMail.html");
+			string htmlContent = File.ReadAllText(@"wwwroot\Mails\RegistrationMail.html");
 			htmlContent = htmlContent.Replace("{OtpPlaceholder}", otp);
 
 			return SendEmailAsync(recipientEmail, "Welcome to Linkup", htmlContent).Result;
@@ -387,7 +395,7 @@ public class AuthRepository : IAuthRepository
 	{
 		try
 		{
-			string htmlContent = File.ReadAllText("Mails/ResetPassMail.html");
+			string htmlContent = File.ReadAllText(@"wwwroot\Mails\ResetPassMail.html");
 			htmlContent = htmlContent.Replace("{ResetCodePlaceholder}", resetCode);
 
 			return SendEmailAsync(recipientEmail, "Linkup Reset Password", htmlContent).Result;
@@ -403,7 +411,7 @@ public class AuthRepository : IAuthRepository
 	{
 		try
 		{
-			string htmlContent = File.ReadAllText("Mails/DeactivationMail.html");
+			string htmlContent = File.ReadAllText(@"wwwroot\Mails\DeactivationMail.html");
 			htmlContent = htmlContent.Replace("{ReasonPlaceholder}", reason);
 
 			return SendEmailAsync(recipientEmail, "Linkup Deactivation", htmlContent).Result;
@@ -419,7 +427,7 @@ public class AuthRepository : IAuthRepository
 	{
 		try
 		{
-			string htmlContent = File.ReadAllText("Mails/WarningMail.html");
+			string htmlContent = File.ReadAllText(@"wwwroot\Mails\WarningMail.html");
 
 			return SendEmailAsync(recipientEmail, "Linkup Warning", htmlContent).Result;
 		}

@@ -93,24 +93,6 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-		[HttpGet("UncompletedServices")]
-		public IActionResult GetUncompletedServices()
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ApiResponses.NotValid);
-				}
-				var services = _mapper.Map<List<GetServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
-				return Ok(services);
-			}
-			catch
-			{
-				return StatusCode(500, ApiResponses.SomethingWrong);
-			}
-		}
-
 		[HttpPut("Complete/{ServiceId}")]
         public IActionResult CompleteService(int ServiceId)
 		{
@@ -496,27 +478,45 @@ namespace ServicesApp.Controllers
 			}
 		}
 
-		//[HttpGet("MatchedRequestsOfProvider/{ProviderId}")]
-		//public IActionResult GetMatchedRequestsOfProvider(string ProviderId)
-		//{
-		//	try
-		//	{
-		//		if (!ModelState.IsValid)
-		//		{
-		//			return BadRequest(ModelState);
-		//		}
-		//		if (! _providerRepository.ProviderExist(ProviderId))
-		//		{
-		//			return NotFound(ApiResponses.UserNotFound);
-		//		}
-		//		var services = _serviceRepository.GetMatchedRequestsOfProvider(ProviderId);
-		//		var mapServices = _mapper.Map<List<GetServiceRequestDto>>(services);
-		//		return Ok(mapServices);
-		//	}
-		//	catch
-		//	{
-		//		return StatusCode(500, ApiResponses.SomethingWrong);
-		//	}
-		//}
+		[HttpGet("MatchedRequestsOfProvider/{ProviderId}")]
+		public IActionResult GetMatchedRequestsOfProvider(string ProviderId)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ModelState);
+				}
+				if (!_providerRepository.ProviderExist(ProviderId))
+				{
+					return NotFound(ApiResponses.UserNotFound);
+				}
+				var services = _serviceRepository.GetMatchedRequestsOfProvider(ProviderId);
+				var mapServices = _mapper.Map<List<GetServiceRequestDto>>(services);
+				return Ok(mapServices);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
+
+		[HttpGet("UncompletedServices")]
+		public IActionResult GetUncompletedServices()
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ApiResponses.NotValid);
+				}
+				var services = _mapper.Map<List<GetServiceRequestDto>>(_serviceRepository.GetUncompletedServices());
+				return Ok(services);
+			}
+			catch
+			{
+				return StatusCode(500, ApiResponses.SomethingWrong);
+			}
+		}
 	}
 }

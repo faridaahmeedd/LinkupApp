@@ -336,7 +336,7 @@ namespace ServicesApp.Tests.Controller
 			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
 			A.CallTo(() => _serviceRepository.GetUndeclinedOffersOfService(serviceId)).Returns(offers);
 			A.CallTo(() => _mapper.Map<List<GetServiceOfferDto>>(offers)).Returns(offerDtos);
-			A.CallTo(() => _reviewRepository.CalculateAvgRating(A<string>._)).Returns(Task.FromResult(4.5)); 
+			A.CallTo(() => _reviewRepository.CalculateAvgRating(A<string>._)).Returns(Task.FromResult(4.5));
 
 			// Act
 			var result = await _controller.GetUndeclinedOffersOfService(serviceId);
@@ -708,6 +708,186 @@ namespace ServicesApp.Tests.Controller
 			var okResult = Assert.IsType<OkObjectResult>(result);
 			Assert.Equal(200, okResult.StatusCode);
 			Assert.Equal(ApiResponses.SuccessUpdated, okResult.Value);
+		}
+
+		[Fact]
+		public void AddImages_InvalidModelState_ReturnsBadRequest()
+		{
+			// Arrange
+			_controller.ModelState.AddModelError("key", "error message");
+			int serviceId = 1;
+			var imagesDto = new List<ImageDto>();
+
+			// Act
+			var result = _controller.AddImages(serviceId, imagesDto);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(ApiResponses.NotValid, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void AddImages_ServiceNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			int serviceId = 1;
+			var imagesDto = new List<ImageDto>();
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(false);
+
+			// Act
+			var result = _controller.AddImages(serviceId, imagesDto);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(ApiResponses.RequestNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void AddImages_ExceedsImageLimit_ReturnsBadRequest()
+		{
+			// Arrange
+			int serviceId = 1;
+			var imagesDto = A.CollectionOfFake<ImageDto>(5).ToList(); // Creating a list with 5 fake ImageDto objects
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.GetImagesOfService(serviceId)).Returns(A.CollectionOfFake<Image>(1).ToList());
+
+			// Act
+			var result = _controller.AddImages(serviceId, imagesDto);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(ApiResponses.ImagesExceededMax, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void AddImages_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			int serviceId = 1;
+			var imagesDto = A.CollectionOfFake<ImageDto>(5).ToList();
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.GetImagesOfService(serviceId)).Returns(A.Fake<List<Image>>());
+			A.CallTo(() => _serviceRepository.GetService(serviceId)).Returns(A.Fake<ServiceRequest>());
+
+			// Act
+			var result = _controller.AddImages(serviceId, imagesDto);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(ApiResponses.SuccessCreated, okResult.Value);
+		}
+
+		[Fact]
+		public void GetImageOfService_InvalidModelState_ReturnsBadRequest()
+		{
+			// Arrange
+			_controller.ModelState.AddModelError("key", "error message");
+			int serviceId = 1;
+
+			// Act
+			var result = _controller.GetImageOfService(serviceId);
+
+			// Assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.Equal(ApiResponses.NotValid, badRequestResult.Value);
+		}
+
+		[Fact]
+		public void GetImageOfService_ServiceNotFound_ReturnsNotFound()
+		{
+			// Arrange
+			int serviceId = 1;
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(false);
+
+			// Act
+			var result = _controller.GetImageOfService(serviceId);
+
+			// Assert
+			var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+			Assert.Equal(ApiResponses.RequestNotFound, notFoundResult.Value);
+		}
+
+		[Fact]
+		public void GetImageOfService_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			int serviceId = 1;
+			var images = A.CollectionOfFake<Image>(3).ToList();
+			var imagesDto = A.CollectionOfFake<ImageDto>(3).ToList();
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Returns(true);
+			A.CallTo(() => _serviceRepository.GetImagesOfService(serviceId)).Returns(images);
+			A.CallTo(() => _mapper.Map<List<ImageDto>>(images)).Returns(imagesDto);
+
+			// Act
+			var result = _controller.GetImageOfService(serviceId);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			var resultValue = Assert.IsType<List<ImageDto>>(okResult.Value);
+			Assert.Equal(imagesDto, resultValue);
+		}
+
+		[Fact]
+		public void GetImageOfService_Exception_ReturnsStatusCode500()
+		{
+			// Arrange
+			int serviceId = 1;
+			A.CallTo(() => _serviceRepository.ServiceExist(serviceId)).Throws(new System.Exception());
+
+			// Act
+			var result = _controller.GetImageOfService(serviceId);
+
+			// Assert
+			var statusCodeResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, statusCodeResult.StatusCode);
+			Assert.Equal(ApiResponses.SomethingWrong, statusCodeResult.Value);
+		}
+
+		[Fact]
+		public void DeleteImage_ImageNotDeleted_ReturnsStatusCode500()
+		{
+			// Arrange
+			int imageId = 1;
+			A.CallTo(() => _serviceRepository.DeleteImage(imageId)).Returns(false);
+
+			// Act
+			var result = _controller.DeleteImage(imageId);
+
+			// Assert
+			var statusCodeResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, statusCodeResult.StatusCode);
+			Assert.Equal(ApiResponses.FailedToDelete, statusCodeResult.Value);
+		}
+
+		[Fact]
+		public void DeleteImage_ValidRequest_ReturnsOk()
+		{
+			// Arrange
+			int imageId = 1;
+			A.CallTo(() => _serviceRepository.DeleteImage(imageId)).Returns(true);
+
+			// Act
+			var result = _controller.DeleteImage(imageId);
+
+			// Assert
+			var okResult = Assert.IsType<OkObjectResult>(result);
+			Assert.Equal(ApiResponses.SuccessDeleted, okResult.Value);
+		}
+
+		[Fact]
+		public void DeleteImage_Exception_ReturnsStatusCode500()
+		{
+			// Arrange
+			int imageId = 1;
+			A.CallTo(() => _serviceRepository.DeleteImage(imageId)).Throws(new Exception());
+
+			// Act
+			var result = _controller.DeleteImage(imageId);
+
+			// Assert
+			var statusCodeResult = Assert.IsType<ObjectResult>(result);
+			Assert.Equal(500, statusCodeResult.StatusCode);
+			Assert.Equal(ApiResponses.SomethingWrong, statusCodeResult.Value);
 		}
 	}
 }

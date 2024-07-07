@@ -41,7 +41,7 @@ namespace ServicesApp.Repositories
 		{
 			var request = _serviceRepository.GetService(ServiceId);
 			var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
-            var fees = offer.Examination ? (200 + request.Customer.Balance) : (offer.Fees + request.Customer.Balance);
+            var fees = offer.Fees + request.Customer.Balance;
             var data = new
 			{
 				amount = (100 *fees).ToString(),
@@ -81,7 +81,7 @@ namespace ServicesApp.Repositories
 		{
 			var request = _serviceRepository.GetService(ServiceId);
 			var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
-            var fees = offer.Examination ? (200 + request.Customer.Balance) : (offer.Fees + request.Customer.Balance);
+            var fees = offer.Fees + request.Customer.Balance;
 
             string token = await auth();
 

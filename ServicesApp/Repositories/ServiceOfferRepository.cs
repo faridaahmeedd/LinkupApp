@@ -33,6 +33,10 @@ namespace ServicesApp.Repository
 
 		public bool CreateOffer(ServiceOffer offer)
 		{
+			if(offer.Examination)
+			{
+				offer.Fees = 200;
+			}
 			_context.Add(offer);
 			return Save();
 		}

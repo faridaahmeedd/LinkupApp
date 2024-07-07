@@ -44,8 +44,9 @@ namespace ServicesApp.Repositories
 				var jsonResponse = await response.Content.ReadAsStringAsync();
 				var jsonObject = JObject.Parse(jsonResponse);
 				var predictedSubcategory = jsonObject["subcategory"].ToString();
+				Console.WriteLine(predictedSubcategory);
 
-				if (predictedSubcategory == request.Subcategory.NameAr || predictedSubcategory == request.Subcategory.NameEn)
+				if (predictedSubcategory == request.Subcategory.NameAr.ToLower() || predictedSubcategory == request.Subcategory.NameEn.ToLower())
 				{
 					return true;
 				}

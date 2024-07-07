@@ -1,6 +1,4 @@
-﻿using ServicesApp.Core.Models;
-
-namespace ServicesApp.Models
+﻿namespace ServicesApp.Models
 {
 	public class Review
 	{

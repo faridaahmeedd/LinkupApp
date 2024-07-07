@@ -33,7 +33,32 @@ namespace ServicesApp.Repository
 
 		public bool CreateOffer(ServiceOffer offer)
 		{
+			if(offer.Examination)
+			{
+				offer.Fees = 200;
+			}
 			_context.Add(offer);
+			return Save();
+		}
+
+		public bool AdminAssignProvider(int offerId, string providerId)
+		{
+			var existingOffer = GetOffer(offerId);
+			if (existingOffer != null && existingOffer.AdminOffer)
+			{
+				existingOffer.Provider = _context.Providers.Find(providerId);
+			}
+			return Save();
+		}
+
+		public bool ApproveAdminOffer(int offerId)
+		{
+			var existingOffer = GetOffer(offerId);
+			if (existingOffer != null && existingOffer.AdminOffer)
+			{
+				existingOffer.AdminOfferStatus = "Approved";
+				existingOffer.AdminOffer = false;
+			}
 			return Save();
 		}
 
@@ -42,7 +67,7 @@ namespace ServicesApp.Repository
 			var request = _context.Requests.Include(r => r.Subcategory).Where(r=> r.Id == serviceOffer.Request.Id).FirstOrDefault();
 			if (request != null)
 			{
-				if (request.Volunteer == true)
+				if (request.Volunteer == true || serviceOffer.Examination)
 				{
 					return true;
 				}
@@ -72,6 +97,7 @@ namespace ServicesApp.Repository
 			}
 			return false;
 		}
+
         public bool IsOfferAccepted(int requestId)
         {
             var acceptedOffer = _context.Offers
@@ -107,6 +133,7 @@ namespace ServicesApp.Repository
 					existingOffer.Fees = updatedOffer.Fees;
 					existingOffer.TimeSlotId = updatedOffer.TimeSlotId;
 					existingOffer.Duration = updatedOffer.Duration;
+					existingOffer.Examination = updatedOffer.Examination;
 					return Save();
 				}
 			}
@@ -120,7 +147,7 @@ namespace ServicesApp.Repository
 			{
 				return false;
 			}
-			if (offer.Status == "Accepted")
+			if (offer.Status == "Accepted" && offer.Provider != null)
 			{
 				var timeSlot = _context.TimeSlots.Where(t => t.Id == offer.TimeSlotId).FirstOrDefault();
 
@@ -131,10 +158,16 @@ namespace ServicesApp.Repository
 				// Check if the difference is greater than or equal to 24 hours
 				if (offerTime <= TimeAfter24)
 				{
-					offer.Provider.Balance += (offer.Fees * 10) / 100;
+					offer.Provider.Balance += (offer.Fees * 50) / 100;
 				}
-				offer.Request.Status = "Requested";
+				//offer.Request.Status = "Requested";
 				timeSlot.ToTime = TimeOnly.MinValue;
+
+				//offer.Status = "Offered";
+				offer.AdminOffer = true;
+				offer.AdminOfferStatus = null;
+				offer.Provider = null;
+				return Save();
 			}
 			_context.Remove(offer);
 			return Save();

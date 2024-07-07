@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using ServicesApp.Core.Models;
 using ServicesApp.Data;
+using ServicesApp.EmailSetting;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
 using ServicesApp.Repositories;
 using ServicesApp.Repository;
+using ServicesApp.Setting;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -78,6 +79,10 @@ builder.Services.AddAuthentication(options =>{
 		ValidateAudience = true,
 		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
 	};
+}).AddGoogle(googleOptions =>
+{
+	googleOptions.ClientId = builder.Configuration["Google:ClientId"];
+	googleOptions.ClientSecret = builder.Configuration["Google:ClientSecret"];
 });
 builder.Services.AddCors(options =>
 {
@@ -87,6 +92,9 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader();
     });
 });
+builder.Services.AddMemoryCache();
+builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("SMTP"));
+builder.Services.Configure<GoogleSetting>(builder.Configuration.GetSection("Google"));
 
 
 var app = builder.Build();

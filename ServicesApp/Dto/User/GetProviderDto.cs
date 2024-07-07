@@ -14,8 +14,10 @@
         public required DateOnly BirthDate { get; set; }
         public required string JobTitle { get; set; }
         public string? Description { get; set; }
-        public byte[]? Image { get; set; }
+		public string? OfficialDocument { get; set; }
+		public byte[]? Image { get; set; }
         public required int Balance { get; set; }
         public required bool Active { get; set; }
-    }
+		public bool Approved { get; set; }
+	}
 }

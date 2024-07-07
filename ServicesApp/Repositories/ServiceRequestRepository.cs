@@ -51,8 +51,32 @@ namespace ServicesApp.Repository
             _context.Add(service);
 			return Save();
 		}
-       
-        public bool UpdateService(ServiceRequest updatedService)
+
+		public int CreateRequestAfterExamination(int ServiceId)
+		{
+            var existingService = GetService(ServiceId);
+
+            if (existingService != null)
+			{
+				var newService = new ServiceRequest
+				{
+					Description = existingService.ExaminationComment,
+					Location = existingService.Location,
+					PaymentMethod = existingService.PaymentMethod,
+					PaymentStatus = "Pending",
+					Status = "Requested",
+					Customer = existingService.Customer,
+					Subcategory = existingService.Subcategory,
+					Volunteer = existingService.Volunteer,
+				};
+				_context.Requests.Add(newService);
+                Save();
+                return newService.Id;
+			}
+			return 0;
+		}
+
+		public bool UpdateService(ServiceRequest updatedService)
         {
             var existingService = _context.Requests.Find(updatedService.Id);
             if (existingService != null)
@@ -61,7 +85,6 @@ namespace ServicesApp.Repository
 				if (existingService.Status == "Requested")
                 {
 					existingService.Description = updatedService.Description;
-					existingService.Image = updatedService.Image;
 					existingService.Location = updatedService.Location;
 					existingService.PaymentMethod = updatedService.PaymentMethod;
 				}
@@ -70,7 +93,31 @@ namespace ServicesApp.Repository
             return false;
         }
 
-        public bool DeleteService(int id)
+		public bool AddExaminationComment(int ServiceId, string Comment)
+		{
+			var existingService = GetService(ServiceId);
+			
+			if (existingService != null)
+			{
+				existingService.ExaminationComment = Comment;
+				return Save();
+			}
+			return false;
+		}
+
+		public bool AddEmergency(int ServiceId, string EmergencyType)
+		{
+			var existingService = GetService(ServiceId);
+
+			if (existingService != null)
+			{
+				existingService.Emergency = EmergencyType;
+				return Save();
+			}
+			return false;
+		}
+
+		public bool DeleteService(int id)
 		{
 			var service = _context.Requests.Include(c => c.Customer).Where(p => p.Id == id).FirstOrDefault();
 			if (service.Status == "Completed")
@@ -89,7 +136,7 @@ namespace ServicesApp.Repository
 				// Check if the difference is greater than or equal to 24 hours
 				if (offerTime <= TimeAfter24)
                 {
-					service.Customer.Balance += (offer.Fees * 10)/100 ;
+					service.Customer.Balance += (offer.Fees * 50)/100 ;
 				}
             }
 			_context.Remove(service!);
@@ -194,20 +241,67 @@ namespace ServicesApp.Repository
 			return calendarDtos;
 		}
 
-		//public ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string providerId)
-		//{
-		//	var requests = GetUncompletedServices();
-		//	var matchedRequests = new List<ServiceRequest>();
+		public bool CheckRequestCompleted(int requestId)
+		{
+			var request = _context.Requests.FirstOrDefault(r => r.Id == requestId && r.Status == "Completed");
+			if (request != null)
+			{
+				return true;
+			}
+			return false;
+		}
 
-		//	foreach (var request in requests)
-		//	{
-		//		bool isMatched = _MLRepository.MatchJobAndService(request.Id, providerId).Result;
-		//		if (isMatched)
-		//		{
-		//			matchedRequests.Add(request);
-		//		}
-		//	}
-		//	return matchedRequests;
-		//}
+        public ICollection<Image> GetImagesOfService(int ServiceId) 
+        {
+            return _context.Images.Where(p => p.ServiceRequest.Id == ServiceId).ToList();
+        }
+
+        public bool AddImages(List<Image> images)
+        {
+            foreach (var item in images)
+            {
+                _context.Add(item);
+            }
+            return Save();
+        }
+
+        public bool DeleteImage(int id)
+        {
+            var image = _context.Images.Find(id);
+            if (image != null)
+            {
+                _context.Images.Remove(image);
+                return Save();
+            }
+            return false; 
+        }
+
+		public ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string providerId)
+		{
+			var requests = GetUncompletedServices();
+			var matchedRequests = new List<ServiceRequest>();
+
+			try
+			{
+				foreach (var request in requests)
+				{
+					bool isMatched = _MLRepository.MatchJobAndService(request.Id, providerId).Result;
+					if (isMatched)
+					{
+						matchedRequests.Add(request);
+						Console.WriteLine(request.Id.ToString(), "-----------------------TRYYYY---------------------------------");
+					}
+				}
+			}
+			catch
+			{
+				matchedRequests = (List<ServiceRequest>)requests;
+				foreach (var request in matchedRequests)
+				{
+					Console.WriteLine(request.Id.ToString(), "-----------------------CATCHH---------------------------------");
+				}
+			}
+			return matchedRequests;
+		}
 	}
 }

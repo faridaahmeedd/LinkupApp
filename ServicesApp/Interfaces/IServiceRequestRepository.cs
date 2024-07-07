@@ -21,10 +21,16 @@ namespace ServicesApp.Interfaces
 		bool CompleteService(int id);
 		bool UpdateUnknownSubcategory(int serviceId, string subcategoryName);
 		ICollection<GetCalendarDto> GetCalendarDetails(string CustomerId);
-		//ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
+		bool CheckRequestCompleted(int requestId);
+		bool AddExaminationComment(int ServiceId, string Comment);
+		bool AddEmergency(int ServiceId, string EmergencyType);
+		int CreateRequestAfterExamination(int ServiceId);
+		ICollection<Image> GetImagesOfService(int ServiceId);
+		bool AddImages(List<Image> images);
+		bool DeleteImage(int id);
+		ICollection<ServiceRequest> GetMatchedRequestsOfProvider(string ProviderId);
 		//bool CheckServiceMinFees(ServiceRequest service, int categoryId);
 		//bool UpdateMaxFees(int serviceId, int maxFees);
-		//ICollection<ServiceRequest> GetServicesWithFees();
 		//ICollection<ServiceRequest> GetServicesWithFees(string customerId);
 	}
 }

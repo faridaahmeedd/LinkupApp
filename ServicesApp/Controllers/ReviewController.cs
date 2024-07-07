@@ -7,6 +7,7 @@ using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using ServicesApp.Repositories;
 using ServicesApp.Helper;
+using System.Collections.Generic;
 
 namespace ServicesApp.Controllers
 {
@@ -63,8 +64,8 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponses.ReviewNotFound);
                 }
-                var Review = _ReviewRepository.GetReview(ReviewId);
-                var mapReview = _mapper.Map<GetReviewDto>(Review);
+                var review = _ReviewRepository.GetReview(ReviewId);
+                var mapReview = _mapper.Map<GetReviewDto>(review);
                 return Ok(mapReview);
             }
             catch
@@ -86,13 +87,9 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponses.UserNotFound);
                 }
-                var Review = _ReviewRepository.GetReviewsOfCustomer(CustomerId);
-                var mappedReviews = Review.Select(review =>
-                {
-                    var reviewDto = _mapper.Map<GetReviewDto>(review);
-                    return reviewDto;
-                }).ToList();
-                return Ok(mappedReviews);
+                var reviews = _ReviewRepository.GetReviewsOfCustomer(CustomerId);
+                var mappedReviews = _mapper.Map<List<GetReviewDto>>(reviews);
+				return Ok(mappedReviews);
             }
             catch
             {
@@ -113,13 +110,8 @@ namespace ServicesApp.Controllers
                 {
                     return NotFound(ApiResponses.UserNotFound);
                 }
-                var Reviews = _ReviewRepository.GetReviewsOfProvider(ProviderId);
-                var mappedReviews = Reviews.Select(review =>
-                {
-                    var reviewDto = _mapper.Map<GetReviewDto>(review);
-                    return reviewDto;
-                }).ToList();
-
+                var reviews = _ReviewRepository.GetReviewsOfProvider(ProviderId);
+				var mappedReviews = _mapper.Map<List<GetReviewDto>>(reviews);
                 return Ok(mappedReviews);
             }
             catch
@@ -142,7 +134,11 @@ namespace ServicesApp.Controllers
                     return NotFound(ApiResponses.UserNotFound);
                 }
                 var rating = await _ReviewRepository.CalculateAvgRating(Id);
-                return Ok(rating);
+				if (rating < 0 || rating > 5)
+				{
+					return BadRequest(ApiResponses.InvalidRating);
+				}
+				return Ok(rating);
             }
             catch
             {
@@ -151,7 +147,7 @@ namespace ServicesApp.Controllers
         }
 
         [HttpPost("Customer/{RequestId}")]
-        public async Task<IActionResult> CreateCustomerReview(int RequestId, [FromBody] PostReviewDto ReviewCreate)
+        public async Task<IActionResult> CreateCustomerReview([FromBody] PostReviewDto ReviewCreate, int RequestId)
         {
             try
             {
@@ -159,30 +155,24 @@ namespace ServicesApp.Controllers
                 {
                     return BadRequest(ApiResponses.NotValid);
                 }
-
-                var mapReview = _mapper.Map<Review>(ReviewCreate);
                 if (!_serviceRequestRepository.ServiceExist(RequestId))
                 {
                     return NotFound(ApiResponses.RequestNotFound);
                 }
-
-				if (!_ReviewRepository.CheckRequestOfReviewCompleted(RequestId))
+				if (!_serviceRequestRepository.CheckRequestCompleted(RequestId))
 				{
 					return BadRequest(ApiResponses.UncompletedService);
 				}
-
-				mapReview.Request = _serviceRequestRepository.GetService(RequestId);
-				var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(mapReview.Request.Id);
-				mapReview.ReviewerName = acceptedOffer?.Provider?.FName + " " + acceptedOffer?.Provider?.LName;
-
-				if (_ReviewRepository.GetReviewsOfRequest(mapReview.Request.Id).Any(review => review.ReviewerRole == "Provider"))
+				if (_ReviewRepository.IsProviderAlreadyReviewed(RequestId))
 				{
-                    return BadRequest(ApiResponses.ServiceAlreadyReviewed);
-                }
+					return BadRequest(ApiResponses.ServiceAlreadyReviewed);
+				}
+
+				var mapReview = _mapper.Map<Review>(ReviewCreate);
+				mapReview.Request = _serviceRequestRepository.GetService(RequestId);
+               
+                await _ReviewRepository.CreateCustomerReview(mapReview);
                 mapReview.ReviewerRole = "Provider";
-                _ReviewRepository.CreateReview(mapReview);
-                
-                 await _ReviewRepository.Warning(mapReview.Request.Customer.Id);
 
                 return Ok(new
                 {
@@ -198,7 +188,7 @@ namespace ServicesApp.Controllers
         }
 
         [HttpPost("Provider/{RequestId}")]
-        public async Task<IActionResult> CreateProviderReview(int RequestId, [FromBody] PostReviewDto ReviewCreate)
+        public async Task<IActionResult> CreateProviderReview([FromBody] PostReviewDto ReviewCreate, int RequestId)
         {
             try
             {
@@ -206,29 +196,25 @@ namespace ServicesApp.Controllers
                 {
                     return BadRequest(ApiResponses.NotValid);
                 }
-
-                var mapReview = _mapper.Map<Review>(ReviewCreate);
                 if (!_serviceRequestRepository.ServiceExist(RequestId))
                 {
                     return NotFound(ApiResponses.RequestNotFound);
                 }
-                if (!_ReviewRepository.CheckRequestOfReviewCompleted(RequestId))
-                {
-                    return BadRequest(ApiResponses.UncompletedService);
+				if (!_serviceRequestRepository.CheckRequestCompleted(RequestId))
+				{
+					return BadRequest(ApiResponses.UncompletedService);
+				}
+				if (_ReviewRepository.IsCustomerAlreadyReviewed(RequestId))
+				{
+					return BadRequest(ApiResponses.ServiceAlreadyReviewed);
 				}
 
-                mapReview.Request = _serviceRequestRepository.GetService(RequestId);
-				mapReview.ReviewerName = mapReview.Request.Customer.FName + " " + mapReview.Request.Customer.LName;
-
-                if (_ReviewRepository.GetReviewsOfRequest(mapReview.Request.Id).Any(review => review.ReviewerRole == "Customer"))
-                {
-                    return BadRequest(ApiResponses.ServiceAlreadyReviewed);
-                }
+				var mapReview = _mapper.Map<Review>(ReviewCreate);
+				mapReview.Request = _serviceRequestRepository.GetService(RequestId);
+                await _ReviewRepository.CreateProviderReview(mapReview);
                 mapReview.ReviewerRole = "Customer";
-                 _ReviewRepository.CreateReview(mapReview);
-                var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(mapReview.Request.Id);
 
-                await _ReviewRepository.Warning(acceptedOffer?.Provider?.Id);
+
                 return Ok(new
                 {
                     statusMsg = "success",

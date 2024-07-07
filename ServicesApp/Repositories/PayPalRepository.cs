@@ -29,7 +29,9 @@ namespace ServicesApp.Repositories
 			var request = _serviceRepository.GetService(ServiceId);
 			var offer = _serviceRepository.GetAcceptedOffer(ServiceId);
 			var accessToken = await GetAccessToken();
-			var createPaymentJson = new
+			//var fees = (offer.Fees + request.Customer.Balance).ToString();
+			//var feesWithoutBalance = offer.Examination ? (200 ).ToString() : (offer.Fees ).ToString();
+            var createPaymentJson = new
 			{
 				intent = "sale",
 				payer = new

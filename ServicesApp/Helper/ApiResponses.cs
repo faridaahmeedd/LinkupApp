@@ -42,7 +42,12 @@
             statusMsg = "fail",
             message = "Invalid Email or Password."
         };
-        public static readonly object CanNotSentMail = new
+		public static readonly object EmailNotVerified = new
+		{
+			statusMsg = "fail",
+			message = "Email verification is required to login."
+		};
+		public static readonly object CanNotSentMail = new
         {
             statusMsg = "fail",
             message = "Can not send mail."
@@ -62,7 +67,17 @@
             statusMsg = "fail",
             message = "Can not Change Password."
         };
-        public static readonly object UserAlreadyExist = new
+		public static readonly object OtpVerified = new
+		{
+			statusMsg = "success",
+			message = "OTP verified successfully."
+		};
+		public static readonly object InvalidOtp = new
+		{
+			statusMsg = "fail",
+			message = "Invalid OTP."
+		};
+		public static readonly object UserAlreadyExist = new
         {
             statusMsg = "fail",
             message = "User Already Exists."
@@ -162,7 +177,12 @@
             statusMsg = "fail",
             message = "You can only add up to three time slots."
         };
-        public static readonly object FeesOutsideRange = new
+		public static readonly object ImagesExceededMax = new
+		{
+			statusMsg = "fail",
+			message = "You can only add up to five images."
+		};
+		public static readonly object FeesOutsideRange = new
         {
             statusMsg = "fail",
             message = "Offered fees is outside the category's specified range."
@@ -172,35 +192,35 @@
             statusMsg = "fail",
             message = "Not authorized to do this action."
         };
-        public static readonly object PaymentError = new
-        {
-            statusMsg = "fail",
-            message = "Error occured while paying for the service."
-        };
         public static readonly object ReviewNotFound = new
         {
             statusMsg = "fail",
             message = "Review not Found."
         };
-        public static readonly object ReportNotFound = new
+		public static readonly object InvalidRating = new
+		{
+			statusMsg = "fail",
+			message = "The rating value is out of the expected range (0-5)."
+		};
+		public static readonly object ServiceAlreadyReviewed = new
+		{
+			statusMsg = "fail",
+			message = "This service has already been reviewed."
+		};
+		public static readonly object ReportNotFound = new
         {
             statusMsg = "fail",
             message = "Report not Found."
         };
-        public static readonly object PaidAlready = new
+		public static readonly object PaymentError = new
+		{
+			statusMsg = "fail",
+			message = "Error occured while paying for the service."
+		};
+		public static readonly object PaidAlready = new
         {
             statusMsg = "fail",
             message = "This service has already been paid."
-        };
-        public static readonly object RefundedAlready = new
-        {
-            statusMsg = "fail",
-            message = "This service has already been refunded."
-        };
-        public static readonly object RefundSuccess = new
-        {
-            statusMsg = "success",
-            message = "This service has been refunded successfully."
         };
         public static readonly object CannotCapture = new
         {
@@ -217,10 +237,21 @@
             statusMsg = "fail",
             message = "This service is not completed."
         };
-        public static readonly object ServiceAlreadyReviewed = new
-        {
-            statusMsg = "fail",
-            message = "This service has already been reviewed."
-        };
-    }
+		public static readonly object NotExamination = new
+		{
+			statusMsg = "fail",
+			message = "Not an examination visit."
+		};
+
+		//public static readonly object RefundedAlready = new
+		//{
+		//	statusMsg = "fail",
+		//	message = "This service has already been refunded."
+		//};
+		//public static readonly object RefundSuccess = new
+		//{
+		//	statusMsg = "success",
+		//	message = "This service has been refunded successfully."
+		//};
+	}
 }

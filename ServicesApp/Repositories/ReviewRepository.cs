@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ServicesApp.Core.Models;
 using ServicesApp.Data;
 using ServicesApp.Interfaces;
 using ServicesApp.Models;
+using ServicesApp.Repository;
 using System.Linq;
 using System.Web.Helpers;
 
@@ -13,13 +14,14 @@ namespace ServicesApp.Repositories
 	{
 		private readonly DataContext _context;
 		private readonly IAuthRepository _authRepository;
-        private readonly UserManager<AppUser> _userManager;
+		private readonly IServiceRequestRepository _serviceRequestRepository;
+		private readonly UserManager<AppUser> _userManager;
 
-
-        public ReviewRepository(DataContext context, IAuthRepository authRepository , UserManager<AppUser> userManager)
+		public ReviewRepository(DataContext context, IAuthRepository authRepository , IServiceRequestRepository serviceRequestRepository, UserManager<AppUser> userManager)
 		{
 			_context = context;
 			_authRepository = authRepository;
+			_serviceRequestRepository = serviceRequestRepository;
 			_userManager = userManager;
 		}
 
@@ -62,7 +64,7 @@ namespace ServicesApp.Repositories
 
 		public Review GetReview(int id)
 		{
-			return _context.Reviews.Where(p => p.Id == id).FirstOrDefault();
+			return _context.Reviews.Include(p => p.Request).Where(p => p.Id == id).FirstOrDefault();
 		}
 
 		public bool ReviewExist(int id)
@@ -70,23 +72,37 @@ namespace ServicesApp.Repositories
 			return _context.Reviews.Any(p => p.Id == id);
 		}
 
-		public bool CreateReview(Review review)
+		public bool IsCustomerAlreadyReviewed(int requestId)
 		{
+			return GetReviewsOfRequest(requestId).Any(review => review.ReviewerRole == "Customer");
+		}
+
+		public bool IsProviderAlreadyReviewed(int requestId)
+		{
+			return GetReviewsOfRequest(requestId).Any(review => review.ReviewerRole == "Provider");
+		}
+
+		public async Task<bool> CreateCustomerReview(Review review)
+		{
+			var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(review.Request.Id);
+			review.ReviewerName = acceptedOffer?.Provider?.FName + " " + acceptedOffer?.Provider?.LName;
+			review.ReviewerRole = "Provider";
 			_context.Add(review);
+			await Warning(review.Request.Customer.Id);
 			return Save();
 		}
 
-		public bool CheckRequestOfReviewCompleted(int requestId)
+		public async Task<bool> CreateProviderReview(Review review)
 		{
-            var request = _context.Requests.FirstOrDefault(r => r.Id == requestId && r.Status == "Completed");
-            if (request != null)
-            {
-				return true;
-            }
-            return false;
-        }
+			review.ReviewerName = review.Request.Customer.FName + " " + review.Request.Customer.LName;
+			review.ReviewerRole = "Customer";
+			_context.Add(review);
+			var acceptedOffer = _serviceRequestRepository.GetAcceptedOffer(review.Request.Id);
+			await Warning(acceptedOffer?.Provider?.Id);
+			return Save();
+		}
 
-        public bool Save()
+		public bool Save()
 		{
 			var saved = _context.SaveChanges();
 			return saved > 0 ? true : false;
@@ -121,7 +137,6 @@ namespace ServicesApp.Repositories
 
 		public async Task<bool> Warning(string Id)
 		{
-
             var userReviews = GetReviewsOfProvider(Id);
             AppUser appUser = await _userManager.FindByIdAsync(Id);
             if (appUser != null)
@@ -140,7 +155,7 @@ namespace ServicesApp.Repositories
 			{
 				if (avgRating < 2.5)
 				{
-					_authRepository.SendMail(appUser.Email, "Warning", "Warning");
+					_authRepository.SendWarningEmail(appUser.Email);
 					return true;
 				}
 			}
